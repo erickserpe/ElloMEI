@@ -4,24 +4,26 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.math.BigDecimal; // IMPORTAÇÃO ADICIONADA
 
-@Entity // Avisa ao JPA que esta classe representa uma tabela no banco de dados
+@Entity
 public class Conta {
 
-    @Id // Marca o campo 'id' como a chave primária da tabela
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Diz ao banco para gerar o valor do ID automaticamente
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nomeConta; // Ex: "Sicoob", "Caixa Físico"
-    private String tipo;      // Ex: "Conta Corrente", "Caixa"
-    private Double saldoInicial;
-    private Double saldoAtual;
+    private String nomeConta;
+    private String tipo;
 
-    // Construtor padrão (obrigatório para o JPA)
+    // --- CORRIGIDO AQUI ---
+    private BigDecimal saldoInicial;
+    private BigDecimal saldoAtual;
+
     public Conta() {
     }
 
-    // Getters e Setters (para acessar e modificar os atributos)
+    // Getters e Setters (também corrigidos)
     public Long getId() {
         return id;
     }
@@ -46,19 +48,23 @@ public class Conta {
         this.tipo = tipo;
     }
 
-    public Double getSaldoInicial() {
+    // --- CORRIGIDO AQUI ---
+    public BigDecimal getSaldoInicial() {
         return saldoInicial;
     }
 
-    public void setSaldoInicial(Double saldoInicial) {
+    // --- CORRIGIDO AQUI ---
+    public void setSaldoInicial(BigDecimal saldoInicial) {
         this.saldoInicial = saldoInicial;
     }
 
-    public Double getSaldoAtual() {
+    // --- CORRIGIDO AQUI ---
+    public BigDecimal getSaldoAtual() {
         return saldoAtual;
     }
 
-    public void setSaldoAtual(Double saldoAtual) {
+    // --- CORRIGIDO AQUI ---
+    public void setSaldoAtual(BigDecimal saldoAtual) {
         this.saldoAtual = saldoAtual;
     }
 }

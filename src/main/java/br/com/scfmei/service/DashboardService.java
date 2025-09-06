@@ -25,7 +25,7 @@ public class DashboardService {
         List<Conta> contas = contaRepository.findAll();
         return contas.stream()
                 .map(Conta::getSaldoAtual) // Pega o saldo atual de cada conta
-                .reduce(BigDecimal.ZERO, BigDecimal::add); // Soma todos os saldos, começando do zero
+                .reduce(BigDecimal.ZERO, BigDecimal::add ); // Soma todos os saldos, começando do zero
     }
 
     public BigDecimal getTotalEntradasMesAtual() {
