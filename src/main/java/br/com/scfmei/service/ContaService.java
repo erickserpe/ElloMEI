@@ -46,4 +46,12 @@ public class ContaService {
     public Optional<Conta> buscarPorId(Long id) {
         return contaRepository.findById(id); // O JpaRepository já nos dá este método!
     }
+    /**
+     * Exclui uma conta do banco de dados pelo seu ID.
+     * @param id O ID da conta a ser excluída.
+     */
+    @Transactional
+    public void excluirPorId(Long id) {
+        contaRepository.deleteById(id); // O JpaRepository também nos dá este método!
+    }
 }

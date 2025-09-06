@@ -67,4 +67,11 @@ public class ContaController {
         }
     }
 
+    // MÉTODO PARA EXCLUIR UMA CONTA
+    @GetMapping("/excluir/{id}")
+    public String excluirConta(@PathVariable Long id) {
+        contaService.excluirPorId(id); // Chama o serviço para apagar a conta
+        return "redirect:/contas";     // Redireciona de volta para a lista atualizada
+    }
+
 }
