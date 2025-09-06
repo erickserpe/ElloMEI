@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - SCF MEI</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}"/>
+</head>
+<body>
+<div class="container mt-4">
+    <h1 class="mb-4">Painel de Controle</h1>
+
+    <div class="mb-4">
+        <a th:href="@{/lancamentos}" class="btn btn-primary">Lançamentos</a>
+        <a th:href="@{/contas}" class="btn btn-secondary">Contas</a>
+        <a th:href="@{/categorias}" class="btn btn-secondary">Categorias</a>
+        <a th:href="@{/pessoas}" class="btn btn-secondary">Pessoas</a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">SALDO TOTAL</div>
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${'R$ ' + #numbers.formatDecimal(saldoTotal, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">ENTRADAS NO MÊS</div>
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${'R$ ' + #numbers.formatDecimal(totalEntradas, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-dark bg-warning mb-3">
+                <div class="card-header">SAÍDAS NO MÊS</div>
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${'R$ ' + #numbers.formatDecimal(totalSaidas, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
