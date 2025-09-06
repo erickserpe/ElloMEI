@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulário de Pessoa</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}"/>
+</head>
+<body>
+
+<div class="container mt-4">
+    <h1>Cadastro de Pessoa</h1>
+
+    <form th:action="@{/pessoas}" method="post" th:object="${pessoa}">
+        <input type="hidden" th:field="*{id}" />
+
+        <div class="mb-3">
+            <label for="nome" class="form-label">Nome da Pessoa</label>
+            <input type="text" class="form-control" id="nome" th:field="*{nome}" placeholder="Ex: João da Silva">
+        </div>
+
+        <button type="submit" class="btn btn-success">Salvar</button>
+        <a th:href="@{/pessoas}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+
+</body>
+</html>

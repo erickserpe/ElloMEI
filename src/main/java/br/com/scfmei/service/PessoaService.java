@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PessoaService {
@@ -21,7 +22,18 @@ public class PessoaService {
 
     @Transactional
     public Pessoa salvar(Pessoa pessoa) {
-        // Por enquanto, não temos regras de negócio complexas para salvar uma pessoa
         return pessoaRepository.save(pessoa);
+    }
+
+    // --- MÉTODO NOVO ---
+    @Transactional(readOnly = true)
+    public Optional<Pessoa> buscarPorId(Long id) {
+        return pessoaRepository.findById(id);
+    }
+
+    // --- MÉTODO NOVO ---
+    @Transactional
+    public void excluirPorId(Long id) {
+        pessoaRepository.deleteById(id);
     }
 }
