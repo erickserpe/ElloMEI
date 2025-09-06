@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulário de Lançamento</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}"/>
+</head>
+<body>
+
+<div class="container mt-4">
+    <h1>Novo Lançamento</h1>
+
+    <form th:action="@{/lancamentos}" method="post" th:object="${lancamento}">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="descricao" class="form-label">Descrição</label>
+                <input type="text" class="form-control" id="descricao" th:field="*{descricao}" required>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label for="data" class="form-label">Data</label>
+                <input type="date" class="form-control" id="data" th:field="*{data}" required>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label for="valor" class="form-label">Valor</label>
+                <input type="number" step="0.01" class="form-control" id="valor" th:field="*{valor}" required>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <label for="tipo" class="form-label">Tipo</label>
+                <select class="form-select" id="tipo" th:field="*{tipo}" required>
+                    <option th:each="tipoOpt : ${T(br.com.scfmei.domain.TipoLancamento).values()}"
+                            th:value="${tipoOpt}" th:text="${tipoOpt}"></option>
+                </select>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label for="conta" class="form-label">Conta</label>
+                <select class="form-select" id="conta" th:field="*{conta}" required>
+                    <option th:each="c : ${listaDeContas}" th:value="${c.id}" th:text="${c.nomeConta}"></option>
+                </select>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label for="categoria" class="form-label">Categoria</label>
+                <select class="form-select" id="categoria" th:field="*{categoriaDespesa}">
+                    <option value="">Nenhuma</option> <option th:each="cat : ${listaDeCategorias}" th:value="${cat.id}" th:text="${cat.nome}"></option>
+                </select>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label for="pessoa" class="form-label">Pessoa</label>
+                <select class="form-select" id="pessoa" th:field="*{pessoa}">
+                    <option value="">Nenhuma</option> <option th:each="p : ${listaDePessoas}" th:value="${p.id}" th:text="${p.nome}"></option>
+                </select>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">Salvar</button>
+        <a th:href="@{/lancamentos}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+
+</body>
+</html>
