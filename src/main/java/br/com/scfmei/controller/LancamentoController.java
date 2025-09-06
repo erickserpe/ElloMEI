@@ -51,6 +51,32 @@ public class LancamentoController {
         lancamentoService.salvar(lancamento);
         return "redirect:/lancamentos";
     }
+
+    // MÉTODO PARA MOSTRAR O FORMULÁRIO DE EDIÇÃO PREENCHIDO
+    @GetMapping("/editar/{id}")
+    public String mostrarFormularioDeEdicao(@PathVariable Long id, Model model) {
+        // Carrega as listas para os dropdowns, assim como no formulário de "novo"
+        model.addAttribute("listaDeContas", contaService.buscarTodas());
+        model.addAttribute("listaDeCategorias", categoriaService.buscarTodas());
+        model.addAttribute("listaDePessoas", pessoaService.buscarTodas());
+
+        // Busca o lançamento específico que queremos editar
+        Optional<Lancamento> lancamentoOpt = lancamentoService.buscarPorId(id);
+        if (lancamentoOpt.isPresent()) {
+            model.addAttribute("lancamento", lancamentoOpt.get());
+        } else {
+            return "redirect:/lancamentos"; // Se não achar, volta para a lista
+        }
+
+        return "form-lancamento"; // Reutiliza a mesma view do formulário
+    }
+
+    // MÉTODO PARA EXCLUIR UM LANÇAMENTO
+    @GetMapping("/excluir/{id}")
+    public String excluirLancamento(@PathVariable Long id) {
+        lancamentoService.excluirPorId(id);
+        return "redirect:/lancamentos";
+    }
     // Adicione estas injeções
     @Autowired
     private ContaService contaService;

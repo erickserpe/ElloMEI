@@ -5,6 +5,7 @@ import br.com.scfmei.repository.LancamentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.Optional;
 
 import java.util.List;
 
@@ -24,5 +25,16 @@ public class LancamentoService {
         return lancamentoRepository.save(lancamento);
     }
 
-    // Futuramente, adicionaremos os outros métodos aqui (buscarPorId, excluirPorId)
+
+// ... dentro da classe LancamentoService ...
+
+    @Transactional(readOnly = true)
+    public Optional<Lancamento> buscarPorId(Long id) {
+        return lancamentoRepository.findById(id);
+    }
+
+    @Transactional
+    public void excluirPorId(Long id) {
+        lancamentoRepository.deleteById(id);
+    }
 }
