@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Lista de Contas</title>
-
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}"/>
-
 </head>
 <body>
 
-<div class="container mt-4"> <h1 class="mb-3">Minhas Contas</h1>
+<div class="container mt-4">
+    <h1 class="mb-3">Minhas Contas</h1>
+
+    <a th:href="@{/contas/novo}" class="btn btn-primary mb-3">Nova Conta</a>
 
     <table class="table table-striped table-hover table-bordered">
         <thead class="table-dark">
@@ -18,7 +19,7 @@
             <th>Nome da Conta</th>
             <th>Tipo</th>
             <th>Saldo Atual</th>
-        </tr>
+            <th>Ações</th> </tr>
         </thead>
         <tbody>
         <tr th:each="conta : ${listaDeContas}">
@@ -26,6 +27,10 @@
             <td th:text="${conta.nomeConta}">Conta Corrente Teste</td>
             <td th:text="${conta.tipo}">Tipo Teste</td>
             <td th:text="${'R$ ' + #numbers.formatDecimal(conta.saldoAtual, 1, 'POINT', 2, 'COMMA')}">R$ 100,00</td>
+
+            <td>
+                <a th:href="@{/contas/editar/{id}(id=${conta.id})}" class="btn btn-warning btn-sm">Editar</a>
+            </td>
         </tr>
         </tbody>
     </table>

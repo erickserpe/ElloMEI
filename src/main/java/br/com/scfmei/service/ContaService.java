@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service // "Carimbo" que identifica esta classe como um Serviço gerenciado pelo Spring
 public class ContaService {
@@ -35,5 +36,14 @@ public class ContaService {
             conta.setSaldoAtual(conta.getSaldoInicial());
         }
         return contaRepository.save(conta);
+    }
+    /**
+     * Busca uma única conta pelo seu ID.
+     * @param id O ID da conta a ser buscada.
+     * @return Um Optional contendo a conta se encontrada, ou vazio se não.
+     */
+    @Transactional(readOnly = true)
+    public Optional<Conta> buscarPorId(Long id) {
+        return contaRepository.findById(id); // O JpaRepository já nos dá este método!
     }
 }
