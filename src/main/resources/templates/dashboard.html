@@ -1,22 +1,12 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout-base(~{::title}, ~{::div})}">
 <head>
-    <meta charset="UTF-8">
     <title>Dashboard - SCF MEI</title>
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}"/>
 </head>
 <body>
-<div th:replace="~{menu :: menu-principal}"></div>
-<div class="container mt-4">
+<div>
     <h1 class="mb-4">Painel de Controle</h1>
-
-    <div class="mb-4">
-        <a th:href="@{/lancamentos}" class="btn btn-primary">Lançamentos</a>
-        <a th:href="@{/contas}" class="btn btn-secondary">Contas</a>
-        <a th:href="@{/categorias}" class="btn btn-secondary">Categorias</a>
-        <a th:href="@{/pessoas}" class="btn btn-secondary">Pessoas</a>
-    </div>
-
 
     <div class="row">
         <div class="col-md-4">
@@ -44,7 +34,6 @@
             </div>
         </div>
     </div>
-
 </div>
 </body>
 </html>

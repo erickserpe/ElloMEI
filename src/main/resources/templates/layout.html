@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" th:fragment="layout-base (title, content)">
+<head>
+    <meta charset="UTF-8">
+    <title th:replace="${title}">SCF-MEI</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}"/>
+</head>
+<style>
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh; /* Altura mínima de 100% da altura da tela */
+    }
+    main {
+        flex-grow: 1; /* Faz o conteúdo principal crescer e empurrar o rodapé para baixo */
+    }
+</style>
+<body>
+
+<header th:replace="~{menu :: menu-principal}"></header>
+
+<main class="container">
+    <div th:replace="${content}">
+    </div>
+</main>
+
+<footer class="container mt-5 text-muted text-center">
+    <hr>
+    <p>&copy; 2025 SCF-MEI. Todos os direitos reservados.</p>
+</footer>
+
+</body>
+</html>

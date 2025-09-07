@@ -1,13 +1,11 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout-base(~{::title}, ~{::div})}">
 <head>
-    <meta charset="UTF-8">
     <title>Lançamentos Financeiros</title>
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}"/>
 </head>
 <body>
-<div th:replace="~{menu :: menu-principal}"></div>
-<div class="container mt-4">
+<div>
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1>Lançamentos</h1>
         <a th:href="@{/lancamentos/novo}" class="btn btn-primary">Novo Lançamento</a>
@@ -27,14 +25,12 @@
         </thead>
         <tbody>
         <tr th:each="lancamento : ${listaDeLancamentos}">
-            <td th:text="${#temporals.format(lancamento.data, 'dd/MM/yyyy')}">01/01/2025</td>
-            <td th:text="${lancamento.descricao}">Compra de Mercadoria</td>
-            <td th:text="${lancamento.conta.nomeConta}">Sicoob</td>
-
-            <td th:text="${lancamento.categoriaDespesa != null ? lancamento.categoriaDespesa.nome : '-'}">Fornecedores</td>
-
-            <td th:text="${lancamento.tipo}">SAIDA</td>
-            <td th:text="${'R$ ' + #numbers.formatDecimal(lancamento.valor, 1, 'POINT', 2, 'COMMA')}">R$ 150,00</td>
+            <td th:text="${#temporals.format(lancamento.data, 'dd/MM/yyyy')}"></td>
+            <td th:text="${lancamento.descricao}"></td>
+            <td th:text="${lancamento.conta.nomeConta}"></td>
+            <td th:text="${lancamento.categoriaDespesa != null ? lancamento.categoriaDespesa.nome : '-'}"></td>
+            <td th:text="${lancamento.tipo}"></td>
+            <td th:text="${'R$ ' + #numbers.formatDecimal(lancamento.valor, 1, 'POINT', 2, 'COMMA')}"></td>
             <td>
                 <a th:href="@{/lancamentos/editar/{id}(id=${lancamento.id})}" class="btn btn-warning btn-sm">Editar</a>
                 <a th:href="@{/lancamentos/excluir/{id}(id=${lancamento.id})}" class="btn btn-danger btn-sm">Excluir</a>

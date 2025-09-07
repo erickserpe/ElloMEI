@@ -1,16 +1,14 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout-base(~{::title}, ~{::div})}">
 <head>
-    <meta charset="UTF-8">
     <title>Formulário de Conta</title>
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}"/>
 </head>
 <body>
-
-<div class="container mt-4">
+<div>
     <h1>Cadastro de Conta</h1>
-
     <form th:action="@{/contas}" method="post" th:object="${conta}">
+        <input type="hidden" th:field="*{id}" />
         <div class="mb-3">
             <label for="nomeConta" class="form-label">Nome da Conta</label>
             <input type="text" class="form-control" id="nomeConta" th:field="*{nomeConta}" placeholder="Ex: Sicoob, Caixa Físico">
@@ -23,19 +21,9 @@
             <label for="saldoInicial" class="form-label">Saldo Inicial</label>
             <input type="number" step="0.01" class="form-control" id="saldoInicial" th:field="*{saldoInicial}">
         </div>
-
         <button type="submit" class="btn btn-success">Salvar</button>
         <a th:href="@{/contas}" class="btn btn-secondary">Cancelar</a>
     </form>
-    <form th:action="@{/contas}" method="post" th:object="${conta}">
-        <input type="hidden" th:field="*{id}" />
-
-        <div class="mb-3">
-            <label for="nomeConta" class="form-label">Nome da Conta</label>
-            <input type="text" class="form-control" id="nomeConta" th:field="*{nomeConta}" placeholder="Ex: Sicoob, Caixa Físico">
-        </div>
-    </form>
 </div>
-
 </body>
 </html>
