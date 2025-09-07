@@ -84,7 +84,11 @@ public class LancamentoService {
         }
         contaService.salvar(conta);
     }
-    public List<Lancamento> buscarPorMesEAno(int ano, int mes) {
-        return lancamentoRepository.findByAnoAndMes(ano, mes);
+//    public List<Lancamento> buscarPorMesEAno(int ano, int mes) {
+//        return lancamentoRepository.findByAnoAndMes(ano, mes);
+//    }
+
+    public List<Lancamento> buscarPorPeriodo(LocalDate dataInicio, LocalDate dataFim) {
+        return lancamentoRepository.findByDataBetweenOrderByDataDesc(dataInicio, dataFim);
     }
 }

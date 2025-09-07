@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestParam;
+import java.time.LocalDate;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,15 +38,14 @@ public class LancamentoController {
     // --- MÉTODOS DO CONTROLLER ---
 
     @GetMapping
-    public String listarLancamentos(@RequestParam(required = false) Integer ano,
-                                    @RequestParam(required = false) Integer mes,
+    public String listarLancamentos(@RequestParam(required = false) LocalDate dataInicio,
+                                    @RequestParam(required = false) LocalDate dataFim,
                                     Model model) {
-
         List<Lancamento> lancamentos;
 
-        // Se o ano e o mês foram enviados na URL, filtra a busca
-        if (ano != null && mes != null) {
-            lancamentos = lancamentoService.buscarPorMesEAno(ano, mes);
+        // Se as duas datas foram informadas, filtra a busca por período
+        if (dataInicio != null && dataFim != null) {
+            lancamentos = lancamentoService.buscarPorPeriodo(dataInicio, dataFim);
         } else {
             // Se não, busca todos os lançamentos
             lancamentos = lancamentoService.buscarTodos();

@@ -33,7 +33,9 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
     );
     // ... dentro da interface LancamentoRepository ...
 
-    @Query("SELECT l FROM Lancamento l WHERE YEAR(l.data) = :ano AND MONTH(l.data) = :mes ORDER BY l.data DESC")
-    List<Lancamento> findByAnoAndMes(@Param("ano") int ano, @Param("mes") int mes);
+//    @Query("SELECT l FROM Lancamento l WHERE YEAR(l.data) = :ano AND MONTH(l.data) = :mes ORDER BY l.data DESC")
+//    List<Lancamento> findByAnoAndMes(@Param("ano") int ano, @Param("mes") int mes);
 
+    // O Spring Data JPA cria a consulta automaticamente a partir do nome do método!
+    List<Lancamento> findByDataBetweenOrderByDataDesc(LocalDate dataInicio, LocalDate dataFim);
 }
