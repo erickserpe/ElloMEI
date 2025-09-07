@@ -1,8 +1,12 @@
 package br.com.scfmei.domain;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Entity
 public class Lancamento {
@@ -11,13 +15,22 @@ public class Lancamento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Descrição é obrigatória.")
+    @Size(min = 3, max = 100, message = "Descrição deve ter entre 3 e 100 caracteres.")
     private String descricao;
+
+    @NotNull(message = "Valor é obrigatório.")
+    @Positive(message = "Valor deve ser positivo.")
     private BigDecimal valor;
+
+    @NotNull(message = "Data é obrigatória.")
     private LocalDate data;
 
+    @NotNull(message = "Tipo é obrigatório.")
     @Enumerated(EnumType.STRING)
     private TipoLancamento tipo;
 
+    @NotNull(message = "Conta é obrigatória.")
     @ManyToOne
     @JoinColumn(name = "conta_id")
     private Conta conta;
@@ -29,6 +42,7 @@ public class Lancamento {
     @ManyToOne
     @JoinColumn(name = "pessoa_id")
     private Pessoa pessoa;
+
 
     // Getters e Setters
     public Long getId() { return id; }
