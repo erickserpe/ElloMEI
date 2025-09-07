@@ -1,6 +1,8 @@
 package br.com.scfmei.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 public class Pessoa {
@@ -9,7 +11,10 @@ public class Pessoa {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Nome da pessoa é obrigatório.")
+    @Size(min = 3, message = "Nome deve ter no mínimo 3 caracteres.")
     private String nome;
+
 
     // Construtor
     public Pessoa() {

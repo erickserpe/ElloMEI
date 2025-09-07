@@ -4,7 +4,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.math.BigDecimal; // IMPORTAÇÃO ADICIONADA
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
 @Entity
 public class Conta {
@@ -13,17 +15,22 @@ public class Conta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Nome da conta é obrigatório.")
     private String nomeConta;
+
+    @NotBlank(message = "Tipo da conta é obrigatório.")
     private String tipo;
 
-    // --- CORRIGIDO AQUI ---
+    @NotNull(message = "Saldo inicial é obrigatório.")
     private BigDecimal saldoInicial;
+
     private BigDecimal saldoAtual;
 
+    // Construtor
     public Conta() {
     }
 
-    // Getters e Setters (também corrigidos)
+    // Getters e Setters
     public Long getId() {
         return id;
     }
@@ -48,22 +55,18 @@ public class Conta {
         this.tipo = tipo;
     }
 
-    // --- CORRIGIDO AQUI ---
     public BigDecimal getSaldoInicial() {
         return saldoInicial;
     }
 
-    // --- CORRIGIDO AQUI ---
     public void setSaldoInicial(BigDecimal saldoInicial) {
         this.saldoInicial = saldoInicial;
     }
 
-    // --- CORRIGIDO AQUI ---
     public BigDecimal getSaldoAtual() {
         return saldoAtual;
     }
 
-    // --- CORRIGIDO AQUI ---
     public void setSaldoAtual(BigDecimal saldoAtual) {
         this.saldoAtual = saldoAtual;
     }

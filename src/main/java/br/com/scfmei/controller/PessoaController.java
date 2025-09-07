@@ -2,9 +2,11 @@ package br.com.scfmei.controller;
 
 import br.com.scfmei.domain.Pessoa;
 import br.com.scfmei.service.PessoaService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,12 +32,6 @@ public class PessoaController {
         return "form-pessoa";
     }
 
-    @PostMapping
-    public String salvarPessoa(@ModelAttribute Pessoa pessoa) {
-        pessoaService.salvar(pessoa);
-        return "redirect:/pessoas";
-    }
-
     @GetMapping("/editar/{id}")
     public String mostrarFormularioDeEdicao(@PathVariable Long id, Model model) {
         Optional<Pessoa> pessoaOpt = pessoaService.buscarPorId(id);
@@ -43,6 +39,16 @@ public class PessoaController {
             model.addAttribute("pessoa", pessoaOpt.get());
             return "form-pessoa";
         }
+        return "redirect:/pessoas";
+    }
+
+    // --- ESTE É O ÚNICO MÉTODO @PostMapping QUE DEVEMOS TER ---
+    @PostMapping
+    public String salvarPessoa(@Valid @ModelAttribute("pessoa") Pessoa pessoa, BindingResult result) {
+        if (result.hasErrors()) {
+            return "form-pessoa";
+        }
+        pessoaService.salvar(pessoa);
         return "redirect:/pessoas";
     }
 

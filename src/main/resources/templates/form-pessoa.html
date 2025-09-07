@@ -17,6 +17,7 @@
         <div class="mb-3">
             <label for="nome" class="form-label">Nome da Pessoa</label>
             <input type="text" class="form-control" id="nome" th:field="*{nome}" placeholder="Ex: João da Silva">
+            <div class="text-danger" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></div>
         </div>
 
         <button type="submit" class="btn btn-success">Salvar</button>

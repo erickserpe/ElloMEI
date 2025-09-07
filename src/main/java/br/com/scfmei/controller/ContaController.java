@@ -2,9 +2,11 @@ package br.com.scfmei.controller;
 
 import br.com.scfmei.domain.Conta;
 import br.com.scfmei.service.ContaService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -43,11 +45,14 @@ public class ContaController {
     }
 
     // MÉTODO PARA RECEBER OS DADOS DO FORMULÁRIO E SALVAR
+    // MÉTODO SALVAR ATUALIZADO
     @PostMapping
-    public String salvarConta(@ModelAttribute Conta conta) {
-        // O Spring preenche o objeto "conta" com os dados do formulário
-        contaService.salvar(conta); // Usa o serviço para salvar a conta no banco
-        return "redirect:/contas"; // Redireciona o usuário de volta para a página de listagem
+    public String salvarConta(@Valid @ModelAttribute("conta") Conta conta, BindingResult result) {
+        if (result.hasErrors()) {
+            return "form-conta"; // Se tiver erro, volta para o formulário
+        }
+        contaService.salvar(conta);
+        return "redirect:/contas";
     }
 
     // MÉTODO PARA MOSTRAR O FORMULÁRIO PREENCHIDO PARA EDIÇÃO
