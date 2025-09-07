@@ -43,6 +43,9 @@ public class Lancamento {
     @JoinColumn(name = "pessoa_id")
     private Pessoa pessoa;
 
+    private String comprovantePath; // Guardará o nome do arquivo, ex: "nota-fiscal-01.pdf"
+
+
 
     // Getters e Setters
     public Long getId() { return id; }
@@ -61,4 +64,10 @@ public class Lancamento {
     public void setCategoriaDespesa(CategoriaDespesa categoriaDespesa) { this.categoriaDespesa = categoriaDespesa; }
     public Pessoa getPessoa() { return pessoa; }
     public void setPessoa(Pessoa pessoa) { this.pessoa = pessoa; }
+    public String getComprovantePath() {
+        return comprovantePath;
+    }
+    public void setComprovantePath(String comprovantePath) {
+        this.comprovantePath = comprovantePath;
+    }
 }

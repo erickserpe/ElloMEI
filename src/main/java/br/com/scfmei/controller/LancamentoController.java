@@ -16,6 +16,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.time.LocalDate;
+import br.com.scfmei.service.FileStorageService;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +35,8 @@ public class LancamentoController {
     private CategoriaDespesaService categoriaService;
     @Autowired
     private PessoaService pessoaService;
+    @Autowired
+    private FileStorageService fileStorageService; // ADICIONE ESTA LINHA
 
 
     // --- MÉTODOS DO CONTROLLER ---
@@ -81,13 +85,29 @@ public class LancamentoController {
 
     // --- MÉTODO SALVAR ÚNICO E CORRETO, COM VALIDAÇÃO ---
     @PostMapping
-    public String salvarLancamento(@Valid @ModelAttribute("lancamento") Lancamento lancamento, BindingResult result, Model model) {
+    public String salvarLancamento(@Valid @ModelAttribute("lancamento") Lancamento lancamento,
+                                   BindingResult result,
+                                   @RequestParam("comprovanteFile") MultipartFile comprovanteFile,
+                                   Model model) {
         if (result.hasErrors()) {
-            // Se houver erros, recarregamos as listas para os dropdowns e voltamos ao formulário
+            // ... (código para lidar com erros de validação continua o mesmo)
             model.addAttribute("listaDeContas", contaService.buscarTodas());
             model.addAttribute("listaDeCategorias", categoriaService.buscarTodas());
             model.addAttribute("listaDePessoas", pessoaService.buscarTodas());
             return "form-lancamento";
+        }
+
+        // --- LÓGICA DE UPLOAD CORRIGIDA ---
+
+        // Se um novo arquivo foi enviado, salva-o
+        if (!comprovanteFile.isEmpty()) {
+            String fileName = fileStorageService.storeFile(comprovanteFile);
+            lancamento.setComprovantePath(fileName);
+        } else if (lancamento.getId() != null) {
+            // Se NENHUM novo arquivo foi enviado E estamos EDITANDO um lançamento existente...
+            // ...buscamos o caminho do arquivo antigo no banco e o mantemos.
+            lancamentoService.buscarPorId(lancamento.getId())
+                    .ifPresent(lancamentoExistente -> lancamento.setComprovantePath(lancamentoExistente.getComprovantePath()));
         }
 
         lancamentoService.salvar(lancamento);
