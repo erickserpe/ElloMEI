@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,9 +38,14 @@ public class CategoriaDespesaController {
         return "form-categoria";
     }
 
-    // --- CREATE/UPDATE (Salvar) ---
+    // MÉTODO SALVAR ATUALIZADO COM VALIDAÇÃO
     @PostMapping
-    public String salvarCategoria(@ModelAttribute CategoriaDespesa categoria) {
+    public String salvarCategoria(@Valid @ModelAttribute("categoria") CategoriaDespesa categoria, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            // Se houver erros, retorna para a mesma página do formulário para mostrá-los
+            return "form-categoria";
+        }
+
         categoriaService.salvar(categoria);
         return "redirect:/categorias";
     }

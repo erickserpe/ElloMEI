@@ -34,6 +34,59 @@
             </div>
         </div>
     </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Despesas por Categoria (Mês Atual)</h5>
+                    <canvas id="despesasPorCategoriaChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script th:src="@{/webjars/chartjs/4.4.3/dist/chart.umd.js}"></script>
+    <script>
+        // Executa o script depois que a página carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. Busca os dados no nosso endpoint da API
+            fetch('/api/dashboard/despesas-por-categoria')
+                .then(response => response.json())
+                .then(data => {
+                    // 2. Prepara os dados para o formato que o Chart.js entende
+                    const labels = data.map(item => item.label);
+                    const values = data.map(item => item.value);
+
+                    // 3. Pega o elemento <canvas> do HTML
+                    const ctx = document.getElementById('despesasPorCategoriaChart');
+
+                    // 4. Cria o novo gráfico
+                    new Chart(ctx, {
+                        type: 'doughnut', // Tipo do gráfico (pizza/rosca)
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Total Gasto',
+                                data: values,
+                                backgroundColor: [ // Cores para cada fatia
+                                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                }
+                            }
+                        }
+                    });
+                });
+        });
+    </script>
 </div>
 </body>
 </html>

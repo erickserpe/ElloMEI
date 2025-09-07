@@ -1,5 +1,6 @@
 package br.com.scfmei.service;
 
+import br.com.scfmei.domain.ChartData;
 import br.com.scfmei.domain.Conta;
 import br.com.scfmei.domain.TipoLancamento;
 import br.com.scfmei.repository.ContaRepository;
@@ -42,5 +43,11 @@ public class DashboardService {
         LocalDate fimDoMes = mesAtual.atEndOfMonth();
         BigDecimal total = lancamentoRepository.calcularTotalPorTipoEPeriodo(TipoLancamento.SAIDA, inicioDoMes, fimDoMes);
         return total != null ? total : BigDecimal.ZERO;
+    }
+    public List<ChartData> getDespesasPorCategoriaMesAtual() {
+        YearMonth mesAtual = YearMonth.now();
+        LocalDate inicioDoMes = mesAtual.atDay(1);
+        LocalDate fimDoMes = mesAtual.atEndOfMonth();
+        return lancamentoRepository.findDespesasPorCategoriaNoPeriodo(inicioDoMes, fimDoMes);
     }
 }
