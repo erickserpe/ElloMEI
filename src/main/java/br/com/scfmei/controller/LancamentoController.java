@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,8 +37,20 @@ public class LancamentoController {
     // --- MÉTODOS DO CONTROLLER ---
 
     @GetMapping
-    public String listarLancamentos(Model model) {
-        List<Lancamento> lancamentos = lancamentoService.buscarTodos();
+    public String listarLancamentos(@RequestParam(required = false) Integer ano,
+                                    @RequestParam(required = false) Integer mes,
+                                    Model model) {
+
+        List<Lancamento> lancamentos;
+
+        // Se o ano e o mês foram enviados na URL, filtra a busca
+        if (ano != null && mes != null) {
+            lancamentos = lancamentoService.buscarPorMesEAno(ano, mes);
+        } else {
+            // Se não, busca todos os lançamentos
+            lancamentos = lancamentoService.buscarTodos();
+        }
+
         model.addAttribute("listaDeLancamentos", lancamentos);
         return "lancamentos";
     }

@@ -31,5 +31,9 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
             @Param("inicioDoMes") LocalDate inicioDoMes,
             @Param("fimDoMes") LocalDate fimDoMes
     );
+    // ... dentro da interface LancamentoRepository ...
+
+    @Query("SELECT l FROM Lancamento l WHERE YEAR(l.data) = :ano AND MONTH(l.data) = :mes ORDER BY l.data DESC")
+    List<Lancamento> findByAnoAndMes(@Param("ano") int ano, @Param("mes") int mes);
 
 }

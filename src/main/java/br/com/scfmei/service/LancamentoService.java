@@ -84,4 +84,7 @@ public class LancamentoService {
         }
         contaService.salvar(conta);
     }
+    public List<Lancamento> buscarPorMesEAno(int ano, int mes) {
+        return lancamentoRepository.findByAnoAndMes(ano, mes);
+    }
 }

@@ -8,6 +8,30 @@
 <div>
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1>Lançamentos</h1>
+        <form th:action="@{/lancamentos}" method="get" class="row g-3 align-items-center mb-4">
+            <div class="col-auto">
+                <select name="mes" class="form-select">
+                    <option value="1">Janeiro</option>
+                    <option value="2">Fevereiro</option>
+                    <option value="3">Março</option>
+                    <option value="4">Abril</option>
+                    <option value="5">Maio</option>
+                    <option value="6">Junho</option>
+                    <option value="7">Julho</option>
+                    <option value="8">Agosto</option>
+                    <option value="9">Setembro</option>
+                    <option value="10">Outubro</option>
+                    <option value="11">Novembro</option>
+                    <option value="12">Dezembro</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <input type="number" name="ano" class="form-control" placeholder="Ano" th:value="${#dates.year(#dates.createNow())}">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-secondary">Filtrar</button>
+            </div>
+        </form>
         <a th:href="@{/lancamentos/novo}" class="btn btn-primary">Novo Lançamento</a>
     </div>
 
