@@ -1,55 +1,41 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout-base(~{::title}, ~{::#login-content})}">
 <head>
-    <meta charset="UTF-8">
     <title>Login - SCF MEI</title>
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}"/>
-    <style>
-        html, body {
-            height: 100%;
-        }
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #f5f5f5;
-        }
-        .form-signin {
-            width: 100%;
-            max-width: 330px;
-            padding: 15px;
-            margin: auto;
-        }
-    </style>
 </head>
-<body class="text-center">
+<body>
+<div id="login-content">
+    <div class="row justify-content-center">
+        <div class="col-md-5 col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Bem-vindo!</h2>
+                    <form th:action="@{/login}" method="post">
+                        <h3 class="h5 mb-3 fw-normal text-center">Acesse o seu sistema</h3>
 
-<main class="form-signin">
-    <form th:action="@{/login}" method="post">
-        <h1 class="h3 mb-3 fw-normal">SCF-MEI</h1>
-        <h2 class="h5 mb-3 fw-normal">Por favor, faça o login</h2>
+                        <div th:if="${param.error}" class="alert alert-danger">
+                            Usuário ou senha inválidos.
+                        </div>
+                        <div th:if="${param.logout}" class="alert alert-success">
+                            Você foi desconectado com sucesso.
+                        </div>
 
-        <div th:if="${param.error}" class="alert alert-danger">
-            Usuário ou senha inválidos.
+                        <div class="form-floating mb-2">
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Usuário" required autofocus>
+                            <label for="username">Usuário</label>
+                        </div>
+                        <div class="form-floating">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Senha" required>
+                            <label for="password">Senha</label>
+                        </div>
+
+                        <button class="w-100 btn btn-lg btn-primary mt-3" type="submit">Entrar</button>
+                    </form>
+                </div>
+            </div>
         </div>
-
-        <div th:if="${param.logout}" class="alert alert-success">
-            Você foi desconectado com sucesso.
-        </div>
-
-        <div class="form-floating mb-2">
-            <input type="text" class="form-control" id="username" name="username" placeholder="Usuário" required autofocus>
-            <label for="username">Usuário</label>
-        </div>
-        <div class="form-floating">
-            <input type="password" class="form-control" id="password" name="password" placeholder="Senha" required>
-            <label for="password">Senha</label>
-        </div>
-
-        <button class="w-100 btn btn-lg btn-primary mt-3" type="submit">Entrar</button>
-        <p class="mt-5 mb-3 text-muted">&copy; 2025</p>
-    </form>
-</main>
-
+    </div>
+</div>
 </body>
 </html>
