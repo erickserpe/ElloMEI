@@ -9,18 +9,16 @@
     <h1 class="mb-4">Painel de Controle</h1>
 
     <div class="card mb-4">
-        <div class="card-header">
-            Filtros
-        </div>
+        <div class="card-header">Filtros</div>
         <div class="card-body">
             <form th:action="@{/}" method="get" class="row g-3 align-items-center">
                 <div class="col-md-3">
                     <label for="dataInicio" class="form-label">Data de Início</label>
-                    <input type="date" id="dataInicio" name="dataInicio" class="form-control" th:value="${dataInicioSel}">
+                    <input type="date" id="dataInicio" name="dataInicio" class="form-control" th:value="${dataInicioSel != null ? #temporals.format(dataInicioSel, 'yyyy-MM-dd') : ''}">
                 </div>
                 <div class="col-md-3">
                     <label for="dataFim" class="form-label">Data Fim</label>
-                    <input type="date" id="dataFim" name="dataFim" class="form-control" th:value="${dataFimSel}">
+                    <input type="date" id="dataFim" name="dataFim" class="form-control" th:value="${dataFimSel != null ? #temporals.format(dataFimSel, 'yyyy-MM-dd') : ''}">
                 </div>
                 <div class="col-md-2">
                     <label for="contaId" class="form-label">Conta</label>
@@ -51,10 +49,83 @@
     </div>
 
     <div class="row">
-    </div>
-    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">SALDO TOTAL</div>
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${'R$ ' + #numbers.formatDecimal(saldoTotal, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">ENTRADAS NO PERÍODO</div>
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${'R$ ' + #numbers.formatDecimal(totalEntradas, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-dark bg-warning mb-3">
+                <div class="card-header">SAÍDAS NO PERÍODO</div>
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${'R$ ' + #numbers.formatDecimal(totalSaidas, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</h5>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Despesas por Categoria (Período)</h5>
+                    <canvas id="despesasPorCategoriaChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/webjars/chartjs/4.4.3/dist/chart.umd.js}"></script>
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Pega os valores dos filtros que o Thymeleaf deixou na página
+            const dataInicio = /*[[${dataInicioSel}]]*/ null;
+            const dataFim = /*[[${dataFimSel}]]*/ null;
+            const contaId = /*[[${contaIdSel}]]*/ null;
+            const pessoaId = /*[[${pessoaIdSel}]]*/ null;
+
+            // Monta a URL da API com os parâmetros de filtro
+            let apiUrl = '/api/dashboard/despesas-por-categoria?';
+            if (dataInicio) apiUrl += `dataInicio=${dataInicio}&`;
+            if (dataFim) apiUrl += `dataFim=${dataFim}&`;
+            if (contaId) apiUrl += `contaId=${contaId}&`;
+            if (pessoaId) apiUrl += `pessoaId=${pessoaId}&`;
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length === 0) return; // Se não houver dados, não desenha o gráfico
+
+                    const labels = data.map(item => item.label);
+                    const values = data.map(item => item.value);
+
+                    const ctx = document.getElementById('despesasPorCategoriaChart');
+
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Total Gasto',
+                                data: values,
+                                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40']
+                            }]
+                        }
+                    });
+                });
+        });
+    </script>
 </div>
 </body>
 </html>

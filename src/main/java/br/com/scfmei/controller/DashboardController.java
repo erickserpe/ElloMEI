@@ -32,16 +32,16 @@ public class DashboardController {
             @RequestParam(required = false) Long pessoaId,
             Model model) {
 
-        // 1. Busca os dados para preencher os dropdowns do filtro
+        // 1. Busca os dados para preencher os dropdowns do filtro (como antes)
         model.addAttribute("listaDeContas", contaService.buscarTodas());
         model.addAttribute("listaDePessoas", pessoaService.buscarTodas());
 
-        // 2. Busca os totais (futuramente, eles usarão os filtros)
-        model.addAttribute("saldoTotal", dashboardService.getSaldoTotal());
-        model.addAttribute("totalEntradas", dashboardService.getTotalEntradasMesAtual());
-        model.addAttribute("totalSaidas", dashboardService.getTotalSaidasMesAtual());
+        // 2. AGORA, PASSA OS FILTROS PARA O SERVIÇO FAZER OS CÁLCULOS
+        model.addAttribute("saldoTotal", dashboardService.getSaldoTotal(contaId));
+        model.addAttribute("totalEntradas", dashboardService.getTotalEntradas(dataInicio, dataFim, contaId, pessoaId));
+        model.addAttribute("totalSaidas", dashboardService.getTotalSaidas(dataInicio, dataFim, contaId, pessoaId));
 
-        // 3. Devolve os filtros selecionados para a view, para que eles permaneçam selecionados
+        // Devolve os filtros selecionados para a view (como antes)
         model.addAttribute("dataInicioSel", dataInicio);
         model.addAttribute("dataFimSel", dataFim);
         model.addAttribute("contaIdSel", contaId);
@@ -49,4 +49,5 @@ public class DashboardController {
 
         return "dashboard";
     }
+
 }

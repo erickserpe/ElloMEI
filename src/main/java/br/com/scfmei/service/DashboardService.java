@@ -22,32 +22,46 @@ public class DashboardService {
     @Autowired
     private LancamentoRepository lancamentoRepository;
 
-    public BigDecimal getSaldoTotal() {
-        List<Conta> contas = contaRepository.findAll();
-        return contas.stream()
-                .map(Conta::getSaldoAtual) // Pega o saldo atual de cada conta
-                .reduce(BigDecimal.ZERO, BigDecimal::add ); // Soma todos os saldos, começando do zero
+    public BigDecimal getSaldoTotal(Long contaId) {
+        // Se um ID de conta foi especificado, retorna o saldo apenas daquela conta
+        if (contaId != null) {
+            return contaRepository.findById(contaId)
+                    .map(Conta::getSaldoAtual)
+                    .orElse(BigDecimal.ZERO);
+        }
+        // Se não, soma o saldo de todas as contas
+        return contaRepository.findAll().stream()
+                .map(Conta::getSaldoAtual)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public BigDecimal getTotalEntradasMesAtual() {
-        YearMonth mesAtual = YearMonth.now();
-        LocalDate inicioDoMes = mesAtual.atDay(1);
-        LocalDate fimDoMes = mesAtual.atEndOfMonth();
-        BigDecimal total = lancamentoRepository.calcularTotalPorTipoEPeriodo(TipoLancamento.ENTRADA, inicioDoMes, fimDoMes);
+    public BigDecimal getTotalEntradas(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long pessoaId) {
+        // Se as datas não forem fornecidas, usa o mês atual como padrão
+        if (dataInicio == null || dataFim == null) {
+            YearMonth mesAtual = YearMonth.now();
+            dataInicio = mesAtual.atDay(1);
+            dataFim = mesAtual.atEndOfMonth();
+        }
+        BigDecimal total = lancamentoRepository.calcularTotalComFiltros(TipoLancamento.ENTRADA, dataInicio, dataFim, contaId, pessoaId);
         return total != null ? total : BigDecimal.ZERO;
     }
 
-    public BigDecimal getTotalSaidasMesAtual() {
-        YearMonth mesAtual = YearMonth.now();
-        LocalDate inicioDoMes = mesAtual.atDay(1);
-        LocalDate fimDoMes = mesAtual.atEndOfMonth();
-        BigDecimal total = lancamentoRepository.calcularTotalPorTipoEPeriodo(TipoLancamento.SAIDA, inicioDoMes, fimDoMes);
+    public BigDecimal getTotalSaidas(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long pessoaId) {
+        if (dataInicio == null || dataFim == null) {
+            YearMonth mesAtual = YearMonth.now();
+            dataInicio = mesAtual.atDay(1);
+            dataFim = mesAtual.atEndOfMonth();
+        }
+        BigDecimal total = lancamentoRepository.calcularTotalComFiltros(TipoLancamento.SAIDA, dataInicio, dataFim, contaId, pessoaId);
         return total != null ? total : BigDecimal.ZERO;
     }
-    public List<ChartData> getDespesasPorCategoriaMesAtual() {
-        YearMonth mesAtual = YearMonth.now();
-        LocalDate inicioDoMes = mesAtual.atDay(1);
-        LocalDate fimDoMes = mesAtual.atEndOfMonth();
-        return lancamentoRepository.findDespesasPorCategoriaNoPeriodo(inicioDoMes, fimDoMes);
+
+    public List<ChartData> getDespesasPorCategoria(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long pessoaId) {
+        if (dataInicio == null || dataFim == null) {
+            YearMonth mesAtual = YearMonth.now();
+            dataInicio = mesAtual.atDay(1);
+            dataFim = mesAtual.atEndOfMonth();
+        }
+        return lancamentoRepository.findDespesasPorCategoriaComFiltros(dataInicio, dataFim, contaId, pessoaId);
     }
 }
