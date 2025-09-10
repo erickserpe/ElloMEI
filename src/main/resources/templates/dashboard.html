@@ -8,85 +8,53 @@
 <div>
     <h1 class="mb-4">Painel de Controle</h1>
 
+    <div class="card mb-4">
+        <div class="card-header">
+            Filtros
+        </div>
+        <div class="card-body">
+            <form th:action="@{/}" method="get" class="row g-3 align-items-center">
+                <div class="col-md-3">
+                    <label for="dataInicio" class="form-label">Data de Início</label>
+                    <input type="date" id="dataInicio" name="dataInicio" class="form-control" th:value="${dataInicioSel}">
+                </div>
+                <div class="col-md-3">
+                    <label for="dataFim" class="form-label">Data Fim</label>
+                    <input type="date" id="dataFim" name="dataFim" class="form-control" th:value="${dataFimSel}">
+                </div>
+                <div class="col-md-2">
+                    <label for="contaId" class="form-label">Conta</label>
+                    <select id="contaId" name="contaId" class="form-select">
+                        <option value="">Todas</option>
+                        <option th:each="conta : ${listaDeContas}"
+                                th:value="${conta.id}"
+                                th:text="${conta.nomeConta}"
+                                th:selected="${conta.id == contaIdSel}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="pessoaId" class="form-label">Pessoa</label>
+                    <select id="pessoaId" name="pessoaId" class="form-select">
+                        <option value="">Todas</option>
+                        <option th:each="pessoa : ${listaDePessoas}"
+                                th:value="${pessoa.id}"
+                                th:text="${pessoa.nome}"
+                                th:selected="${pessoa.id == pessoaIdSel}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">Aplicar</button>
+                    <a th:href="@{/}" class="btn btn-outline-secondary">Limpar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="row">
-        <div class="col-md-4">
-            <div class="card text-white bg-success mb-3">
-                <div class="card-header">SALDO TOTAL</div>
-                <div class="card-body">
-                    <h5 class="card-title" th:text="${'R$ ' + #numbers.formatDecimal(saldoTotal, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</h5>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card text-white bg-info mb-3">
-                <div class="card-header">ENTRADAS NO MÊS</div>
-                <div class="card-body">
-                    <h5 class="card-title" th:text="${'R$ ' + #numbers.formatDecimal(totalEntradas, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</h5>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card text-dark bg-warning mb-3">
-                <div class="card-header">SAÍDAS NO MÊS</div>
-                <div class="card-body">
-                    <h5 class="card-title" th:text="${'R$ ' + #numbers.formatDecimal(totalSaidas, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</h5>
-                </div>
-            </div>
-        </div>
     </div>
-
     <div class="row mt-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Despesas por Categoria (Mês Atual)</h5>
-                    <canvas id="despesasPorCategoriaChart"></canvas>
-                </div>
-            </div>
-        </div>
     </div>
 
-
-    <script th:src="@{/webjars/chartjs/4.4.3/dist/chart.umd.js}"></script>
-    <script>
-        // Executa o script depois que a página carregar
-        document.addEventListener('DOMContentLoaded', function() {
-            // 1. Busca os dados no nosso endpoint da API
-            fetch('/api/dashboard/despesas-por-categoria')
-                .then(response => response.json())
-                .then(data => {
-                    // 2. Prepara os dados para o formato que o Chart.js entende
-                    const labels = data.map(item => item.label);
-                    const values = data.map(item => item.value);
-
-                    // 3. Pega o elemento <canvas> do HTML
-                    const ctx = document.getElementById('despesasPorCategoriaChart');
-
-                    // 4. Cria o novo gráfico
-                    new Chart(ctx, {
-                        type: 'doughnut', // Tipo do gráfico (pizza/rosca)
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                label: 'Total Gasto',
-                                data: values,
-                                backgroundColor: [ // Cores para cada fatia
-                                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
-                                ]
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            plugins: {
-                                legend: {
-                                    position: 'top',
-                                }
-                            }
-                        }
-                    });
-                });
-        });
-    </script>
 </div>
 </body>
 </html>
