@@ -92,4 +92,12 @@ public class LancamentoService {
     public List<Lancamento> buscarPorPeriodo(LocalDate dataInicio, LocalDate dataFim) {
         return lancamentoRepository.findByDataBetweenOrderByDataDesc(dataInicio, dataFim);
     }
+    public List<Lancamento> buscarComFiltros(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long pessoaId) {
+        // Lógica de busca. Por enquanto, vamos filtrar apenas por data.
+        // Futuramente, podemos tornar a consulta no repositório mais complexa para aceitar todos os filtros.
+        if (dataInicio != null && dataFim != null) {
+            return lancamentoRepository.findByDataBetweenOrderByDataDesc(dataInicio, dataFim);
+        }
+        return lancamentoRepository.findAll(); // Se não houver filtro de data, retorna todos
+    }
 }

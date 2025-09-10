@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de Lançamentos</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 10px; }
+        h1 { text-align: center; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
+        thead { background-color: #f2f2f2; }
+        .total { font-weight: bold; }
+        .entrada { color: #28a745; }
+        .saida { color: #dc3545; }
+    </style>
+</head>
+<body>
+<h1>Relatório de Lançamentos</h1>
+<p th:if="${dataInicio != null}">
+    <strong>Período de:</strong>
+    <span th:text="${#temporals.format(dataInicio, 'dd/MM/yyyy')}"></span>
+    <strong>até</strong>
+    <span th:text="${#temporals.format(dataFim, 'dd/MM/yyyy')}"></span>
+</p>
+
+<table>
+    <thead>
+    <tr>
+        <th>Data</th>
+        <th>Descrição</th>
+        <th>Conta</th>
+        <th>Categoria</th>
+        <th>Tipo</th>
+        <th>Valor</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="lancamento : ${lancamentos}">
+        <td th:text="${#temporals.format(lancamento.data, 'dd/MM/yyyy')}"></td>
+        <td th:text="${lancamento.descricao}"></td>
+        <td th:text="${lancamento.conta.nomeConta}"></td>
+        <td th:text="${lancamento.categoriaDespesa != null ? lancamento.categoriaDespesa.nome : '-'}"></td>
+        <td th:text="${lancamento.tipo}"
+            th:class="${lancamento.tipo.name() == 'ENTRADA' ? 'entrada' : 'saida'}"></td>
+        <td th:text="${#numbers.formatDecimal(lancamento.valor, 1, 'POINT', 2, 'COMMA')}"
+            th:class="${lancamento.tipo.name() == 'ENTRADA' ? 'entrada' : 'saida'}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

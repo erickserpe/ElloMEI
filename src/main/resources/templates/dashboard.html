@@ -42,7 +42,9 @@
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary me-2">Aplicar</button>
-                    <a th:href="@{/}" class="btn btn-outline-secondary">Limpar</a>
+                    <a th:href="@{/}" class="btn btn-outline-secondary me-2">Limpar</a>
+                    <a th:href="@{/relatorio/pdf(dataInicio=${dataInicioSel}, dataFim=${dataFimSel}, contaId=${contaIdSel}, pessoaId=${pessoaIdSel})}"
+                       class="btn btn-success" target="_blank">PDF</a>
                 </div>
             </form>
         </div>
