@@ -57,6 +57,9 @@ public class DashboardController {
         model.addAttribute("totalEntradas", dashboardService.getTotalEntradas(dataInicio, dataFim, contaId, pessoaId));
         model.addAttribute("totalSaidas", dashboardService.getTotalSaidas(dataInicio, dataFim, contaId, pessoaId));
 
+        model.addAttribute("faturamentoMes", dashboardService.getFaturamentoMesAtual());
+        model.addAttribute("faturamentoAno", dashboardService.getFaturamentoAnoAtual());
+
         // Devolve os filtros selecionados para a view (como antes)
         model.addAttribute("dataInicioSel", dataInicio);
         model.addAttribute("dataFimSel", dataFim);

@@ -64,4 +64,21 @@ public class DashboardService {
         }
         return lancamentoRepository.findDespesasPorCategoriaComFiltros(dataInicio, dataFim, contaId, pessoaId);
     }
+    public BigDecimal getFaturamentoMesAtual() {
+        YearMonth mesAtual = YearMonth.now();
+        LocalDate inicioDoMes = mesAtual.atDay(1);
+        LocalDate fimDoMes = mesAtual.atEndOfMonth();
+        // Usamos a consulta que já existe, mas sem filtros de conta ou pessoa
+        BigDecimal total = lancamentoRepository.calcularTotalComFiltros(TipoLancamento.ENTRADA, inicioDoMes, fimDoMes, null, null);
+        return total != null ? total : BigDecimal.ZERO;
+    }
+
+    public BigDecimal getFaturamentoAnoAtual() {
+        int anoAtual = YearMonth.now().getYear();
+        LocalDate inicioDoAno = LocalDate.of(anoAtual, 1, 1);
+        LocalDate fimDoAno = LocalDate.of(anoAtual, 12, 31);
+        // Usamos a mesma consulta, mas para o período do ano inteiro
+        BigDecimal total = lancamentoRepository.calcularTotalComFiltros(TipoLancamento.ENTRADA, inicioDoAno, fimDoAno, null, null);
+        return total != null ? total : BigDecimal.ZERO;
+    }
 }

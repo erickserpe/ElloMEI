@@ -77,6 +77,49 @@
         </div>
     </div>
 
+    <div class="row mt-2">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    Controle de Faturamento MEI (Ano: <span th:text="${#dates.year(#dates.createNow())}">2025</span>)
+                </div>
+                <div class="card-body">
+                    <div>
+                        <div class="d-flex justify-content-between">
+                            <strong>Faturamento Anual</strong>
+                            <div>
+                                <span th:text="${'R$ ' + #numbers.formatDecimal(faturamentoAno, 1, 'POINT', 2, 'COMMA')}"></span> /
+                                <span>R$ 81.000,00</span>
+                            </div>
+                        </div>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar bg-info" role="progressbar"
+                                 th:style="'width:' + (${faturamentoAno} / 81000 * 100) + '%;'"
+                                 th:text="${#numbers.formatDecimal(faturamentoAno / 81000 * 100, 1, 'POINT', 1, 'COMMA')} + '%'">
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div>
+                        <div class="d-flex justify-content-between">
+                            <strong>Faturamento Mensal (Proporcional)</strong>
+                            <div>
+                                <span th:text="${'R$ ' + #numbers.formatDecimal(faturamentoMes, 1, 'POINT', 2, 'COMMA')}"></span> /
+                                <span>R$ 6.750,00</span>
+                            </div>
+                        </div>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar bg-success" role="progressbar"
+                                 th:style="'width:' + (${faturamentoMes} / 6750 * 100) + '%;'"
+                                 th:text="${#numbers.formatDecimal(faturamentoMes / 6750 * 100, 1, 'POINT', 1, 'COMMA')} + '%'">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row mt-4">
         <div class="col-md-6">
             <div class="card">
