@@ -22,6 +22,3 @@ INSERT INTO conta(nome_conta, tipo, saldo_inicial, saldo_atual) VALUES ('Sicoob'
 
 INSERT INTO conta(nome_conta, tipo, saldo_inicial, saldo_atual) VALUES ('Sicredi', 'Conta Corrente', 0.0, 0.0);
 
--- Criando o primeiro usuário 'erick' com a senha '5522' criptografada
--- ATENÇÃO: A senha NUNCA é guardada em texto puro. Este código abaixo é a senha '5522' já criptografada.
-INSERT INTO usuario (username, password, nome_completo, roles) VALUES ('erick', '$2a$10$3g5vJ0pBCx23kDUgPBz84.w881xV43G6k54TRd5Xl7Nlp.b.v598e', 'Erick Luan', 'USER');
