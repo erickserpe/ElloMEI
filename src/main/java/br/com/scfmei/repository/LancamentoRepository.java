@@ -43,4 +43,19 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
             @Param("contaId") Long contaId,
             @Param("pessoaId") Long pessoaId
     );
+    @Query("SELECT SUM(l.valor) FROM Lancamento l " +
+            "WHERE l.tipo = 'SAIDA' AND l.comNotaFiscal = true " +
+            "AND l.data >= :dataInicio AND l.data <= :dataFim")
+    BigDecimal sumSaidasComNotaNoPeriodo(
+            @Param("dataInicio") LocalDate dataInicio,
+            @Param("dataFim") LocalDate dataFim
+    );
+    @Query("SELECT SUM(l.valor) FROM Lancamento l JOIN l.conta c " +
+            "WHERE l.tipo = 'ENTRADA' " +
+            "AND c.tipo <> 'Caixa' " + // O operador <> significa 'diferente de'
+            "AND l.data >= :dataInicio AND l.data <= :dataFim")
+    BigDecimal sumEntradasBancariasNoPeriodo(
+            @Param("dataInicio") LocalDate dataInicio,
+            @Param("dataFim") LocalDate dataFim
+    );
 }

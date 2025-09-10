@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+import java.util.Map;
+import java.util.HashMap;
+import java.time.YearMonth;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -29,5 +34,34 @@ public class DashboardRestController {
         // Chama o novo método do serviço, passando os filtros recebidos da URL
         List<ChartData> data = dashboardService.getDespesasPorCategoria(dataInicio, dataFim, contaId, pessoaId);
         return ResponseEntity.ok(data);
+    }
+    @GetMapping("/faturamento-widget")
+    public ResponseEntity<Map<String, BigDecimal>> getDadosWidgetFaturamento(@RequestParam String tipoCalculo) {
+        YearMonth mesAtual = YearMonth.now();
+        int anoAtual = mesAtual.getYear();
+
+        BigDecimal faturamentoAnual;
+        BigDecimal faturamentoMensal;
+
+        switch (tipoCalculo) {
+            case "BANCARIO":
+                faturamentoAnual = dashboardService.getFaturamentoBancario(anoAtual);
+                faturamentoMensal = dashboardService.getFaturamentoBancarioMesAtual(); // Precisamos criar este método
+                break;
+            case "ESTIMADO_CUSTOS":
+                faturamentoAnual = dashboardService.getMetaFaturamentoBaseadoEmCustos(anoAtual);
+                faturamentoMensal = dashboardService.getMetaFaturamentoBaseadoEmCustosMensal(); // E este também
+                break;
+            default: // "OFICIAL"
+                faturamentoAnual = dashboardService.getFaturamentoOficial(anoAtual);
+                faturamentoMensal = dashboardService.getFaturamentoMesAtual();
+                break;
+        }
+
+        Map<String, BigDecimal> response = new HashMap<>();
+        response.put("faturamentoAnual", faturamentoAnual);
+        response.put("faturamentoMensal", faturamentoMensal);
+
+        return ResponseEntity.ok(response);
     }
 }

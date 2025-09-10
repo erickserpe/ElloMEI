@@ -9,7 +9,9 @@
     <h1 class="mb-4">Painel de Controle</h1>
 
     <div class="card mb-4">
-        <div class="card-header">Filtros</div>
+        <div class="card-header">
+            Filtros
+        </div>
         <div class="card-body">
             <form th:action="@{/}" method="get" class="row g-3 align-items-center">
                 <div class="col-md-3">
@@ -40,7 +42,7 @@
                                 th:selected="${pessoa.id == pessoaIdSel}"></option>
                     </select>
                 </div>
-                <div class="col-md-2 d-flex align-items-end">
+                <div class="col-auto d-flex align-items-end">
                     <button type="submit" class="btn btn-primary me-2">Aplicar</button>
                     <a th:href="@{/}" class="btn btn-outline-secondary me-2">Limpar</a>
                     <a th:href="@{/relatorio/pdf(dataInicio=${dataInicioSel}, dataFim=${dataFimSel}, contaId=${contaIdSel}, pessoaId=${pessoaIdSel})}"
@@ -80,23 +82,27 @@
     <div class="row mt-2">
         <div class="col-12">
             <div class="card">
-                <div class="card-header">
-                    Controle de Faturamento MEI (Ano: <span th:text="${#dates.year(#dates.createNow())}">2025</span>)
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Controle de Faturamento MEI (Ano: <span th:text="${#dates.year(#dates.createNow())}">2025</span>)</span>
+                    <div class="col-md-4">
+                        <select id="faturamento-filter" class="form-select form-select-sm">
+                            <option value="OFICIAL" selected>Visão: Faturamento Oficial (MEI)</option>
+                            <option value="BANCARIO">Visão: Faturamento Bancário</option>
+                            <option value="ESTIMADO_CUSTOS">Visão: Meta (Baseado em Compras)</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div>
                         <div class="d-flex justify-content-between">
                             <strong>Faturamento Anual</strong>
                             <div>
-                                <span th:text="${'R$ ' + #numbers.formatDecimal(faturamentoAno, 1, 'POINT', 2, 'COMMA')}"></span> /
+                                <span id="faturamento-anual-valor">R$ 0,00</span> /
                                 <span>R$ 81.000,00</span>
                             </div>
                         </div>
                         <div class="progress" style="height: 20px;">
-                            <div class="progress-bar bg-info" role="progressbar"
-                                 th:style="'width:' + (${faturamentoAno} / 81000 * 100) + '%;'"
-                                 th:text="${#numbers.formatDecimal(faturamentoAno / 81000 * 100, 1, 'POINT', 1, 'COMMA')} + '%'">
-                            </div>
+                            <div id="faturamento-anual-barra" class="progress-bar bg-info" role="progressbar" style="width: 0%;">0%</div>
                         </div>
                     </div>
                     <hr>
@@ -104,15 +110,12 @@
                         <div class="d-flex justify-content-between">
                             <strong>Faturamento Mensal (Proporcional)</strong>
                             <div>
-                                <span th:text="${'R$ ' + #numbers.formatDecimal(faturamentoMes, 1, 'POINT', 2, 'COMMA')}"></span> /
+                                <span id="faturamento-mensal-valor">R$ 0,00</span> /
                                 <span>R$ 6.750,00</span>
                             </div>
                         </div>
                         <div class="progress" style="height: 20px;">
-                            <div class="progress-bar bg-success" role="progressbar"
-                                 th:style="'width:' + (${faturamentoMes} / 6750 * 100) + '%;'"
-                                 th:text="${#numbers.formatDecimal(faturamentoMes / 6750 * 100, 1, 'POINT', 1, 'COMMA')} + '%'">
-                            </div>
+                            <div id="faturamento-mensal-barra" class="progress-bar bg-success" role="progressbar" style="width: 0%;">0%</div>
                         </div>
                     </div>
                 </div>
@@ -133,14 +136,13 @@
 
     <script th:src="@{/webjars/chartjs/4.4.3/dist/chart.umd.js}"></script>
     <script th:inline="javascript">
+        // Script para o Gráfico de Pizza
         document.addEventListener('DOMContentLoaded', function() {
-            // Pega os valores dos filtros que o Thymeleaf deixou na página
             const dataInicio = /*[[${dataInicioSel}]]*/ null;
             const dataFim = /*[[${dataFimSel}]]*/ null;
             const contaId = /*[[${contaIdSel}]]*/ null;
             const pessoaId = /*[[${pessoaIdSel}]]*/ null;
 
-            // Monta a URL da API com os parâmetros de filtro
             let apiUrl = '/api/dashboard/despesas-por-categoria?';
             if (dataInicio) apiUrl += `dataInicio=${dataInicio}&`;
             if (dataFim) apiUrl += `dataFim=${dataFim}&`;
@@ -150,11 +152,10 @@
             fetch(apiUrl)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.length === 0) return; // Se não houver dados, não desenha o gráfico
+                    if (data.length === 0) return;
 
                     const labels = data.map(item => item.label);
                     const values = data.map(item => item.value);
-
                     const ctx = document.getElementById('despesasPorCategoriaChart');
 
                     new Chart(ctx, {
@@ -169,6 +170,46 @@
                         }
                     });
                 });
+        });
+
+        // Script para o Widget de Faturamento Dinâmico
+        function formatarMoeda(valor) {
+            if(valor === null) return 'R$ 0,00';
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
+        }
+
+        function atualizarWidgetFaturamento(tipoCalculo) {
+            const apiUrl = `/api/dashboard/faturamento-widget?tipoCalculo=${tipoCalculo}`;
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const valorAnualEl = document.getElementById('faturamento-anual-valor');
+                    const barraAnualEl = document.getElementById('faturamento-anual-barra');
+                    const valorMensalEl = document.getElementById('faturamento-mensal-valor');
+                    const barraMensalEl = document.getElementById('faturamento-mensal-barra');
+
+                    const faturamentoAnual = data.faturamentoAnual || 0;
+                    const percentualAnual = (faturamentoAnual / 81000 * 100).toFixed(1);
+                    valorAnualEl.innerText = formatarMoeda(faturamentoAnual);
+                    barraAnualEl.style.width = `${percentualAnual}%`;
+                    barraAnualEl.innerText = `${percentualAnual}%`;
+
+                    const faturamentoMensal = data.faturamentoMensal || 0;
+                    const percentualMensal = (faturamentoMensal / 6750 * 100).toFixed(1);
+                    valorMensalEl.innerText = formatarMoeda(faturamentoMensal);
+                    barraMensalEl.style.width = `${percentualMensal}%`;
+                    barraMensalEl.innerText = `${percentualMensal}%`;
+                });
+        }
+
+        const filtroFaturamentoEl = document.getElementById('faturamento-filter');
+        filtroFaturamentoEl.addEventListener('change', (event) => {
+            atualizarWidgetFaturamento(event.target.value);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            atualizarWidgetFaturamento('OFICIAL');
         });
     </script>
 </div>

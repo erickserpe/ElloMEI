@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -43,11 +44,13 @@ public class Lancamento {
     @JoinColumn(name = "pessoa_id")
     private Pessoa pessoa;
 
-    private String comprovantePath; // Guardará o nome do arquivo, ex: "nota-fiscal-01.pdf"
+    private String comprovantePath;
+
+    // --- ATRIBUTO QUE ESTAVA CAUSANDO O ERRO ---
+    private Boolean comNotaFiscal;
 
 
-
-    // Getters e Setters
+    // --- Getters e Setters ---
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getDescricao() { return descricao; }
@@ -64,10 +67,14 @@ public class Lancamento {
     public void setCategoriaDespesa(CategoriaDespesa categoriaDespesa) { this.categoriaDespesa = categoriaDespesa; }
     public Pessoa getPessoa() { return pessoa; }
     public void setPessoa(Pessoa pessoa) { this.pessoa = pessoa; }
-    public String getComprovantePath() {
-        return comprovantePath;
+    public String getComprovantePath() { return comprovantePath; }
+    public void setComprovantePath(String comprovantePath) { this.comprovantePath = comprovantePath; }
+
+    // --- GETTER E SETTER PARA O NOVO CAMPO ---
+    public Boolean getComNotaFiscal() {
+        return comNotaFiscal;
     }
-    public void setComprovantePath(String comprovantePath) {
-        this.comprovantePath = comprovantePath;
+    public void setComNotaFiscal(Boolean comNotaFiscal) {
+        this.comNotaFiscal = comNotaFiscal;
     }
 }

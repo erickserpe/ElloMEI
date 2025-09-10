@@ -40,6 +40,7 @@ public class DashboardController {
     @Autowired
     private LancamentoService lancamentoService;
 
+    // Dentro da classe DashboardController
     @GetMapping("/")
     public String mostrarDashboard(
             @RequestParam(required = false) LocalDate dataInicio,
@@ -48,23 +49,21 @@ public class DashboardController {
             @RequestParam(required = false) Long pessoaId,
             Model model) {
 
-        // 1. Busca os dados para preencher os dropdowns do filtro (como antes)
+        // 1. Busca os dados para preencher os dropdowns do filtro
         model.addAttribute("listaDeContas", contaService.buscarTodas());
         model.addAttribute("listaDePessoas", pessoaService.buscarTodas());
 
-        // 2. AGORA, PASSA OS FILTROS PARA O SERVIÇO FAZER OS CÁLCULOS
+        // 2. Busca os totais para os CARDS SUPERIORES (Saldo, Entradas, Saídas)
         model.addAttribute("saldoTotal", dashboardService.getSaldoTotal(contaId));
         model.addAttribute("totalEntradas", dashboardService.getTotalEntradas(dataInicio, dataFim, contaId, pessoaId));
         model.addAttribute("totalSaidas", dashboardService.getTotalSaidas(dataInicio, dataFim, contaId, pessoaId));
 
-        model.addAttribute("faturamentoMes", dashboardService.getFaturamentoMesAtual());
-        model.addAttribute("faturamentoAno", dashboardService.getFaturamentoAnoAtual());
-
-        // Devolve os filtros selecionados para a view (como antes)
+        // 3. Devolve os filtros selecionados para a view, para que eles permaneçam selecionados
         model.addAttribute("dataInicioSel", dataInicio);
         model.addAttribute("dataFimSel", dataFim);
         model.addAttribute("contaIdSel", contaId);
         model.addAttribute("pessoaIdSel", pessoaId);
+
 
         return "dashboard";
     }
