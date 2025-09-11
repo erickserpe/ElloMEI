@@ -16,6 +16,8 @@ public class Lancamento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String grupoOperacao;
+
     @NotBlank(message = "Descrição é obrigatória.")
     @Size(min = 3, max = 100, message = "Descrição deve ter entre 3 e 100 caracteres.")
     private String descricao;
@@ -77,4 +79,13 @@ public class Lancamento {
     public void setComNotaFiscal(Boolean comNotaFiscal) {
         this.comNotaFiscal = comNotaFiscal;
     }
+    public String getGrupoOperacao() {
+        return grupoOperacao;
+    }
+
+    public void setGrupoOperacao(String grupoOperacao) {
+        this.grupoOperacao = grupoOperacao;
+    }
+
+
 }

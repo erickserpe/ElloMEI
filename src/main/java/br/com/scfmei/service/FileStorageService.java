@@ -77,4 +77,7 @@ public class FileStorageService {
 
         return newImageName;
     }
+    public Path getFileStorageLocation() {
+        return this.fileStorageLocation;
+    }
 }

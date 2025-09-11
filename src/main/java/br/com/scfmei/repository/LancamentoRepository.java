@@ -58,4 +58,18 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
             @Param("dataInicio") LocalDate dataInicio,
             @Param("dataFim") LocalDate dataFim
     );
+    List<Lancamento> findByGrupoOperacao(String grupoOperacao);
+
+    @Query("SELECT l FROM Lancamento l WHERE " +
+            "(:dataInicio IS NULL OR l.data >= :dataInicio) AND " +
+            "(:dataFim IS NULL OR l.data <= :dataFim) AND " +
+            "(:contaId IS NULL OR l.conta.id = :contaId) AND " +
+            "(:pessoaId IS NULL OR l.pessoa.id = :pessoaId) " +
+            "ORDER BY l.data DESC")
+    List<Lancamento> findComFiltrosCompletos(
+            @Param("dataInicio") LocalDate dataInicio,
+            @Param("dataFim") LocalDate dataFim,
+            @Param("contaId") Long contaId,
+            @Param("pessoaId") Long pessoaId
+    );
 }

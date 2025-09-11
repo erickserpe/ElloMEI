@@ -8,21 +8,47 @@
 <div>
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1>Lançamentos</h1>
-        <form th:action="@{/lancamentos}" method="get" class="row g-3 align-items-center mb-4 border p-3 rounded bg-light">
-            <div class="col-md-4">
-                <label for="dataInicio" class="form-label">Data de Início</label>
-                <input type="date" id="dataInicio" name="dataInicio" class="form-control">
-            </div>
-            <div class="col-md-4">
-                <label for="dataFim" class="form-label">Data Fim</label>
-                <input type="date" id="dataFim" name="dataFim" class="form-control">
-            </div>
-            <div class="col-md-4 d-flex align-items-end">
-                <button type="submit" class="btn btn-secondary me-2">Filtrar</button>
-                <a th:href="@{/lancamentos}" class="btn btn-outline-secondary">Limpar Filtro</a>
-            </div>
-        </form>
         <a th:href="@{/lancamentos/novo}" class="btn btn-primary">Novo Lançamento</a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">Filtros</div>
+        <div class="card-body">
+            <form th:action="@{/lancamentos}" method="get" class="row g-3 align-items-center">
+                <div class="col-md-3">
+                    <label for="dataInicio" class="form-label">Data de Início</label>
+                    <input type="date" id="dataInicio" name="dataInicio" class="form-control" th:value="${dataInicioSel != null ? #temporals.format(dataInicioSel, 'yyyy-MM-dd') : ''}">
+                </div>
+                <div class="col-md-3">
+                    <label for="dataFim" class="form-label">Data Fim</label>
+                    <input type="date" id="dataFim" name="dataFim" class="form-control" th:value="${dataFimSel != null ? #temporals.format(dataFimSel, 'yyyy-MM-dd') : ''}">
+                </div>
+                <div class="col-md-2">
+                    <label for="contaId" class="form-label">Conta</label>
+                    <select id="contaId" name="contaId" class="form-select">
+                        <option value="">Todas</option>
+                        <option th:each="conta : ${listaDeContas}"
+                                th:value="${conta.id}"
+                                th:text="${conta.nomeConta}"
+                                th:selected="${conta.id == contaIdSel}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="pessoaId" class="form-label">Pessoa</label>
+                    <select id="pessoaId" name="pessoaId" class="form-select">
+                        <option value="">Todas</option>
+                        <option th:each="pessoa : ${listaDePessoas}"
+                                th:value="${pessoa.id}"
+                                th:text="${pessoa.nome}"
+                                th:selected="${pessoa.id == pessoaIdSel}"></option>
+                    </select>
+                </div>
+                <div class="col-auto d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">Filtrar</button>
+                    <a th:href="@{/lancamentos}" class="btn btn-outline-secondary">Limpar</a>
+                </div>
+            </form>
+        </div>
     </div>
 
     <table class="table table-striped table-hover table-bordered">
@@ -31,9 +57,10 @@
             <th>Data</th>
             <th>Descrição</th>
             <th>Conta</th>
-            <th>Categoria</th>
+            <th>Com Nota?</th>
             <th>Tipo</th>
             <th>Valor</th>
+            <th>Grupo</th>
             <th>Ações</th>
         </tr>
         </thead>
@@ -42,9 +69,13 @@
             <td th:text="${#temporals.format(lancamento.data, 'dd/MM/yyyy')}"></td>
             <td th:text="${lancamento.descricao}"></td>
             <td th:text="${lancamento.conta.nomeConta}"></td>
-            <td th:text="${lancamento.categoriaDespesa != null ? lancamento.categoriaDespesa.nome : '-'}"></td>
+            <td>
+                <span th:if="${lancamento.comNotaFiscal}" class="badge bg-success">Sim</span>
+                <span th:unless="${lancamento.comNotaFiscal != null && lancamento.comNotaFiscal}" class="badge bg-secondary">Não</span>
+            </td>
             <td th:text="${lancamento.tipo}"></td>
             <td th:text="${'R$ ' + #numbers.formatDecimal(lancamento.valor, 1, 'POINT', 2, 'COMMA')}"></td>
+            <td><small th:text="${#strings.substring(lancamento.grupoOperacao, 0, 8)}"></small></td>
             <td>
                 <a th:href="@{/lancamentos/editar/{id}(id=${lancamento.id})}" class="btn btn-warning btn-sm">Editar</a>
                 <a th:href="@{/lancamentos/excluir/{id}(id=${lancamento.id})}" class="btn btn-danger btn-sm">Excluir</a>

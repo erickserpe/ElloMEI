@@ -34,16 +34,24 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="lancamento : ${lancamentos}">
-        <td th:text="${#temporals.format(lancamento.data, 'dd/MM/yyyy')}"></td>
-        <td th:text="${lancamento.descricao}"></td>
-        <td th:text="${lancamento.conta.nomeConta}"></td>
-        <td th:text="${lancamento.categoriaDespesa != null ? lancamento.categoriaDespesa.nome : '-'}"></td>
-        <td th:text="${lancamento.tipo}"
-            th:class="${lancamento.tipo.name() == 'ENTRADA' ? 'entrada' : 'saida'}"></td>
-        <td th:text="${#numbers.formatDecimal(lancamento.valor, 1, 'POINT', 2, 'COMMA')}"
-            th:class="${lancamento.tipo.name() == 'ENTRADA' ? 'entrada' : 'saida'}"></td>
-    </tr>
+    <th:block th:each="lancamento : ${lancamentos}">
+        <tr>
+            <td th:text="${#temporals.format(lancamento.data, 'dd/MM/yyyy')}"></td>
+            <td th:text="${lancamento.descricao}"></td>
+            <td th:text="${lancamento.conta.nomeConta}"></td>
+            <td th:text="${lancamento.categoriaDespesa != null ? lancamento.categoriaDespesa.nome : '-'}"></td>
+            <td th:text="${lancamento.tipo}"
+                th:class="${lancamento.tipo.name() == 'ENTRADA' ? 'entrada' : 'saida'}"></td>
+            <td th:text="${#numbers.formatDecimal(lancamento.valor, 1, 'POINT', 2, 'COMMA')}"
+                th:class="${lancamento.tipo.name() == 'ENTRADA' ? 'entrada' : 'saida'}"></td>
+        </tr>
+        <tr th:if="${lancamento.comprovantePath != null}">
+            <td colspan="6" style="padding: 10px; text-align: center;">
+                <strong>Comprovante:</strong><br/>
+                <img th:src="${lancamento.comprovantePath}" style="max-width: 80%; max-height: 250px; margin-top: 5px;" />
+            </td>
+        </tr>
+    </th:block>
     </tbody>
 </table>
 </body>
