@@ -10,12 +10,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.util.Map;
-import java.util.HashMap;
-import java.time.YearMonth;
-
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/dashboard")
@@ -31,10 +30,10 @@ public class DashboardRestController {
             @RequestParam(required = false) Long contaId,
             @RequestParam(required = false) Long pessoaId) {
 
-        // Chama o novo método do serviço, passando os filtros recebidos da URL
         List<ChartData> data = dashboardService.getDespesasPorCategoria(dataInicio, dataFim, contaId, pessoaId);
         return ResponseEntity.ok(data);
     }
+
     @GetMapping("/faturamento-widget")
     public ResponseEntity<Map<String, BigDecimal>> getDadosWidgetFaturamento(@RequestParam String tipoCalculo) {
         YearMonth mesAtual = YearMonth.now();
@@ -46,15 +45,20 @@ public class DashboardRestController {
         switch (tipoCalculo) {
             case "BANCARIO":
                 faturamentoAnual = dashboardService.getFaturamentoBancario(anoAtual);
-                faturamentoMensal = dashboardService.getFaturamentoBancarioMesAtual(); // Precisamos criar este método
+                faturamentoMensal = dashboardService.getFaturamentoBancarioMesAtual();
                 break;
             case "ESTIMADO_CUSTOS":
                 faturamentoAnual = dashboardService.getMetaFaturamentoBaseadoEmCustos(anoAtual);
-                faturamentoMensal = dashboardService.getMetaFaturamentoBaseadoEmCustosMensal(); // E este também
+                faturamentoMensal = dashboardService.getMetaFaturamentoBaseadoEmCustosMensal();
                 break;
             default: // "OFICIAL"
                 faturamentoAnual = dashboardService.getFaturamentoOficial(anoAtual);
-                faturamentoMensal = dashboardService.getFaturamentoMesAtual();
+
+                // --- CORREÇÃO AQUI ---
+                // Usamos o método getTotalEntradas para calcular o faturamento do mês atual
+                LocalDate inicioDoMes = mesAtual.atDay(1);
+                LocalDate fimDoMes = mesAtual.atEndOfMonth();
+                faturamentoMensal = dashboardService.getTotalEntradas(inicioDoMes, fimDoMes, null, null);
                 break;
         }
 

@@ -15,19 +15,23 @@ import java.util.List;
 @Repository
 public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
 
-    List<Lancamento> findByDataBetweenOrderByDataDesc(LocalDate dataInicio, LocalDate dataFim);
+    List<Lancamento> findByGrupoOperacao(String grupoOperacao);
 
-    @Query("SELECT SUM(l.valor) FROM Lancamento l " +
-            "WHERE l.tipo = :tipo " +
-            "AND l.data >= :inicioDoMes AND l.data <= :fimDoMes " +
-            "AND (:contaId IS NULL OR l.conta.id = :contaId) " +
-            "AND (:pessoaId IS NULL OR l.pessoa.id = :pessoaId)")
-    BigDecimal calcularTotalComFiltros(
-            @Param("tipo") TipoLancamento tipo,
-            @Param("inicioDoMes") LocalDate inicioDoMes,
-            @Param("fimDoMes") LocalDate fimDoMes,
+    @Query("SELECT l FROM Lancamento l WHERE " +
+            "(:dataInicio IS NULL OR l.data >= :dataInicio) AND " +
+            "(:dataFim IS NULL OR l.data <= :dataFim) AND " +
+            "(:contaId IS NULL OR l.conta.id = :contaId) AND " +
+            "(:pessoaId IS NULL OR l.pessoa.id = :pessoaId) AND " +
+            "(:tipo IS NULL OR l.tipo = :tipo) AND " +
+            "(:comNotaFiscal IS NULL OR l.comNotaFiscal = :comNotaFiscal) " +
+            "ORDER BY l.data DESC, l.id DESC")
+    List<Lancamento> findComFiltros(
+            @Param("dataInicio") LocalDate dataInicio,
+            @Param("dataFim") LocalDate dataFim,
             @Param("contaId") Long contaId,
-            @Param("pessoaId") Long pessoaId
+            @Param("pessoaId") Long pessoaId,
+            @Param("tipo") TipoLancamento tipo,
+            @Param("comNotaFiscal") Boolean comNotaFiscal
     );
 
     @Query("SELECT new br.com.scfmei.domain.ChartData(c.nome, SUM(l.valor)) " +
@@ -43,33 +47,13 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
             @Param("contaId") Long contaId,
             @Param("pessoaId") Long pessoaId
     );
-    @Query("SELECT SUM(l.valor) FROM Lancamento l " +
-            "WHERE l.tipo = 'SAIDA' AND l.comNotaFiscal = true " +
-            "AND l.data >= :dataInicio AND l.data <= :dataFim")
-    BigDecimal sumSaidasComNotaNoPeriodo(
-            @Param("dataInicio") LocalDate dataInicio,
-            @Param("dataFim") LocalDate dataFim
-    );
+
     @Query("SELECT SUM(l.valor) FROM Lancamento l JOIN l.conta c " +
             "WHERE l.tipo = 'ENTRADA' " +
-            "AND c.tipo <> 'Caixa' " + // O operador <> significa 'diferente de'
+            "AND c.tipo <> 'Caixa' " +
             "AND l.data >= :dataInicio AND l.data <= :dataFim")
     BigDecimal sumEntradasBancariasNoPeriodo(
             @Param("dataInicio") LocalDate dataInicio,
             @Param("dataFim") LocalDate dataFim
-    );
-    List<Lancamento> findByGrupoOperacao(String grupoOperacao);
-
-    @Query("SELECT l FROM Lancamento l WHERE " +
-            "(:dataInicio IS NULL OR l.data >= :dataInicio) AND " +
-            "(:dataFim IS NULL OR l.data <= :dataFim) AND " +
-            "(:contaId IS NULL OR l.conta.id = :contaId) AND " +
-            "(:pessoaId IS NULL OR l.pessoa.id = :pessoaId) " +
-            "ORDER BY l.data DESC")
-    List<Lancamento> findComFiltrosCompletos(
-            @Param("dataInicio") LocalDate dataInicio,
-            @Param("dataFim") LocalDate dataFim,
-            @Param("contaId") Long contaId,
-            @Param("pessoaId") Long pessoaId
     );
 }

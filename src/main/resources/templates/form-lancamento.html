@@ -8,7 +8,8 @@
 
 <div id="conteudo-principal">
     <form th:action="@{/lancamentos}" method="post" th:object="${lancamentoForm}" enctype="multipart/form-data">
-        <h1>Novo Lançamento</h1>
+        <h1 th:if="*{grupoOperacao == null}">Novo Lançamento</h1>
+        <h1 th:unless="*{grupoOperacao == null}">Editar Lançamento</h1>
 
         <input type="hidden" th:field="*{grupoOperacao}" />
 
@@ -58,7 +59,17 @@
                 </div>
                 <div class="row">
                     <div class="col-12 mb-3">
-                        <label for="comprovanteFile" class="form-label">Anexar Comprovante (Opcional)</label>
+                        <div th:if="${!lancamentoForm.comprovantes.isEmpty()}" class="alert alert-info p-2">
+                            <strong>Comprovante(s) atual(is):</strong>
+                            <ul>
+                                <li th:each="comp : ${lancamentoForm.comprovantes}">
+                                    <a th:href="@{/uploads/{filename}(filename=${comp.pathArquivo})}"
+                                       th:text="${#strings.substringAfter(comp.pathArquivo, '_')}"
+                                       target="_blank"></a>
+                                </li>
+                            </ul>
+                        </div>
+                        <label for="comprovanteFile" class="form-label">Anexar Novo(s) Comprovante(s) (Substitui o antigo)</label>
                         <input class="form-control" type="file" id="comprovanteFile" name="comprovanteFile">
                     </div>
                 </div>
@@ -99,86 +110,9 @@
         </div>
     </form>
 
-    <div id="pagamento-template" style="display: none;">
-        <div class="row pagamento-item mb-3">
-            <div class="col-md-6">
-                <label class="form-label">Conta</label>
-                <select class="form-select" name="pagamentos[__INDEX__].conta" required>
-                    <option th:each="c : ${listaDeContas}" th:value="${c.id}" th:text="${c.nomeConta}"></option>
-                </select>
-            </div>
-            <div class="col-md-5">
-                <label class="form-label">Valor</label>
-                <input type="number" step="0.01" class="form-control valor-pagamento" name="pagamentos[__INDEX__].valor" required>
-            </div>
-            <div class="col-md-1 d-flex align-items-end">
-                <button type="button" class="btn btn-danger btn-sm remover-pagamento">X</button>
-            </div>
-        </div>
-    </div>
+    <div id="pagamento-template" style="display: none;"> ... </div>
+    <script> ... </script>
 
-    <script>
-        // O nosso script de depuração com console.log
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("Script do formulário iniciado.");
-            const container = document.getElementById('pagamentos-container');
-            console.log("Container de pagamentos encontrado:", container);
-            const addButton = document.getElementById('adicionar-pagamento');
-            console.log("Botão de adicionar encontrado:", addButton);
-            const templateDiv = document.getElementById('pagamento-template');
-            console.log("Template encontrado:", templateDiv);
-            if (!container || !addButton || !templateDiv) {
-                console.error("ERRO CRÍTICO: Um ou mais elementos essenciais do formulário não foram encontrados. Verifique os IDs no HTML.");
-                return;
-            }
-            const template = templateDiv.innerHTML;
-            let paymentIndex = document.querySelectorAll('.pagamento-item').length;
-            function updateTotal() {
-                let total = 0;
-                document.querySelectorAll('.valor-pagamento').forEach(input => {
-                    const value = parseFloat(input.value);
-                    if (!isNaN(value)) {
-                        total += value;
-                    }
-                });
-                document.getElementById('total-adicionado').innerText = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total);
-                updateRemoveButtons();
-            }
-            function updateRemoveButtons() {
-                const items = document.querySelectorAll('.pagamento-item');
-                items.forEach((item) => {
-                    const removeButton = item.querySelector('.remover-pagamento');
-                    if (items.length > 1) {
-                        removeButton.style.display = 'inline-block';
-                    } else {
-                        removeButton.style.display = 'none';
-                    }
-                });
-            }
-            addButton.addEventListener('click', function() {
-                console.log("Botão 'Adicionar Pagamento' foi clicado!");
-                const newHtml = template.replace(/__INDEX__/g, paymentIndex);
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = newHtml;
-                const newItem = tempDiv.firstElementChild;
-                container.appendChild(newItem);
-                paymentIndex++;
-                updateTotal();
-            });
-            container.addEventListener('click', function(e) {
-                if (e.target && e.target.classList.contains('remover-pagamento')) {
-                    e.target.closest('.pagamento-item').remove();
-                    updateTotal();
-                }
-            });
-            container.addEventListener('input', function(e) {
-                if (e.target && e.target.classList.contains('valor-pagamento')) {
-                    updateTotal();
-                }
-            });
-            updateTotal();
-        });
-    </script>
 </div>
 </body>
 </html>

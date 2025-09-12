@@ -13,8 +13,8 @@ public class LancamentoFormDTO {
     private Pessoa pessoa;
     private Boolean comNotaFiscal;
 
-    // --- O CAMPO QUE FALTAVA ---
-    private String comprovantePath;
+    // O campo para os comprovantes que já existe
+    private List<Comprovante> comprovantes = new ArrayList<>();
 
     private List<PagamentoDTO> pagamentos = new ArrayList<>();
 
@@ -23,6 +23,7 @@ public class LancamentoFormDTO {
     }
 
     // --- Getters e Setters ---
+
     public String getGrupoOperacao() { return grupoOperacao; }
     public void setGrupoOperacao(String grupoOperacao) { this.grupoOperacao = grupoOperacao; }
     public String getDescricao() { return descricao; }
@@ -40,7 +41,11 @@ public class LancamentoFormDTO {
     public List<PagamentoDTO> getPagamentos() { return pagamentos; }
     public void setPagamentos(List<PagamentoDTO> pagamentos) { this.pagamentos = pagamentos; }
 
-    // --- GETTER E SETTER ADICIONADOS ---
-    public String getComprovantePath() { return comprovantePath; }
-    public void setComprovantePath(String comprovantePath) { this.comprovantePath = comprovantePath; }
+    // --- MÉTODOS QUE FALTAVAM ---
+    public List<Comprovante> getComprovantes() {
+        return comprovantes;
+    }
+    public void setComprovantes(List<Comprovante> comprovantes) {
+        this.comprovantes = comprovantes;
+    }
 }

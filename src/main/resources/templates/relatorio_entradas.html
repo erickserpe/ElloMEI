@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Relatório de Faturamento</title>
+    <style> body { font-family: Arial, sans-serif; font-size: 11px; } h1 { text-align: center; } table { width: 100%; border-collapse: collapse; margin-top: 20px; } th, td { border: 1px solid #ccc; padding: 8px; text-align: left; } thead { background-color: #f2f2f2; } .total-row { background-color: #e9ecef; font-weight: bold; } </style>
+</head>
+<body>
+<h1 th:text="'Relatório de Faturamento ' + ${tituloVisao}"></h1>
+<p th:if="${dataInicio != null and dataFim != null}"><strong>Período:</strong> <span th:text="${#temporals.format(dataInicio, 'dd/MM/yyyy')}"></span> a <span th:text="${#temporals.format(dataFim, 'dd/MM/yyyy')}"></span></p>
+<table>
+    <thead><tr><th>Data</th><th>Descrição</th><th>Cliente</th><th>Com Nota?</th><th>Valor</th></tr></thead>
+    <tbody><tr th:each="lanc : ${lancamentos}"><td th:text="${#temporals.format(lanc.data, 'dd/MM/yyyy')}"></td><td th:text="${lanc.descricao}"></td><td th:text="${lanc.pessoa != null ? lanc.pessoa.nome : '-'}"></td><td><span th:if="${lanc.comNotaFiscal}">Sim</span><span th:unless="${lanc.comNotaFiscal}">Não</span></td><td th:text="${#numbers.formatDecimal(lanc.valor, 1, 'POINT', 2, 'COMMA')}"></td></tr></tbody>
+    <tfoot><tr class="total-row"><td colspan="4" style="text-align: right;">TOTAL:</td><td th:text="${'R$ ' + #numbers.formatDecimal(total, 1, 'POINT', 2, 'COMMA')}"></td></tr></tfoot>
+</table>
+</body>
+</html>

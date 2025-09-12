@@ -13,7 +13,7 @@
             Filtros
         </div>
         <div class="card-body">
-            <form th:action="@{/}" method="get" class="row g-3 align-items-center">
+            <form th:action="@{/}" method="get" id="global-filter-form" class="row g-3 align-items-center">
                 <div class="col-md-3">
                     <label for="dataInicio" class="form-label">Data de Início</label>
                     <input type="date" id="dataInicio" name="dataInicio" class="form-control" th:value="${dataInicioSel != null ? #temporals.format(dataInicioSel, 'yyyy-MM-dd') : ''}">
@@ -44,9 +44,7 @@
                 </div>
                 <div class="col-auto d-flex align-items-end">
                     <button type="submit" class="btn btn-primary me-2">Aplicar</button>
-                    <a th:href="@{/}" class="btn btn-outline-secondary me-2">Limpar</a>
-                    <a th:href="@{/relatorio/pdf(dataInicio=${dataInicioSel}, dataFim=${dataFimSel}, contaId=${contaIdSel}, pessoaId=${pessoaIdSel})}"
-                       class="btn btn-success" target="_blank">PDF</a>
+                    <a th:href="@{/}" class="btn btn-outline-secondary">Limpar</a>
                 </div>
             </form>
         </div>
@@ -84,12 +82,13 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>Controle de Faturamento MEI (Ano: <span th:text="${#dates.year(#dates.createNow())}">2025</span>)</span>
-                    <div class="col-md-4">
-                        <select id="faturamento-filter" class="form-select form-select-sm">
+                    <div class="d-flex align-items-center">
+                        <select id="faturamento-filter" class="form-select form-select-sm me-2" style="width: auto;">
                             <option value="OFICIAL" selected>Visão: Faturamento Oficial (MEI)</option>
                             <option value="BANCARIO">Visão: Faturamento Bancário</option>
                             <option value="ESTIMADO_CUSTOS">Visão: Meta (Baseado em Compras)</option>
                         </select>
+                        <button type="button" id="gerar-relatorio-btn" class="btn btn-success btn-sm">Gerar PDF</button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -153,11 +152,9 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.length === 0) return;
-
                     const labels = data.map(item => item.label);
                     const values = data.map(item => item.value);
                     const ctx = document.getElementById('despesasPorCategoriaChart');
-
                     new Chart(ctx, {
                         type: 'doughnut',
                         data: {
@@ -180,7 +177,6 @@
 
         function atualizarWidgetFaturamento(tipoCalculo) {
             const apiUrl = `/api/dashboard/faturamento-widget?tipoCalculo=${tipoCalculo}`;
-
             fetch(apiUrl)
                 .then(response => response.json())
                 .then(data => {
@@ -188,6 +184,8 @@
                     const barraAnualEl = document.getElementById('faturamento-anual-barra');
                     const valorMensalEl = document.getElementById('faturamento-mensal-valor');
                     const barraMensalEl = document.getElementById('faturamento-mensal-barra');
+                    const divMensal = document.getElementById('faturamento-mensal-div');
+                    const hrSeparator = document.getElementById('faturamento-hr-separator');
 
                     const faturamentoAnual = data.faturamentoAnual || 0;
                     const percentualAnual = (faturamentoAnual / 81000 * 100).toFixed(1);
@@ -195,11 +193,18 @@
                     barraAnualEl.style.width = `${percentualAnual}%`;
                     barraAnualEl.innerText = `${percentualAnual}%`;
 
-                    const faturamentoMensal = data.faturamentoMensal || 0;
-                    const percentualMensal = (faturamentoMensal / 6750 * 100).toFixed(1);
-                    valorMensalEl.innerText = formatarMoeda(faturamentoMensal);
-                    barraMensalEl.style.width = `${percentualMensal}%`;
-                    barraMensalEl.innerText = `${percentualMensal}%`;
+                    if (tipoCalculo === 'OFICIAL' || tipoCalculo === 'BANCARIO') {
+                        divMensal.style.display = 'block';
+                        hrSeparator.style.display = 'block';
+                        const faturamentoMensal = data.faturamentoMensal || 0;
+                        const percentualMensal = (faturamentoMensal / 6750 * 100).toFixed(1);
+                        valorMensalEl.innerText = formatarMoeda(faturamentoMensal);
+                        barraMensalEl.style.width = `${percentualMensal}%`;
+                        barraMensalEl.innerText = `${percentualMensal}%`;
+                    } else {
+                        divMensal.style.display = 'none';
+                        hrSeparator.style.display = 'none';
+                    }
                 });
         }
 
@@ -210,6 +215,20 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             atualizarWidgetFaturamento('OFICIAL');
+        });
+
+        // Script para o botão de PDF
+        document.addEventListener('DOMContentLoaded', function() {
+            const pdfButton = document.getElementById('gerar-relatorio-btn');
+            pdfButton.addEventListener('click', function() {
+                const dataInicio = document.getElementById('dataInicio').value;
+                const dataFim = document.getElementById('dataFim').value;
+                const tipoVisao = document.getElementById('faturamento-filter').value;
+                let reportUrl = `/relatorios/faturamento/dinamico/pdf?tipoVisao=${tipoVisao}`;
+                if (dataInicio) reportUrl += `&dataInicio=${dataInicio}`;
+                if (dataFim) reportUrl += `&dataFim=${dataFim}`;
+                window.open(reportUrl, '_blank');
+            });
         });
     </script>
 </div>

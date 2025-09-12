@@ -14,6 +14,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -31,22 +34,17 @@ public class FileStorageService {
         }
     }
 
-    public String storeFile(MultipartFile file) {
+    public List<String> storeFile(MultipartFile file) {
         String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-
         try {
             if (originalFileName.contains("..")) {
                 throw new RuntimeException("Nome de arquivo inválido: " + originalFileName);
             }
-
-            // Verifica se o arquivo é um PDF
             if ("application/pdf".equals(file.getContentType())) {
-                return storePdfAsImage(file, originalFileName);
+                return storePdfAsImages(file, originalFileName);
             } else {
-                // Se for imagem ou outro tipo, salva diretamente
-                return storeImageDirectly(file, originalFileName);
+                return Collections.singletonList(storeImageDirectly(file, originalFileName));
             }
-
         } catch (IOException ex) {
             throw new RuntimeException("Não foi possível armazenar o arquivo " + originalFileName, ex);
         }
@@ -59,24 +57,24 @@ public class FileStorageService {
         return uniqueFileName;
     }
 
-    private String storePdfAsImage(MultipartFile file, String originalFileName) throws IOException {
-        // Remove a extensão .pdf e prepara o nome para .png
+    private List<String> storePdfAsImages(MultipartFile file, String originalFileName) throws IOException {
+        List<String> generatedFiles = new ArrayList<>();
         String fileNameWithoutExt = originalFileName.replaceFirst("[.][^.]+$", "");
-        String newImageName = UUID.randomUUID().toString() + "_" + fileNameWithoutExt + ".png";
-        Path targetLocation = this.fileStorageLocation.resolve(newImageName);
+        String fileIdentifier = UUID.randomUUID().toString();
 
-        // Usa a biblioteca PDFBox para carregar o PDF
         try (PDDocument document = PDDocument.load(file.getInputStream())) {
             PDFRenderer pdfRenderer = new PDFRenderer(document);
-            // Renderiza a primeira página (página 0) como uma imagem
-            BufferedImage bim = pdfRenderer.renderImageWithDPI(0, 150); // 150 DPI é uma boa qualidade
-
-            // Salva a imagem renderizada como um arquivo PNG
-            ImageIO.write(bim, "PNG", targetLocation.toFile());
+            for (int page = 0; page < document.getNumberOfPages(); ++page) {
+                String newImageName = fileIdentifier + "_" + fileNameWithoutExt + "_page_" + (page + 1) + ".png";
+                Path targetLocation = this.fileStorageLocation.resolve(newImageName);
+                BufferedImage bim = pdfRenderer.renderImageWithDPI(page, 150);
+                ImageIO.write(bim, "PNG", targetLocation.toFile());
+                generatedFiles.add(newImageName);
+            }
         }
-
-        return newImageName;
+        return generatedFiles;
     }
+
     public Path getFileStorageLocation() {
         return this.fileStorageLocation;
     }

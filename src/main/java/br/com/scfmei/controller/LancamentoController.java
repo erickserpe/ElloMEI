@@ -31,12 +31,13 @@ public class LancamentoController {
     @GetMapping
     public String listarLancamentos(@RequestParam(required = false) LocalDate dataInicio,
                                     @RequestParam(required = false) LocalDate dataFim,
-                                    // Adicionando filtros que faltavam para consistência
                                     @RequestParam(required = false) Long contaId,
                                     @RequestParam(required = false) Long pessoaId,
                                     Model model) {
 
-        List<Lancamento> lancamentos = lancamentoService.buscarComFiltros(dataInicio, dataFim, contaId, pessoaId);
+        // --- CORREÇÃO AQUI ---
+        // Agora passamos null para os filtros que não usamos nesta tela
+        List<Lancamento> lancamentos = lancamentoService.buscarComFiltros(dataInicio, dataFim, contaId, pessoaId, null, null);
         model.addAttribute("listaDeLancamentos", lancamentos);
 
         // Adiciona listas para os dropdowns de filtro
@@ -66,18 +67,14 @@ public class LancamentoController {
         model.addAttribute("listaDeContas", contaService.buscarTodas());
         model.addAttribute("listaDeCategorias", categoriaService.buscarTodas());
         model.addAttribute("listaDePessoas", pessoaService.buscarTodas());
-
-        // Chama o novo serviço que prepara o DTO para edição
         LancamentoFormDTO formDTO = lancamentoService.carregarOperacaoParaEdicao(id);
         model.addAttribute("lancamentoForm", formDTO);
-
         return "form-lancamento";
     }
 
     @PostMapping
     public String salvarLancamento(@ModelAttribute("lancamentoForm") LancamentoFormDTO lancamentoForm,
                                    @RequestParam("comprovanteFile") MultipartFile comprovanteFile) {
-
         lancamentoService.salvarOuAtualizarOperacao(lancamentoForm, comprovanteFile);
         return "redirect:/lancamentos";
     }
