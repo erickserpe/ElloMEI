@@ -10,7 +10,7 @@ public class LancamentoFormDTO {
     private LocalDate data;
     private TipoLancamento tipo;
     private CategoriaDespesa categoriaDespesa;
-    private Pessoa pessoa;
+    private Contato contato;
     private Boolean comNotaFiscal;
 
     // O campo para os comprovantes que já existe
@@ -34,8 +34,8 @@ public class LancamentoFormDTO {
     public void setTipo(TipoLancamento tipo) { this.tipo = tipo; }
     public CategoriaDespesa getCategoriaDespesa() { return categoriaDespesa; }
     public void setCategoriaDespesa(CategoriaDespesa categoriaDespesa) { this.categoriaDespesa = categoriaDespesa; }
-    public Pessoa getPessoa() { return pessoa; }
-    public void setPessoa(Pessoa pessoa) { this.pessoa = pessoa; }
+    public Contato getPessoa() { return contato; }
+    public void setPessoa(Contato contato) { this.contato = contato; }
     public Boolean getComNotaFiscal() { return comNotaFiscal; }
     public void setComNotaFiscal(Boolean comNotaFiscal) { this.comNotaFiscal = comNotaFiscal; }
     public List<PagamentoDTO> getPagamentos() { return pagamentos; }

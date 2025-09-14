@@ -36,7 +36,7 @@
     <tr th:each="lancamento : ${lancamentos}">
         <td th:text="${#temporals.format(lancamento.data, 'dd/MM/yyyy')}"></td>
         <td th:text="${lancamento.descricao}"></td>
-        <td th:text="${lancamento.pessoa != null ? lancamento.pessoa.nome : '-'}"></td>
+        <td th:text="${lancamento.contato != null ? lancamento.contato.nome : '-'}"></td>
         <td>
             <span th:if="${lancamento.comNotaFiscal}">Sim</span>
             <span th:unless="${lancamento.comNotaFiscal}">Não</span>

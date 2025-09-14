@@ -36,10 +36,10 @@
                     <label for="pessoaId" class="form-label">Pessoa</label>
                     <select id="pessoaId" name="pessoaId" class="form-select">
                         <option value="">Todas</option>
-                        <option th:each="pessoa : ${listaDePessoas}"
-                                th:value="${pessoa.id}"
-                                th:text="${pessoa.nome}"
-                                th:selected="${pessoa.id == pessoaIdSel}"></option>
+                        <option th:each="contato : ${listaDePessoas}"
+                                th:value="${contato.id}"
+                                th:text="${contato.nome}"
+                                th:selected="${contato.id == pessoaIdSel}"></option>
                     </select>
                 </div>
                 <div class="col-auto d-flex align-items-end">

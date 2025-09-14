@@ -2,7 +2,7 @@ package br.com.scfmei.controller;
 
 import br.com.scfmei.service.ContaService;
 import br.com.scfmei.service.DashboardService;
-import br.com.scfmei.service.PessoaService;
+import br.com.scfmei.service.ContatoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,7 +21,7 @@ public class DashboardController {
     private ContaService contaService;
 
     @Autowired
-    private PessoaService pessoaService;
+    private ContatoService contatoService;
 
     @GetMapping("/")
     public String mostrarDashboard(
@@ -33,7 +33,7 @@ public class DashboardController {
 
         // 1. Busca os dados para preencher os dropdowns do filtro
         model.addAttribute("listaDeContas", contaService.buscarTodas());
-        model.addAttribute("listaDePessoas", pessoaService.buscarTodas());
+        model.addAttribute("listaDePessoas", contatoService.buscarTodas());
 
         // 2. Passa os filtros para o serviço fazer os cálculos para os cards
         model.addAttribute("saldoTotal", dashboardService.getSaldoTotal(contaId));

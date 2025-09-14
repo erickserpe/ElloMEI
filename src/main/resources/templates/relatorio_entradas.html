@@ -10,7 +10,7 @@
 <p th:if="${dataInicio != null and dataFim != null}"><strong>Período:</strong> <span th:text="${#temporals.format(dataInicio, 'dd/MM/yyyy')}"></span> a <span th:text="${#temporals.format(dataFim, 'dd/MM/yyyy')}"></span></p>
 <table>
     <thead><tr><th>Data</th><th>Descrição</th><th>Cliente</th><th>Com Nota?</th><th>Valor</th></tr></thead>
-    <tbody><tr th:each="lanc : ${lancamentos}"><td th:text="${#temporals.format(lanc.data, 'dd/MM/yyyy')}"></td><td th:text="${lanc.descricao}"></td><td th:text="${lanc.pessoa != null ? lanc.pessoa.nome : '-'}"></td><td><span th:if="${lanc.comNotaFiscal}">Sim</span><span th:unless="${lanc.comNotaFiscal}">Não</span></td><td th:text="${#numbers.formatDecimal(lanc.valor, 1, 'POINT', 2, 'COMMA')}"></td></tr></tbody>
+    <tbody><tr th:each="lanc : ${lancamentos}"><td th:text="${#temporals.format(lanc.data, 'dd/MM/yyyy')}"></td><td th:text="${lanc.descricao}"></td><td th:text="${lanc.contato != null ? lanc.contato.nome : '-'}"></td><td><span th:if="${lanc.comNotaFiscal}">Sim</span><span th:unless="${lanc.comNotaFiscal}">Não</span></td><td th:text="${#numbers.formatDecimal(lanc.valor, 1, 'POINT', 2, 'COMMA')}"></td></tr></tbody>
     <tfoot><tr class="total-row"><td colspan="4" style="text-align: right;">TOTAL:</td><td th:text="${'R$ ' + #numbers.formatDecimal(total, 1, 'POINT', 2, 'COMMA')}"></td></tr></tfoot>
 </table>
 </body>

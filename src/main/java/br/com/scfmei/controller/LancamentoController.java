@@ -5,7 +5,7 @@ import br.com.scfmei.domain.LancamentoFormDTO;
 import br.com.scfmei.service.CategoriaDespesaService;
 import br.com.scfmei.service.ContaService;
 import br.com.scfmei.service.LancamentoService;
-import br.com.scfmei.service.PessoaService;
+import br.com.scfmei.service.ContatoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,7 +26,7 @@ public class LancamentoController {
     @Autowired
     private CategoriaDespesaService categoriaService;
     @Autowired
-    private PessoaService pessoaService;
+    private ContatoService contatoService;
 
     @GetMapping
     public String listarLancamentos(@RequestParam(required = false) LocalDate dataInicio,
@@ -42,7 +42,7 @@ public class LancamentoController {
 
         // Adiciona listas para os dropdowns de filtro
         model.addAttribute("listaDeContas", contaService.buscarTodas());
-        model.addAttribute("listaDePessoas", pessoaService.buscarTodas());
+        model.addAttribute("listaDePessoas", contatoService.buscarTodas());
 
         // Devolve os filtros selecionados para a view
         model.addAttribute("dataInicioSel", dataInicio);
@@ -57,7 +57,7 @@ public class LancamentoController {
     public String mostrarFormularioDeNovoLancamento(Model model) {
         model.addAttribute("listaDeContas", contaService.buscarTodas());
         model.addAttribute("listaDeCategorias", categoriaService.buscarTodas());
-        model.addAttribute("listaDePessoas", pessoaService.buscarTodas());
+        model.addAttribute("listaDePessoas", contatoService.buscarTodas());
         model.addAttribute("lancamentoForm", new LancamentoFormDTO());
         return "form-lancamento";
     }
@@ -66,7 +66,7 @@ public class LancamentoController {
     public String mostrarFormularioDeEdicao(@PathVariable Long id, Model model) {
         model.addAttribute("listaDeContas", contaService.buscarTodas());
         model.addAttribute("listaDeCategorias", categoriaService.buscarTodas());
-        model.addAttribute("listaDePessoas", pessoaService.buscarTodas());
+        model.addAttribute("listaDePessoas", contatoService.buscarTodas());
         LancamentoFormDTO formDTO = lancamentoService.carregarOperacaoParaEdicao(id);
         model.addAttribute("lancamentoForm", formDTO);
         return "form-lancamento";
