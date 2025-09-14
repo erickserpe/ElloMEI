@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
+import java.time.LocalDate;
 
 @Entity
 public class Usuario {
@@ -28,7 +29,7 @@ public class Usuario {
     private String cnpj;
 
     private String roles; // Papéis/Permissões do usuário
-
+    private LocalDate dataAberturaMei;
     // Getters e Setters...
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -48,4 +49,10 @@ public class Usuario {
     public void setCnpj(String cnpj) { this.cnpj = cnpj; }
     public String getRoles() { return roles; }
     public void setRoles(String roles) { this.roles = roles; }
+    public LocalDate getDataAberturaMei() {
+        return dataAberturaMei;
+    }
+    public void setDataAberturaMei(LocalDate dataAberturaMei) {
+        this.dataAberturaMei = dataAberturaMei;
+    }
 }

@@ -78,7 +78,7 @@
     </div>
 
     <div class="row mt-2">
-        <div class="col-12">
+        <div class="col-md-6">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>Controle de Faturamento MEI (Ano: <span th:text="${#dates.year(#dates.createNow())}">2025</span>)</span>
@@ -88,7 +88,7 @@
                             <option value="BANCARIO">Visão: Faturamento Bancário</option>
                             <option value="ESTIMADO_CUSTOS">Visão: Meta (Baseado em Compras)</option>
                         </select>
-                        <button type="button" id="gerar-relatorio-btn" class="btn btn-success btn-sm">Gerar PDF</button>
+                        <button type="button" id="gerar-relatorio-btn" class="btn btn-success btn-sm">PDF</button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -104,13 +104,13 @@
                             <div id="faturamento-anual-barra" class="progress-bar bg-info" role="progressbar" style="width: 0%;">0%</div>
                         </div>
                     </div>
-                    <hr>
-                    <div>
+                    <hr id="faturamento-hr-separator">
+                    <div id="faturamento-mensal-div">
                         <div class="d-flex justify-content-between">
-                            <strong>Faturamento Mensal (Proporcional)</strong>
+                            <strong id="faturamento-mensal-titulo">Faturamento Mensal (Proporcional)</strong>
                             <div>
                                 <span id="faturamento-mensal-valor">R$ 0,00</span> /
-                                <span>R$ 6.750,00</span>
+                                <span id="faturamento-mensal-teto">R$ 6.750,00</span>
                             </div>
                         </div>
                         <div class="progress" style="height: 20px;">
@@ -120,9 +120,6 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="row mt-4">
         <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
@@ -135,100 +132,113 @@
 
     <script th:src="@{/webjars/chartjs/4.4.3/dist/chart.umd.js}"></script>
     <script th:inline="javascript">
-        // Script para o Gráfico de Pizza
+        // Espera a página inteira carregar para executar qualquer script
         document.addEventListener('DOMContentLoaded', function() {
-            const dataInicio = /*[[${dataInicioSel}]]*/ null;
-            const dataFim = /*[[${dataFimSel}]]*/ null;
-            const contaId = /*[[${contaIdSel}]]*/ null;
-            const pessoaId = /*[[${pessoaIdSel}]]*/ null;
 
-            let apiUrl = '/api/dashboard/despesas-por-categoria?';
-            if (dataInicio) apiUrl += `dataInicio=${dataInicio}&`;
-            if (dataFim) apiUrl += `dataFim=${dataFim}&`;
-            if (contaId) apiUrl += `contaId=${contaId}&`;
-            if (pessoaId) apiUrl += `pessoaId=${pessoaId}&`;
+            // --- LÓGICA DO GRÁFICO DE PIZZA ---
+            function carregarGraficoPizza() {
+                const dataInicio = /*[[${dataInicioSel}]]*/ null;
+                const dataFim = /*[[${dataFimSel}]]*/ null;
+                const contaId = /*[[${contaIdSel}]]*/ null;
+                const pessoaId = /*[[${pessoaIdSel}]]*/ null;
 
-            fetch(apiUrl)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.length === 0) return;
-                    const labels = data.map(item => item.label);
-                    const values = data.map(item => item.value);
-                    const ctx = document.getElementById('despesasPorCategoriaChart');
-                    new Chart(ctx, {
-                        type: 'doughnut',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                label: 'Total Gasto',
-                                data: values,
-                                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40']
-                            }]
-                        }
+                let apiUrl = '/api/dashboard/despesas-por-categoria?';
+                if (dataInicio) apiUrl += `dataInicio=${dataInicio}&`;
+                if (dataFim) apiUrl += `dataFim=${dataFim}&`;
+                if (contaId) apiUrl += `contaId=${contaId}&`;
+                if (pessoaId) apiUrl += `pessoaId=${pessoaId}&`;
+
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.length === 0) return;
+                        const labels = data.map(item => item.label);
+                        const values = data.map(item => item.value);
+                        const ctx = document.getElementById('despesasPorCategoriaChart');
+
+                        new Chart(ctx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: 'Total Gasto',
+                                    data: values,
+                                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40']
+                                }]
+                            }
+                        });
                     });
-                });
-        });
+            }
 
-        // Script para o Widget de Faturamento Dinâmico
-        function formatarMoeda(valor) {
-            if(valor === null) return 'R$ 0,00';
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
-        }
+            // --- LÓGICA DO WIDGET DE FATURAMENTO ---
+            function formatarMoeda(valor) {
+                if(valor === null || valor === undefined) return 'R$ 0,00';
+                return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
+            }
 
-        function atualizarWidgetFaturamento(tipoCalculo) {
-            const apiUrl = `/api/dashboard/faturamento-widget?tipoCalculo=${tipoCalculo}`;
-            fetch(apiUrl)
-                .then(response => response.json())
-                .then(data => {
-                    const valorAnualEl = document.getElementById('faturamento-anual-valor');
-                    const barraAnualEl = document.getElementById('faturamento-anual-barra');
-                    const valorMensalEl = document.getElementById('faturamento-mensal-valor');
-                    const barraMensalEl = document.getElementById('faturamento-mensal-barra');
-                    const divMensal = document.getElementById('faturamento-mensal-div');
-                    const hrSeparator = document.getElementById('faturamento-hr-separator');
+            function atualizarWidgetFaturamento(tipoCalculo) {
+                const apiUrl = `/api/dashboard/faturamento-widget?tipoCalculo=${tipoCalculo}`;
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        const valorAnualEl = document.getElementById('faturamento-anual-valor');
+                        const barraAnualEl = document.getElementById('faturamento-anual-barra');
+                        const valorMensalEl = document.getElementById('faturamento-mensal-valor');
+                        const barraMensalEl = document.getElementById('faturamento-mensal-barra');
+                        const divMensal = document.getElementById('faturamento-mensal-div');
+                        const hrSeparator = document.getElementById('faturamento-hr-separator');
+                        const tituloMensalEl = document.getElementById('faturamento-mensal-titulo');
+                        const tetoMensalEl = document.getElementById('faturamento-mensal-teto');
 
-                    const faturamentoAnual = data.faturamentoAnual || 0;
-                    const percentualAnual = (faturamentoAnual / 81000 * 100).toFixed(1);
-                    valorAnualEl.innerText = formatarMoeda(faturamentoAnual);
-                    barraAnualEl.style.width = `${percentualAnual}%`;
-                    barraAnualEl.innerText = `${percentualAnual}%`;
+                        const faturamentoAnual = data.faturamentoAnual || 0;
+                        const percentualAnual = (faturamentoAnual / 81000 * 100).toFixed(1);
+                        valorAnualEl.innerText = formatarMoeda(faturamentoAnual);
+                        barraAnualEl.style.width = `${percentualAnual}%`;
+                        barraAnualEl.innerText = `${percentualAnual}%`;
 
-                    if (tipoCalculo === 'OFICIAL' || tipoCalculo === 'BANCARIO') {
-                        divMensal.style.display = 'block';
-                        hrSeparator.style.display = 'block';
                         const faturamentoMensal = data.faturamentoMensal || 0;
                         const percentualMensal = (faturamentoMensal / 6750 * 100).toFixed(1);
                         valorMensalEl.innerText = formatarMoeda(faturamentoMensal);
                         barraMensalEl.style.width = `${percentualMensal}%`;
                         barraMensalEl.innerText = `${percentualMensal}%`;
-                    } else {
-                        divMensal.style.display = 'none';
-                        hrSeparator.style.display = 'none';
-                    }
+
+                        divMensal.style.display = 'block';
+                        hrSeparator.style.display = 'block';
+
+                        if (tipoCalculo === 'ESTIMADO_CUSTOS') {
+                            tituloMensalEl.innerText = 'Meta Mensal (Baseado em Compras)';
+                            tetoMensalEl.innerText = '';
+                        } else {
+                            tituloMensalEl.innerText = 'Faturamento Mensal (Proporcional)';
+                            tetoMensalEl.innerText = 'R$ 6.750,00';
+                        }
+                    });
+            }
+
+            // --- LÓGICA DO BOTÃO DE PDF ---
+            function configurarBotaoPdf() {
+                const pdfButton = document.getElementById('gerar-relatorio-btn');
+                pdfButton.addEventListener('click', function() {
+                    const dataInicio = document.getElementById('dataInicio').value;
+                    const dataFim = document.getElementById('dataFim').value;
+                    const tipoVisao = document.getElementById('faturamento-filter').value;
+                    let reportUrl = `/relatorios/faturamento/dinamico/pdf?tipoVisao=${tipoVisao}`;
+                    if (dataInicio) reportUrl += `&dataInicio=${dataInicio}`;
+                    if (dataFim) reportUrl += `&dataFim=${dataFim}`;
+                    window.open(reportUrl, '_blank');
                 });
-        }
+            }
 
-        const filtroFaturamentoEl = document.getElementById('faturamento-filter');
-        filtroFaturamentoEl.addEventListener('change', (event) => {
-            atualizarWidgetFaturamento(event.target.value);
-        });
-
-        document.addEventListener('DOMContentLoaded', () => {
-            atualizarWidgetFaturamento('OFICIAL');
-        });
-
-        // Script para o botão de PDF
-        document.addEventListener('DOMContentLoaded', function() {
-            const pdfButton = document.getElementById('gerar-relatorio-btn');
-            pdfButton.addEventListener('click', function() {
-                const dataInicio = document.getElementById('dataInicio').value;
-                const dataFim = document.getElementById('dataFim').value;
-                const tipoVisao = document.getElementById('faturamento-filter').value;
-                let reportUrl = `/relatorios/faturamento/dinamico/pdf?tipoVisao=${tipoVisao}`;
-                if (dataInicio) reportUrl += `&dataInicio=${dataInicio}`;
-                if (dataFim) reportUrl += `&dataFim=${dataFim}`;
-                window.open(reportUrl, '_blank');
+            // --- INICIALIZAÇÃO E EVENTOS ---
+            const filtroFaturamentoEl = document.getElementById('faturamento-filter');
+            filtroFaturamentoEl.addEventListener('change', (event) => {
+                atualizarWidgetFaturamento(event.target.value);
             });
+
+            // Chama as funções para carregar o estado inicial da página
+            carregarGraficoPizza();
+            atualizarWidgetFaturamento('OFICIAL');
+            configurarBotaoPdf();
         });
     </script>
 </div>
