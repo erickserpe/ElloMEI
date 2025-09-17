@@ -33,7 +33,7 @@ public class DashboardController {
 
         // 1. Busca os dados para preencher os dropdowns do filtro
         model.addAttribute("listaDeContas", contaService.buscarTodas());
-        model.addAttribute("listaDePessoas", contatoService.buscarTodas());
+        model.addAttribute("listaDePessoas", contatoService.buscarTodos());
 
         // 2. Passa os filtros para o serviço fazer os cálculos para os cards
         model.addAttribute("saldoTotal", dashboardService.getSaldoTotal(contaId));

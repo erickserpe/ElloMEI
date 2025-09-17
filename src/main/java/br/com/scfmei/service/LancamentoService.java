@@ -53,7 +53,7 @@ public class LancamentoService {
             lancamento.setData(form.getData());
             lancamento.setTipo(form.getTipo());
             lancamento.setCategoriaDespesa(form.getCategoriaDespesa());
-            lancamento.setPessoa(form.getPessoa());
+            lancamento.setContato(form.getContato());
             lancamento.setComNotaFiscal(form.getComNotaFiscal());
             lancamento.setGrupoOperacao(grupoOperacao);
             Conta conta = contaService.buscarPorId(pagamento.getConta()).orElseThrow(() -> new RuntimeException("Conta não encontrada!"));
@@ -85,7 +85,7 @@ public class LancamentoService {
         form.setData(umLancamentoDoGrupo.getData());
         form.setTipo(umLancamentoDoGrupo.getTipo());
         form.setCategoriaDespesa(umLancamentoDoGrupo.getCategoriaDespesa());
-        form.setPessoa(umLancamentoDoGrupo.getPessoa());
+        form.setContato(umLancamentoDoGrupo.getContato());
         form.setComNotaFiscal(umLancamentoDoGrupo.getComNotaFiscal());
         form.setComprovantes(umLancamentoDoGrupo.getComprovantes());
         List<PagamentoDTO> pagamentos = lancamentosDoGrupo.stream().map(l -> {

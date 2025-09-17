@@ -21,7 +21,8 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
             "(:dataInicio IS NULL OR l.data >= :dataInicio) AND " +
             "(:dataFim IS NULL OR l.data <= :dataFim) AND " +
             "(:contaId IS NULL OR l.conta.id = :contaId) AND " +
-            "(:pessoaId IS NULL OR l.pessoa.id = :pessoaId) AND " +
+            // Correção aqui: de l.pessoa.id para l.contato.id
+            "(:pessoaId IS NULL OR l.contato.id = :pessoaId) AND " +
             "(:tipo IS NULL OR l.tipo = :tipo) AND " +
             "(:comNotaFiscal IS NULL OR l.comNotaFiscal = :comNotaFiscal) " +
             "ORDER BY l.data DESC, l.id DESC")
@@ -38,9 +39,11 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
             "FROM Lancamento l JOIN l.categoriaDespesa c " +
             "WHERE l.tipo = 'SAIDA' " +
             "AND l.data >= :inicioDoMes AND l.data <= :fimDoMes " +
-            "AND (:contaId IS NULL OR l.conta.id = :contaId) " +
-            "AND (:pessoaId IS NULL OR l.pessoa.id = :pessoaId) " +
+            "AND (:contaId IS NULL OR l.conta.id = :contaId) AND " +
+            // Correção aqui também
+            "(:pessoaId IS NULL OR l.contato.id = :pessoaId) " +
             "GROUP BY c.nome")
+
     List<ChartData> findDespesasPorCategoriaComFiltros(
             @Param("inicioDoMes") LocalDate inicioDoMes,
             @Param("fimDoMes") LocalDate fimDoMes,

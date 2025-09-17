@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout-base(~{::title}, ~{::div})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulário de Contato</title>
+</head>
+<body>
+
+<div class="container mt-4">
+    <h1>Cadastro de Contato</h1>
+
+    <form th:action="@{/contatoes}" method="post" th:object="${contato}">
+        <input type="hidden" th:field="*{id}" />
+
+        <div class="mb-3">
+            <label for="tipoContato" class="form-label">Tipo de Contato</label>
+            <select class="form-select" id="tipoContato" th:field="*{tipoContato}" required>
+                <option value="">Selecione o tipo</option>
+                <option th:each="tipoOpt : ${T(br.com.scfmei.domain.TipoContato).values()}"
+                        th:value="${tipoOpt}" th:text="${tipoOpt.descricao}"></option>
+            </select>
+        </div>
+
+        <div id="pessoa-fisica-fields">
+            <div class="mb-3">
+                <label for="nomeCompleto" class="form-label">Nome Completo</label>
+                <input type="text" class="form-control" id="nomeCompleto" th:field="*{nomeCompleto}" placeholder="Ex: João da Silva">
+            </div>
+            <div class="mb-3">
+                <label for="cpf" class="form-label">CPF</label>
+                <input type="text" class="form-control" id="cpf" th:field="*{cpf}">
+            </div>
+        </div>
+
+        <div id="pessoa-juridica-fields" style="display: none;">
+            <div class="mb-3">
+                <label for="razaoSocial" class="form-label">Razão Social</label>
+                <input type="text" class="form-control" id="razaoSocial" th:field="*{razaoSocial}">
+            </div>
+            <div class="mb-3">
+                <label for="nomeFantasia" class="form-label">Nome Fantasia</label>
+                <input type="text" class="form-control" id="nomeFantasia" th:field="*{nomeFantasia}">
+            </div>
+            <div class="mb-3">
+                <label for="cnpj" class="form-label">CNPJ</label>
+                <input type="text" class="form-control" id="cnpj" th:field="*{cnpj}">
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">Salvar</button>
+        <a th:href="@{/contatoes}" class="btn btn-secondary">Cancelar</a>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tipoContatoSelect = document.getElementById('tipoContato');
+            const pfFields = document.getElementById('pessoa-fisica-fields');
+            const pjFields = document.getElementById('pessoa-juridica-fields');
+
+            function toggleFields() {
+                const selectedValue = tipoContatoSelect.value;
+                if (selectedValue === 'PESSOA_FISICA') {
+                    pfFields.style.display = 'block';
+                    pjFields.style.display = 'none';
+                } else if (selectedValue === 'PESSOA_JURIDICA') {
+                    pfFields.style.display = 'none';
+                    pjFields.style.display = 'block';
+                } else {
+                    pfFields.style.display = 'block'; // Padrão
+                    pjFields.style.display = 'none';
+                }
+            }
+
+            // Garante que o estado correto seja exibido ao carregar a página (para edição)
+            toggleFields();
+
+            // Adiciona o listener para mudanças
+            tipoContatoSelect.addEventListener('change', toggleFields);
+        });
+    </script>
+</div>
+
+</body>
+</html>

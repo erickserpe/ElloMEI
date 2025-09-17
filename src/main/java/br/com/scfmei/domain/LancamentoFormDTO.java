@@ -34,9 +34,8 @@ public class LancamentoFormDTO {
     public void setTipo(TipoLancamento tipo) { this.tipo = tipo; }
     public CategoriaDespesa getCategoriaDespesa() { return categoriaDespesa; }
     public void setCategoriaDespesa(CategoriaDespesa categoriaDespesa) { this.categoriaDespesa = categoriaDespesa; }
-    public Contato getPessoa() { return contato; }
-    public void setPessoa(Contato contato) { this.contato = contato; }
-    public Boolean getComNotaFiscal() { return comNotaFiscal; }
+    public Contato getContato() { return contato; }
+    public void setContato(Contato contato) { this.contato = contato; }public Boolean getComNotaFiscal() { return comNotaFiscal; }
     public void setComNotaFiscal(Boolean comNotaFiscal) { this.comNotaFiscal = comNotaFiscal; }
     public List<PagamentoDTO> getPagamentos() { return pagamentos; }
     public void setPagamentos(List<PagamentoDTO> pagamentos) { this.pagamentos = pagamentos; }

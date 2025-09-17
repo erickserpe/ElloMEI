@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout-base(~{::title}, ~{::div})}">
+
+<head>
+    <title>Contatos</title> </head>
+
+<body>
+<div>
+    <h1 class="mb-3">Contatos</h1> <a th:href="@{/contatoes/nova}" class="btn btn-primary mb-3">Novo Contato</a> <table class="table table-striped table-hover table-bordered">
+    <thead class="table-dark">
+    <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Ações</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="contato : ${listaDeContatos}">
+        <td th:text="${contato.id}">1</td>
+        <td th:text="${contato.getNomeExibicao()}">Nome Teste</td>
+        <td>
+            <a th:href="@{/contatoes/editar/{id}(id=${contato.id})}" class="btn btn-warning btn-sm">Editar</a>
+            <a th:href="@{/contatoes/excluir/{id}(id=${contato.id})}" class="btn btn-danger btn-sm">Excluir</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</div>
+</body>
+</html>

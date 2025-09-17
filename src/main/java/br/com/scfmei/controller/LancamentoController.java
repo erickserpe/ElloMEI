@@ -42,7 +42,7 @@ public class LancamentoController {
 
         // Adiciona listas para os dropdowns de filtro
         model.addAttribute("listaDeContas", contaService.buscarTodas());
-        model.addAttribute("listaDePessoas", contatoService.buscarTodas());
+        model.addAttribute("listaDePessoas", contatoService.buscarTodos());
 
         // Devolve os filtros selecionados para a view
         model.addAttribute("dataInicioSel", dataInicio);
@@ -57,7 +57,7 @@ public class LancamentoController {
     public String mostrarFormularioDeNovoLancamento(Model model) {
         model.addAttribute("listaDeContas", contaService.buscarTodas());
         model.addAttribute("listaDeCategorias", categoriaService.buscarTodas());
-        model.addAttribute("listaDePessoas", contatoService.buscarTodas());
+        model.addAttribute("listaDePessoas", contatoService.buscarTodos());
         model.addAttribute("lancamentoForm", new LancamentoFormDTO());
         return "form-lancamento";
     }
@@ -66,7 +66,7 @@ public class LancamentoController {
     public String mostrarFormularioDeEdicao(@PathVariable Long id, Model model) {
         model.addAttribute("listaDeContas", contaService.buscarTodas());
         model.addAttribute("listaDeCategorias", categoriaService.buscarTodas());
-        model.addAttribute("listaDePessoas", contatoService.buscarTodas());
+        model.addAttribute("listaDePessoas", contatoService.buscarTodos());
         LancamentoFormDTO formDTO = lancamentoService.carregarOperacaoParaEdicao(id);
         model.addAttribute("lancamentoForm", formDTO);
         return "form-lancamento";
