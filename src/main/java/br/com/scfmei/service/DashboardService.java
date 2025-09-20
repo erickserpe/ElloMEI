@@ -13,7 +13,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class DashboardService {
@@ -35,43 +39,73 @@ public class DashboardService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public BigDecimal getTotalEntradas(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long pessoaId) {
+    public BigDecimal getTotalEntradas(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long contatoId) {
         if (dataInicio == null || dataFim == null) {
             YearMonth mesAtual = YearMonth.now();
             dataInicio = mesAtual.atDay(1);
             dataFim = mesAtual.atEndOfMonth();
         }
-        List<Lancamento> entradas = lancamentoRepository.findComFiltros(dataInicio, dataFim, contaId, pessoaId, TipoLancamento.ENTRADA, null);
+        List<Lancamento> entradas = lancamentoRepository.findComFiltros(dataInicio, dataFim, contaId, contatoId, TipoLancamento.ENTRADA, null, null, null);
         return entradas.stream()
                 .map(Lancamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public BigDecimal getTotalSaidas(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long pessoaId) {
+    public BigDecimal getTotalSaidas(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long contatoId) {
         if (dataInicio == null || dataFim == null) {
             YearMonth mesAtual = YearMonth.now();
             dataInicio = mesAtual.atDay(1);
             dataFim = mesAtual.atEndOfMonth();
         }
-        List<Lancamento> saidas = lancamentoRepository.findComFiltros(dataInicio, dataFim, contaId, pessoaId, TipoLancamento.SAIDA, null);
+        List<Lancamento> saidas = lancamentoRepository.findComFiltros(dataInicio, dataFim, contaId, contatoId, TipoLancamento.SAIDA, null, null, null);
         return saidas.stream()
                 .map(Lancamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public List<ChartData> getDespesasPorCategoria(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long pessoaId) {
+    public List<ChartData> getDespesasPorCategoria(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long contatoId) {
         if (dataInicio == null || dataFim == null) {
             YearMonth mesAtual = YearMonth.now();
             dataInicio = mesAtual.atDay(1);
             dataFim = mesAtual.atEndOfMonth();
         }
-        return lancamentoRepository.findDespesasPorCategoriaComFiltros(dataInicio, dataFim, contaId, pessoaId);
+        return lancamentoRepository.findDespesasPorCategoriaComFiltros(dataInicio, dataFim, contaId, contatoId);
+    }
+
+    public Map<String, List<?>> getFluxoDeCaixaUltimos12Meses() {
+        Map<String, List<?>> resultado = new HashMap<>();
+        List<String> labels = new ArrayList<>();
+        List<BigDecimal> entradas = new ArrayList<>();
+        List<BigDecimal> saidas = new ArrayList<>();
+
+        LocalDate hoje = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM/yy");
+
+        for (int i = 11; i >= 0; i--) {
+            YearMonth mes = YearMonth.from(hoje.minusMonths(i));
+            labels.add(mes.format(formatter));
+
+            LocalDate inicioDoMes = mes.atDay(1);
+            // --- A CORREÇÃO ESTÁ AQUI ---
+            LocalDate fimDoMes = mes.atEndOfMonth(); // Usar a variável 'mes' do ciclo
+
+            BigDecimal totalEntradas = getTotalEntradas(inicioDoMes, fimDoMes, null, null);
+            BigDecimal totalSaidas = getTotalSaidas(inicioDoMes, fimDoMes, null, null);
+
+            entradas.add(totalEntradas);
+            saidas.add(totalSaidas);
+        }
+
+        resultado.put("labels", labels);
+        resultado.put("entradas", entradas);
+        resultado.put("saidas", saidas);
+        return resultado;
     }
 
     public BigDecimal getFaturamentoOficial(int ano) {
         LocalDate inicioDoAno = LocalDate.of(ano, 1, 1);
         LocalDate fimDoAno = LocalDate.of(ano, 12, 31);
-        List<Lancamento> entradas = lancamentoRepository.findComFiltros(inicioDoAno, fimDoAno, null, null, TipoLancamento.ENTRADA, null);
+        List<Lancamento> entradas = lancamentoRepository.findComFiltros(inicioDoAno, fimDoAno, null, null, TipoLancamento.ENTRADA, null, null, null);
         return entradas.stream()
                 .map(Lancamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -95,7 +129,7 @@ public class DashboardService {
     public BigDecimal getMetaFaturamentoBaseadoEmCustos(int ano) {
         LocalDate inicioDoAno = LocalDate.of(ano, 1, 1);
         LocalDate fimDoAno = LocalDate.of(ano, 12, 31);
-        List<Lancamento> comprasComNota = lancamentoRepository.findComFiltros(inicioDoAno, fimDoAno, null, null, TipoLancamento.SAIDA, true);
+        List<Lancamento> comprasComNota = lancamentoRepository.findComFiltros(inicioDoAno, fimDoAno, null, null, TipoLancamento.SAIDA, null, true, null);
         BigDecimal totalComprasComNota = comprasComNota.stream()
                 .map(Lancamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -109,7 +143,7 @@ public class DashboardService {
         YearMonth mesAtual = YearMonth.now();
         LocalDate inicioDoMes = mesAtual.atDay(1);
         LocalDate fimDoMes = mesAtual.atEndOfMonth();
-        List<Lancamento> comprasComNota = lancamentoRepository.findComFiltros(inicioDoMes, fimDoMes, null, null, TipoLancamento.SAIDA, true);
+        List<Lancamento> comprasComNota = lancamentoRepository.findComFiltros(inicioDoMes, fimDoMes, null, null, TipoLancamento.SAIDA, null, true, null);
         BigDecimal totalComprasComNota = comprasComNota.stream()
                 .map(Lancamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

@@ -1,20 +1,24 @@
 <!DOCTYPE html>
 <html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" /> <style>
-    body { font-family: Arial, sans-serif; font-size: 10px; }
-    h1 { text-align: center; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
-    thead { background-color: #f2f2f2; }
-    .total { font-weight: bold; }
-    .entrada { color: #28a745; }
-    .saida { color: #dc3545; }
-</style>
+    <meta charset="UTF-8" />
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 10px; }
+        h1 { text-align: center; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
+        thead { background-color: #f2f2f2; }
+        .total { font-weight: bold; }
+        .entrada { color: #28a745; }
+        .saida { color: #dc3545; }
+        .comprovante-img { max-width: 80%; max-height: 250px; margin-top: 5px; display: block; margin-left: auto; margin-right: auto; }
+        .comprovante-row td { padding: 10px; text-align: center; background-color: #fafafa; }
+    </style>
     <title>Relatório de Lançamentos</title>
 </head>
 <body>
 <h1>Relatório de Lançamentos</h1>
+
 <p th:if="${dataInicio != null}">
     <strong>Período de:</strong>
     <span th:text="${#temporals.format(dataInicio, 'dd/MM/yyyy')}"></span>
@@ -45,12 +49,17 @@
             <td th:text="${#numbers.formatDecimal(lancamento.valor, 1, 'POINT', 2, 'COMMA')}"
                 th:class="${lancamento.tipo.name() == 'ENTRADA' ? 'entrada' : 'saida'}"></td>
         </tr>
-        <tr th:if="${lancamento.comprovantePath != null}">
-            <td colspan="6" style="padding: 10px; text-align: center;">
-                <strong>Comprovante:</strong><br/>
-                <img th:src="${lancamento.comprovantePath}" style="max-width: 80%; max-height: 250px; margin-top: 5px;" />
+
+        <!-- Linha para mostrar comprovantes, se houver -->
+        <tr th:if="${lancamento.comprovantes != null and !lancamento.comprovantes.isEmpty()}" class="comprovante-row">
+            <td colspan="6">
+                <strong>Comprovantes:</strong>
+                <th:block th:each="comp : ${lancamento.comprovantes}">
+                    <img th:src="@{${comp.caminho}}" alt="Comprovante" class="comprovante-img"/>
+                </th:block>
             </td>
         </tr>
+
     </th:block>
     </tbody>
 </table>

@@ -28,9 +28,15 @@ public class DashboardRestController {
             @RequestParam(required = false) LocalDate dataInicio,
             @RequestParam(required = false) LocalDate dataFim,
             @RequestParam(required = false) Long contaId,
-            @RequestParam(required = false) Long pessoaId) {
+            @RequestParam(required = false) Long contatoId) {
 
-        List<ChartData> data = dashboardService.getDespesasPorCategoria(dataInicio, dataFim, contaId, pessoaId);
+        List<ChartData> data = dashboardService.getDespesasPorCategoria(dataInicio, dataFim, contaId, contatoId);
+        return ResponseEntity.ok(data);
+    }
+
+    @GetMapping("/fluxo-caixa-mensal")
+    public ResponseEntity<Map<String, List<?>>> getFluxoDeCaixaMensal() {
+        Map<String, List<?>> data = dashboardService.getFluxoDeCaixaUltimos12Meses();
         return ResponseEntity.ok(data);
     }
 
@@ -53,9 +59,6 @@ public class DashboardRestController {
                 break;
             default: // "OFICIAL"
                 faturamentoAnual = dashboardService.getFaturamentoOficial(anoAtual);
-
-                // --- CORREÇÃO AQUI ---
-                // Usamos o método getTotalEntradas para calcular o faturamento do mês atual
                 LocalDate inicioDoMes = mesAtual.atDay(1);
                 LocalDate fimDoMes = mesAtual.atEndOfMonth();
                 faturamentoMensal = dashboardService.getTotalEntradas(inicioDoMes, fimDoMes, null, null);

@@ -32,12 +32,12 @@ public class LancamentoController {
     public String listarLancamentos(@RequestParam(required = false) LocalDate dataInicio,
                                     @RequestParam(required = false) LocalDate dataFim,
                                     @RequestParam(required = false) Long contaId,
-                                    @RequestParam(required = false) Long pessoaId,
+                                    @RequestParam(required = false) Long contatoId,
                                     Model model) {
 
-        // --- CORREÇÃO AQUI ---
-        // Agora passamos null para os filtros que não usamos nesta tela
-        List<Lancamento> lancamentos = lancamentoService.buscarComFiltros(dataInicio, dataFim, contaId, pessoaId, null, null);
+        // --- A CORREÇÃO ESTÁ AQUI ---
+        // Agora passamos os 8 argumentos necessários, com 'null' para os que não são usados nesta tela.
+        List<Lancamento> lancamentos = lancamentoService.buscarComFiltros(dataInicio, dataFim, contaId, contatoId, null, null, null, null);
         model.addAttribute("listaDeLancamentos", lancamentos);
 
         // Adiciona listas para os dropdowns de filtro
@@ -48,7 +48,9 @@ public class LancamentoController {
         model.addAttribute("dataInicioSel", dataInicio);
         model.addAttribute("dataFimSel", dataFim);
         model.addAttribute("contaIdSel", contaId);
-        model.addAttribute("pessoaIdSel", pessoaId);
+        // O nome do atributo no model para o HTML deve corresponder ao que o HTML espera.
+        // Se o seu `lancamentos.html` usa `pessoaIdSel`, mantemos assim, mas passando o valor de `contatoId`.
+        model.addAttribute("pessoaIdSel", contatoId);
 
         return "lancamentos";
     }

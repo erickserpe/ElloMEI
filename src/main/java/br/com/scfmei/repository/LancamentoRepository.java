@@ -21,34 +21,35 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
             "(:dataInicio IS NULL OR l.data >= :dataInicio) AND " +
             "(:dataFim IS NULL OR l.data <= :dataFim) AND " +
             "(:contaId IS NULL OR l.conta.id = :contaId) AND " +
-            // Correção aqui: de l.pessoa.id para l.contato.id
-            "(:pessoaId IS NULL OR l.contato.id = :pessoaId) AND " +
+            "(:contatoId IS NULL OR l.contato.id = :contatoId) AND " +
             "(:tipo IS NULL OR l.tipo = :tipo) AND " +
-            "(:comNotaFiscal IS NULL OR l.comNotaFiscal = :comNotaFiscal) " +
+            "(:categoriaId IS NULL OR l.categoriaDespesa.id = :categoriaId) AND " +
+            "(:comNotaFiscal IS NULL OR l.comNotaFiscal = :comNotaFiscal) AND " +
+            "(:descricao IS NULL OR l.descricao LIKE %:descricao%) " + // <-- FILTRO NOVO
             "ORDER BY l.data DESC, l.id DESC")
     List<Lancamento> findComFiltros(
             @Param("dataInicio") LocalDate dataInicio,
             @Param("dataFim") LocalDate dataFim,
             @Param("contaId") Long contaId,
-            @Param("pessoaId") Long pessoaId,
+            @Param("contatoId") Long contatoId,
             @Param("tipo") TipoLancamento tipo,
-            @Param("comNotaFiscal") Boolean comNotaFiscal
+            @Param("categoriaId") Long categoriaId,
+            @Param("comNotaFiscal") Boolean comNotaFiscal,
+            @Param("descricao") String descricao // <-- PARÂMETRO NOVO
     );
 
     @Query("SELECT new br.com.scfmei.domain.ChartData(c.nome, SUM(l.valor)) " +
             "FROM Lancamento l JOIN l.categoriaDespesa c " +
             "WHERE l.tipo = 'SAIDA' " +
             "AND l.data >= :inicioDoMes AND l.data <= :fimDoMes " +
-            "AND (:contaId IS NULL OR l.conta.id = :contaId) AND " +
-            // Correção aqui também
-            "(:pessoaId IS NULL OR l.contato.id = :pessoaId) " +
+            "AND (:contaId IS NULL OR l.conta.id = :contaId) " +
+            "AND (:contatoId IS NULL OR l.contato.id = :contatoId) " +
             "GROUP BY c.nome")
-
     List<ChartData> findDespesasPorCategoriaComFiltros(
             @Param("inicioDoMes") LocalDate inicioDoMes,
             @Param("fimDoMes") LocalDate fimDoMes,
             @Param("contaId") Long contaId,
-            @Param("pessoaId") Long pessoaId
+            @Param("contatoId") Long contatoId
     );
 
     @Query("SELECT SUM(l.valor) FROM Lancamento l JOIN l.conta c " +

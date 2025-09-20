@@ -119,8 +119,8 @@ public class LancamentoService {
     }
 
     @Transactional(readOnly = true)
-    public List<Lancamento> buscarComFiltros(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long pessoaId, TipoLancamento tipo, Boolean comNotaFiscal) {
-        return lancamentoRepository.findComFiltros(dataInicio, dataFim, contaId, pessoaId, tipo, comNotaFiscal);
+    public List<Lancamento> buscarComFiltros(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long contatoId, TipoLancamento tipo, Long categoriaId, Boolean comNotaFiscal, String descricao) {
+        return lancamentoRepository.findComFiltros(dataInicio, dataFim, contaId, contatoId, tipo, categoriaId, comNotaFiscal, descricao);
     }
 
     private void aplicarLancamentoNaConta(Lancamento lancamento) {
