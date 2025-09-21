@@ -1,9 +1,6 @@
 package br.com.scfmei.service;
 
-import br.com.scfmei.domain.ChartData;
-import br.com.scfmei.domain.Conta;
-import br.com.scfmei.domain.Lancamento;
-import br.com.scfmei.domain.TipoLancamento;
+import br.com.scfmei.domain.*;
 import br.com.scfmei.repository.ContaRepository;
 import br.com.scfmei.repository.LancamentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,53 +25,43 @@ public class DashboardService {
     @Autowired
     private LancamentoRepository lancamentoRepository;
 
-    public BigDecimal getSaldoTotal(Long contaId) {
+
+    public BigDecimal getSaldoTotal(Usuario usuario, Long contaId) {
         if (contaId != null) {
             return contaRepository.findById(contaId)
                     .map(Conta::getSaldoAtual)
                     .orElse(BigDecimal.ZERO);
         }
-        return contaRepository.findAll().stream()
+
+        return contaRepository.findByUsuario(usuario).stream()
                 .map(Conta::getSaldoAtual)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public BigDecimal getTotalEntradas(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long contatoId) {
+
+    public BigDecimal getTotalEntradas(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long contatoId, Usuario usuario) {
         if (dataInicio == null || dataFim == null) {
             YearMonth mesAtual = YearMonth.now();
             dataInicio = mesAtual.atDay(1);
             dataFim = mesAtual.atEndOfMonth();
         }
-        // CORREÇÃO AQUI: Adicionado o nono argumento 'null' para o status
-        List<Lancamento> entradas = lancamentoRepository.findComFiltros(dataInicio, dataFim, contaId, contatoId, TipoLancamento.ENTRADA, null, null, null, null);
+        List<Lancamento> entradas = lancamentoRepository.findComFiltros(dataInicio, dataFim, contaId, contatoId, TipoLancamento.ENTRADA, null, null, null, null, usuario);
         return entradas.stream()
                 .map(Lancamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public BigDecimal getTotalSaidas(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long contatoId) {
+    public List<ChartData> getDespesasPorCategoria(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long contatoId, Usuario usuario) {
         if (dataInicio == null || dataFim == null) {
             YearMonth mesAtual = YearMonth.now();
             dataInicio = mesAtual.atDay(1);
             dataFim = mesAtual.atEndOfMonth();
         }
-        // CORREÇÃO AQUI: Adicionado o nono argumento 'null' para o status
-        List<Lancamento> saidas = lancamentoRepository.findComFiltros(dataInicio, dataFim, contaId, contatoId, TipoLancamento.SAIDA, null, null, null, null);
-        return saidas.stream()
-                .map(Lancamento::getValor)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return lancamentoRepository.findDespesasPorCategoriaComFiltros(dataInicio, dataFim, contaId, contatoId, usuario);
     }
 
-    public List<ChartData> getDespesasPorCategoria(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long contatoId) {
-        if (dataInicio == null || dataFim == null) {
-            YearMonth mesAtual = YearMonth.now();
-            dataInicio = mesAtual.atDay(1);
-            dataFim = mesAtual.atEndOfMonth();
-        }
-        return lancamentoRepository.findDespesasPorCategoriaComFiltros(dataInicio, dataFim, contaId, contatoId);
-    }
-
-    public Map<String, List<?>> getFluxoDeCaixaUltimos12Meses() {
+    public Map<String, List<?>> getFluxoDeCaixaUltimos12Meses(Usuario usuario) {
         Map<String, List<?>> resultado = new HashMap<>();
         List<String> labels = new ArrayList<>();
         List<BigDecimal> entradas = new ArrayList<>();
@@ -90,8 +77,11 @@ public class DashboardService {
             LocalDate inicioDoMes = mes.atDay(1);
             LocalDate fimDoMes = mes.atEndOfMonth();
 
-            BigDecimal totalEntradas = getTotalEntradas(inicioDoMes, fimDoMes, null, null);
-            BigDecimal totalSaidas = getTotalSaidas(inicioDoMes, fimDoMes, null, null);
+
+            BigDecimal totalEntradas = lancamentoRepository.findComFiltros(inicioDoMes, fimDoMes, null, null, TipoLancamento.ENTRADA, null, null, null, StatusLancamento.PAGO, usuario)
+                    .stream().map(Lancamento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal totalSaidas = lancamentoRepository.findComFiltros(inicioDoMes, fimDoMes, null, null, TipoLancamento.SAIDA, null, null, null, StatusLancamento.PAGO, usuario)
+                    .stream().map(Lancamento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add);
 
             entradas.add(totalEntradas);
             saidas.add(totalSaidas);
@@ -103,36 +93,34 @@ public class DashboardService {
         return resultado;
     }
 
-    public BigDecimal getFaturamentoOficial(int ano) {
+    public BigDecimal getFaturamentoOficial(int ano, Usuario usuario) {
         LocalDate inicioDoAno = LocalDate.of(ano, 1, 1);
         LocalDate fimDoAno = LocalDate.of(ano, 12, 31);
-        // CORREÇÃO AQUI: Adicionado o nono argumento 'null' para o status
-        List<Lancamento> entradas = lancamentoRepository.findComFiltros(inicioDoAno, fimDoAno, null, null, TipoLancamento.ENTRADA, null, null, null, null);
+        List<Lancamento> entradas = lancamentoRepository.findComFiltros(inicioDoAno, fimDoAno, null, null, TipoLancamento.ENTRADA, null, null, null, null, usuario);
         return entradas.stream()
                 .map(Lancamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public BigDecimal getFaturamentoBancario(int ano) {
+    public BigDecimal getFaturamentoBancario(int ano, Usuario usuario) {
         LocalDate inicioDoAno = LocalDate.of(ano, 1, 1);
         LocalDate fimDoAno = LocalDate.of(ano, 12, 31);
-        BigDecimal total = lancamentoRepository.sumEntradasBancariasNoPeriodo(inicioDoAno, fimDoAno);
+        BigDecimal total = lancamentoRepository.sumEntradasBancariasNoPeriodo(inicioDoAno, fimDoAno, usuario);
         return total != null ? total : BigDecimal.ZERO;
     }
 
-    public BigDecimal getFaturamentoBancarioMesAtual() {
+    public BigDecimal getFaturamentoBancarioMesAtual(Usuario usuario) {
         YearMonth mesAtual = YearMonth.now();
         LocalDate inicioDoMes = mesAtual.atDay(1);
         LocalDate fimDoMes = mesAtual.atEndOfMonth();
-        BigDecimal total = lancamentoRepository.sumEntradasBancariasNoPeriodo(inicioDoMes, fimDoMes);
+        BigDecimal total = lancamentoRepository.sumEntradasBancariasNoPeriodo(inicioDoMes, fimDoMes, usuario);
         return total != null ? total : BigDecimal.ZERO;
     }
 
-    public BigDecimal getMetaFaturamentoBaseadoEmCustos(int ano) {
+    public BigDecimal getMetaFaturamentoBaseadoEmCustos(int ano, Usuario usuario) {
         LocalDate inicioDoAno = LocalDate.of(ano, 1, 1);
         LocalDate fimDoAno = LocalDate.of(ano, 12, 31);
-        // CORREÇÃO AQUI: Adicionado o nono argumento 'null' para o status
-        List<Lancamento> comprasComNota = lancamentoRepository.findComFiltros(inicioDoAno, fimDoAno, null, null, TipoLancamento.SAIDA, null, true, null, null);
+        List<Lancamento> comprasComNota = lancamentoRepository.findComFiltros(inicioDoAno, fimDoAno, null, null, TipoLancamento.SAIDA, null, true, null, null, usuario);
         BigDecimal totalComprasComNota = comprasComNota.stream()
                 .map(Lancamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -142,12 +130,11 @@ public class DashboardService {
         return totalComprasComNota.divide(new BigDecimal("0.8"), 2, RoundingMode.HALF_UP);
     }
 
-    public BigDecimal getMetaFaturamentoBaseadoEmCustosMensal() {
+    public BigDecimal getMetaFaturamentoBaseadoEmCustosMensal(Usuario usuario) {
         YearMonth mesAtual = YearMonth.now();
         LocalDate inicioDoMes = mesAtual.atDay(1);
         LocalDate fimDoMes = mesAtual.atEndOfMonth();
-        // CORREÇÃO AQUI: Adicionado o nono argumento 'null' para o status
-        List<Lancamento> comprasComNota = lancamentoRepository.findComFiltros(inicioDoMes, fimDoMes, null, null, TipoLancamento.SAIDA, null, true, null, null);
+        List<Lancamento> comprasComNota = lancamentoRepository.findComFiltros(inicioDoMes, fimDoMes, null, null, TipoLancamento.SAIDA, null, true, null, null, usuario);
         BigDecimal totalComprasComNota = comprasComNota.stream()
                 .map(Lancamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

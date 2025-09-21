@@ -1,7 +1,7 @@
+// src/main/java/br/com/scfmei/domain/Contato.java
 package br.com.scfmei.domain;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
@@ -24,6 +24,12 @@ public class Contato {
     private String nomeFantasia;
     private String cnpj;
 
+    // --- NOVA ADIÇÃO ---
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
+    // -------------------
+
     // --- Getters e Setters ---
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -40,8 +46,12 @@ public class Contato {
     public String getCnpj() { return cnpj; }
     public void setCnpj(String cnpj) { this.cnpj = cnpj; }
 
-    // Método útil para exibir o nome correto na interface
-    @Transient // Diz ao JPA para ignorar este método, ele não é uma coluna
+    // --- NOVOS GETTERS E SETTERS ---
+    public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
+    // -----------------------------
+
+    @Transient
     public String getNomeExibicao() {
         if (this.tipoContato == TipoContato.PESSOA_JURIDICA && this.nomeFantasia != null && !this.nomeFantasia.isBlank()) {
             return this.nomeFantasia;

@@ -1,10 +1,7 @@
 package br.com.scfmei.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 
 @Entity
@@ -30,6 +27,11 @@ public class Usuario {
 
     private String roles; // Papéis/Permissões do usuário
     private LocalDate dataAberturaMei;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
+
     // Getters e Setters...
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -55,4 +57,6 @@ public class Usuario {
     public void setDataAberturaMei(LocalDate dataAberturaMei) {
         this.dataAberturaMei = dataAberturaMei;
     }
+    public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
 }

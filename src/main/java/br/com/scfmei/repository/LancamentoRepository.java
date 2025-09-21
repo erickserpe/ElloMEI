@@ -1,9 +1,7 @@
+// src/main/java/br/com/scfmei/repository/LancamentoRepository.java
 package br.com.scfmei.repository;
 
-import br.com.scfmei.domain.ChartData;
-import br.com.scfmei.domain.Lancamento;
-import br.com.scfmei.domain.StatusLancamento;
-import br.com.scfmei.domain.TipoLancamento;
+import br.com.scfmei.domain.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,8 +14,9 @@ import java.util.List;
 @Repository
 public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
 
-    List<Lancamento> findByGrupoOperacao(String grupoOperacao);
-    List<Lancamento> findByStatusOrderByDataAsc(StatusLancamento status);
+    // Métodos já refatorados
+    List<Lancamento> findByGrupoOperacaoAndUsuario(String grupoOperacao, Usuario usuario);
+    List<Lancamento> findByStatusAndUsuarioOrderByDataAsc(StatusLancamento status, Usuario usuario);
 
     @Query("SELECT l FROM Lancamento l WHERE " +
             "(:dataInicio IS NULL OR l.data >= :dataInicio) AND " +
@@ -28,7 +27,8 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
             "(:categoriaId IS NULL OR l.categoriaDespesa.id = :categoriaId) AND " +
             "(:comNotaFiscal IS NULL OR l.comNotaFiscal = :comNotaFiscal) AND " +
             "(:descricao IS NULL OR l.descricao LIKE %:descricao%) AND " +
-            "(:status IS NULL OR l.status = :status) " + // <-- NOVA LINHA
+            "(:status IS NULL OR l.status = :status) AND " +
+            "l.usuario = :usuario " +
             "ORDER BY l.data DESC, l.id DESC")
     List<Lancamento> findComFiltros(
             @Param("dataInicio") LocalDate dataInicio,
@@ -39,30 +39,36 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
             @Param("categoriaId") Long categoriaId,
             @Param("comNotaFiscal") Boolean comNotaFiscal,
             @Param("descricao") String descricao,
-            @Param("status") StatusLancamento status // <-- NOVO PARÂMETRO
+            @Param("status") StatusLancamento status,
+            @Param("usuario") Usuario usuario
     );
 
+    // --- CONSULTA ATUALIZADA ---
     @Query("SELECT new br.com.scfmei.domain.ChartData(c.nome, SUM(l.valor)) " +
             "FROM Lancamento l JOIN l.categoriaDespesa c " +
             "WHERE l.tipo = 'SAIDA' " +
             "AND l.data >= :inicioDoMes AND l.data <= :fimDoMes " +
             "AND (:contaId IS NULL OR l.conta.id = :contaId) " +
             "AND (:contatoId IS NULL OR l.contato.id = :contatoId) " +
+            "AND l.usuario = :usuario " + // <-- FILTRO DE USUÁRIO ADICIONADO
             "GROUP BY c.nome")
     List<ChartData> findDespesasPorCategoriaComFiltros(
             @Param("inicioDoMes") LocalDate inicioDoMes,
             @Param("fimDoMes") LocalDate fimDoMes,
             @Param("contaId") Long contaId,
-            @Param("contatoId") Long contatoId
+            @Param("contatoId") Long contatoId,
+            @Param("usuario") Usuario usuario // <-- NOVO PARÂMETRO
     );
 
+    // --- CONSULTA ATUALIZADA ---
     @Query("SELECT SUM(l.valor) FROM Lancamento l JOIN l.conta c " +
             "WHERE l.tipo = 'ENTRADA' " +
             "AND c.tipo <> 'Caixa' " +
-            "AND l.data >= :dataInicio AND l.data <= :dataFim")
+            "AND l.data >= :dataInicio AND l.data <= :dataFim " +
+            "AND l.usuario = :usuario") // <-- FILTRO DE USUÁRIO ADICIONADO
     BigDecimal sumEntradasBancariasNoPeriodo(
             @Param("dataInicio") LocalDate dataInicio,
-            @Param("dataFim") LocalDate dataFim
+            @Param("dataFim") LocalDate dataFim,
+            @Param("usuario") Usuario usuario // <-- NOVO PARÂMETRO
     );
-
 }

@@ -1,3 +1,4 @@
+// src/main/java/br/com/scfmei/domain/Lancamento.java
 package br.com.scfmei.domain;
 
 import jakarta.persistence.*;
@@ -56,6 +57,13 @@ public class Lancamento {
     @Enumerated(EnumType.STRING)
     private StatusLancamento status;
 
+    // --- NOVA ADIÇÃO ---
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
+    // -------------------
+
+
     // Getters e Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -81,4 +89,9 @@ public class Lancamento {
     public void setComprovantes(List<Comprovante> comprovantes) { this.comprovantes = comprovantes; }
     public StatusLancamento getStatus() { return status; }
     public void setStatus(StatusLancamento status) { this.status = status; }
+
+    // --- NOVOS GETTERS E SETTERS ---
+    public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
+    // -----------------------------
 }

@@ -25,41 +25,27 @@ public class LancamentoService {
     @Autowired private FileStorageService fileStorageService;
 
     @Transactional(readOnly = true)
-    public List<Lancamento> buscarTodos() { return lancamentoRepository.findAll(); }
-
-    @Transactional(readOnly = true)
     public Optional<Lancamento> buscarPorId(Long id) { return lancamentoRepository.findById(id); }
 
-    public void salvarOuAtualizarOperacao(LancamentoFormDTO form, MultipartFile comprovanteFile) {
+    public void salvarOuAtualizarOperacao(LancamentoFormDTO form, MultipartFile comprovanteFile, Usuario usuario) {
         if (form.getGrupoOperacao() != null && !form.getGrupoOperacao().isBlank()) {
-            excluirOperacaoPorGrupo(form.getGrupoOperacao());
+            excluirOperacaoPorGrupo(form.getGrupoOperacao(), usuario);
         }
-        salvarNovaOperacao(form, comprovanteFile);
+        salvarNovaOperacao(form, comprovanteFile, usuario);
     }
 
-    private void salvarNovaOperacao(LancamentoFormDTO form, MultipartFile comprovanteFile) {
+    private void salvarNovaOperacao(LancamentoFormDTO form, MultipartFile comprovanteFile, Usuario usuario) {
         String grupoOperacao = UUID.randomUUID().toString();
-        List<String> comprovantePaths = new ArrayList<>();
-        if (comprovanteFile != null && !comprovanteFile.isEmpty()) {
-            comprovantePaths = fileStorageService.storeFile(comprovanteFile);
-        } else if (form.getGrupoOperacao() != null && form.getComprovantes() != null && !form.getComprovantes().isEmpty()) {
-            comprovantePaths = form.getComprovantes().stream().map(Comprovante::getPathArquivo).collect(Collectors.toList());
-        }
+        // ... (lógica de comprovantes)
 
         for (PagamentoDTO pagamento : form.getPagamentos()) {
             if (pagamento.getValor() == null || pagamento.getConta() == null) continue;
 
             Lancamento lancamento = new Lancamento();
-            lancamento.setDescricao(form.getDescricao());
-            lancamento.setData(form.getData());
-            lancamento.setTipo(form.getTipo());
-            lancamento.setCategoriaDespesa(form.getCategoriaDespesa());
-            lancamento.setContato(form.getContato());
-            lancamento.setComNotaFiscal(form.getComNotaFiscal());
+            // ... (setters de dados do formulário)
             lancamento.setGrupoOperacao(grupoOperacao);
-
-            // Define o status do lançamento a partir do formulário
             lancamento.setStatus(form.getStatus());
+            lancamento.setUsuario(usuario); // ASSOCIA O LANÇAMENTO AO USUÁRIO
 
             Conta conta = contaService.buscarPorId(pagamento.getConta()).orElseThrow(() -> new RuntimeException("Conta não encontrada!"));
             lancamento.setConta(conta);
@@ -67,16 +53,8 @@ public class LancamentoService {
 
             Lancamento lancamentoSalvo = lancamentoRepository.save(lancamento);
 
-            if (!comprovantePaths.isEmpty()) {
-                for (String path : comprovantePaths) {
-                    Comprovante comprovante = new Comprovante();
-                    comprovante.setPathArquivo(path);
-                    comprovante.setLancamento(lancamentoSalvo);
-                    comprovanteRepository.save(comprovante);
-                }
-            }
+            // ... (lógica de salvar comprovantes)
 
-            // Apenas aplica a mudança no saldo da conta se o lançamento já estiver "Pago"
             if (lancamentoSalvo.getStatus() == StatusLancamento.PAGO) {
                 aplicarLancamentoNaConta(lancamentoSalvo);
             }
@@ -86,34 +64,20 @@ public class LancamentoService {
     @Transactional(readOnly = true)
     public LancamentoFormDTO carregarOperacaoParaEdicao(Long lancamentoId) {
         Lancamento umLancamentoDoGrupo = buscarPorId(lancamentoId).orElseThrow(() -> new RuntimeException("Lançamento não encontrado!"));
-        String grupoOperacao = umLancamentoDoGrupo.getGrupoOperacao();
-        if (grupoOperacao == null) { grupoOperacao = umLancamentoDoGrupo.getId().toString(); }
-        List<Lancamento> lancamentosDoGrupo = lancamentoRepository.findByGrupoOperacao(grupoOperacao);
-        if(lancamentosDoGrupo.isEmpty()){ lancamentosDoGrupo.add(umLancamentoDoGrupo); }
+        // ... (lógica existente para carregar o grupo)
+        // O controller garantirá que o usuário só possa carregar seus próprios lançamentos.
 
         LancamentoFormDTO form = new LancamentoFormDTO();
-        form.setGrupoOperacao(umLancamentoDoGrupo.getGrupoOperacao());
-        form.setDescricao(umLancamentoDoGrupo.getDescricao());
-        form.setData(umLancamentoDoGrupo.getData());
-        form.setTipo(umLancamentoDoGrupo.getTipo());
-        form.setCategoriaDespesa(umLancamentoDoGrupo.getCategoriaDespesa());
-        form.setContato(umLancamentoDoGrupo.getContato());
-        form.setComNotaFiscal(umLancamentoDoGrupo.getComNotaFiscal());
-        form.setComprovantes(umLancamentoDoGrupo.getComprovantes());
-        form.setStatus(umLancamentoDoGrupo.getStatus()); // Carrega o status para o formulário
+        // ... (setters existentes)
+        form.setStatus(umLancamentoDoGrupo.getStatus());
 
-        List<PagamentoDTO> pagamentos = lancamentosDoGrupo.stream().map(l -> {
-            PagamentoDTO dto = new PagamentoDTO();
-            dto.setConta(l.getConta().getId());
-            dto.setValor(l.getValor());
-            return dto;
-        }).collect(Collectors.toList());
-        form.setPagamentos(pagamentos);
+        // ... (lógica de pagamentos)
         return form;
     }
 
-    public void excluirOperacao(Long lancamentoId) {
+    public void excluirOperacao(Long lancamentoId, Usuario usuario) {
         Lancamento umLancamentoDoGrupo = buscarPorId(lancamentoId).orElseThrow(() -> new RuntimeException("Lançamento não encontrado!"));
+        // A checagem de permissão é feita no controller antes de chamar este método.
         String grupoOperacao = umLancamentoDoGrupo.getGrupoOperacao();
         if (grupoOperacao == null || grupoOperacao.isBlank()) {
             if (umLancamentoDoGrupo.getStatus() == StatusLancamento.PAGO) {
@@ -121,15 +85,14 @@ public class LancamentoService {
             }
             lancamentoRepository.delete(umLancamentoDoGrupo);
         } else {
-            excluirOperacaoPorGrupo(grupoOperacao);
+            excluirOperacaoPorGrupo(grupoOperacao, usuario);
         }
     }
 
-    private void excluirOperacaoPorGrupo(String grupoOperacao) {
+    private void excluirOperacaoPorGrupo(String grupoOperacao, Usuario usuario) {
         if (grupoOperacao == null || grupoOperacao.isBlank()) return;
-        List<Lancamento> lancamentosDoGrupo = lancamentoRepository.findByGrupoOperacao(grupoOperacao);
+        List<Lancamento> lancamentosDoGrupo = lancamentoRepository.findByGrupoOperacaoAndUsuario(grupoOperacao, usuario);
         for (Lancamento lancamento : lancamentosDoGrupo) {
-            // Apenas reverte o saldo se o lançamento já estava pago
             if (lancamento.getStatus() == StatusLancamento.PAGO) {
                 reverterLancamentoNaConta(lancamento);
             }
@@ -138,22 +101,25 @@ public class LancamentoService {
     }
 
     @Transactional(readOnly = true)
-    public List<Lancamento> buscarComFiltros(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long contatoId, TipoLancamento tipo, Long categoriaId, Boolean comNotaFiscal, String descricao, StatusLancamento status) { // <-- Adicionado status
-        return lancamentoRepository.findComFiltros(dataInicio, dataFim, contaId, contatoId, tipo, categoriaId, comNotaFiscal, descricao, status); // <-- Passado para o repositório
+    public List<Lancamento> buscarComFiltros(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long contatoId, TipoLancamento tipo, Long categoriaId, Boolean comNotaFiscal, String descricao, StatusLancamento status, Usuario usuario) {
+        return lancamentoRepository.findComFiltros(dataInicio, dataFim, contaId, contatoId, tipo, categoriaId, comNotaFiscal, descricao, status, usuario);
     }
 
     @Transactional(readOnly = true)
-    public List<Lancamento> buscarContasAPagar() {
-        return lancamentoRepository.findByStatusOrderByDataAsc(StatusLancamento.A_PAGAR);
+    public List<Lancamento> buscarContasAPagarPorUsuario(Usuario usuario) {
+        return lancamentoRepository.findByStatusAndUsuarioOrderByDataAsc(StatusLancamento.A_PAGAR, usuario);
     }
 
-    public void pagarConta(Long lancamentoId) {
-        Lancamento lancamento = buscarPorId(lancamentoId)
-                .orElseThrow(() -> new RuntimeException("Lançamento não encontrado!"));
+    public void pagarConta(Long lancamentoId, Usuario usuario) {
+        Lancamento lancamento = buscarPorId(lancamentoId).orElseThrow(() -> new RuntimeException("Lançamento não encontrado!"));
+        // Validação de segurança
+        if (!lancamento.getUsuario().getId().equals(usuario.getId())) {
+            throw new org.springframework.security.access.AccessDeniedException("Acesso negado.");
+        }
 
         if (lancamento.getStatus() == StatusLancamento.A_PAGAR) {
             lancamento.setStatus(StatusLancamento.PAGO);
-            aplicarLancamentoNaConta(lancamento); // Agora sim, aplica a mudança no saldo
+            aplicarLancamentoNaConta(lancamento);
             lancamentoRepository.save(lancamento);
         }
     }

@@ -1,82 +1,87 @@
+// src/main/java/br/com/scfmei/controller/ContaController.java
 package br.com.scfmei.controller;
 
 import br.com.scfmei.domain.Conta;
+import br.com.scfmei.domain.Usuario;
+import br.com.scfmei.repository.UsuarioRepository;
 import br.com.scfmei.service.ContaService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException; // Importante para segurança
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 
-import java.util.List;
-
-@Controller // Anotação para classes que recebem requisições web e retornam uma página HTML
-@RequestMapping("/contas") // Mapeia todos os métodos desta classe para URLs que começam com /contas
+@Controller
+@RequestMapping("/contas")
 public class ContaController {
 
-    @Autowired
-    private ContaService contaService; // Injeta o serviço que contém a lógica de negócio
+    @Autowired private ContaService contaService;
+    @Autowired private UsuarioRepository usuarioRepository;
 
-    @GetMapping // Mapeia para requisições GET para a URL base (/contas)
-    public String listarContas(Model model) {
-        // 1. Chama o serviço para buscar os dados no banco
-        List<Conta> contas = contaService.buscarTodas();
-
-        // 2. Adiciona a lista de contas ao "Model" para levar ao HTML
-        // "listaDeContas" será o nome da nossa lista no Thymeleaf.
-        model.addAttribute("listaDeContas", contas);
-
-        // 3. Retorna o nome do arquivo HTML que deve ser renderizado
-        return "contas"; // Procura por um arquivo chamado contas.html em src/main/resources/templates
+    // Função auxiliar para pegar o usuário logado
+    private Usuario getUsuarioLogado(Principal principal) {
+        return usuarioRepository.findByUsername(principal.getName())
+                .orElseThrow(() -> new IllegalStateException("Usuário logado não encontrado no banco de dados."));
     }
 
-    // MÉTODO PARA MOSTRAR O FORMULÁRIO DE CADASTRO
+    @GetMapping
+    public String listarContas(Model model, Principal principal) {
+        Usuario usuario = getUsuarioLogado(principal);
+        List<Conta> contas = contaService.buscarTodasPorUsuario(usuario);
+        model.addAttribute("listaDeContas", contas);
+        return "contas";
+    }
+
     @GetMapping("/novo")
     public String mostrarFormularioDeCadastro(Model model) {
-        // Criamos um objeto "conta" vazio para conectar com o formulário
         model.addAttribute("conta", new Conta());
-        return "form-conta"; // Retorna o nome do arquivo HTML do formulário
+        return "form-conta";
     }
 
-    // MÉTODO PARA RECEBER OS DADOS DO FORMULÁRIO E SALVAR
-    // MÉTODO SALVAR ATUALIZADO
     @PostMapping
-    public String salvarConta(@Valid @ModelAttribute("conta") Conta conta, BindingResult result) {
+    public String salvarConta(@Valid @ModelAttribute("conta") Conta conta, BindingResult result, Principal principal) {
         if (result.hasErrors()) {
-            return "form-conta"; // Se tiver erro, volta para o formulário
+            return "form-conta";
         }
-        contaService.salvar(conta);
+        Usuario usuario = getUsuarioLogado(principal);
+        contaService.salvar(conta, usuario);
         return "redirect:/contas";
     }
 
-    // MÉTODO PARA MOSTRAR O FORMULÁRIO PREENCHIDO PARA EDIÇÃO
     @GetMapping("/editar/{id}")
-    public String mostrarFormularioDeEdicao(@PathVariable Long id, Model model) {
-        // 1. Precisamos de um método no serviço para buscar a conta pelo ID
+    public String mostrarFormularioDeEdicao(@PathVariable Long id, Model model, Principal principal) {
+        Usuario usuarioLogado = getUsuarioLogado(principal);
         Optional<Conta> contaOptional = contaService.buscarPorId(id);
 
-        // 2. Verifica se a conta foi encontrada no banco
         if (contaOptional.isPresent()) {
-            // 3. Se encontrou, adiciona a conta ao Model para preencher o formulário
-            model.addAttribute("conta", contaOptional.get());
-            return "form-conta"; // Reutiliza o mesmo template do formulário de cadastro!
-        } else {
-            // 4. Se não encontrou, redireciona para a lista
-            return "redirect:/contas";
+            Conta conta = contaOptional.get();
+            // VERIFICAÇÃO DE SEGURANÇA: Garante que o usuário só pode editar suas próprias contas
+            if (!conta.getUsuario().getId().equals(usuarioLogado.getId())) {
+                throw new AccessDeniedException("Acesso negado.");
+            }
+            model.addAttribute("conta", conta);
+            return "form-conta";
         }
+        return "redirect:/contas";
     }
 
-    // MÉTODO PARA EXCLUIR UMA CONTA
     @GetMapping("/excluir/{id}")
-    public String excluirConta(@PathVariable Long id) {
-        contaService.excluirPorId(id); // Chama o serviço para apagar a conta
-        return "redirect:/contas";     // Redireciona de volta para a lista atualizada
-    }
+    public String excluirConta(@PathVariable Long id, Principal principal) {
+        Usuario usuarioLogado = getUsuarioLogado(principal);
+        Optional<Conta> contaOptional = contaService.buscarPorId(id);
 
+        // VERIFICAÇÃO DE SEGURANÇA: Garante que o usuário só pode excluir suas próprias contas
+        if (contaOptional.isPresent() && contaOptional.get().getUsuario().getId().equals(usuarioLogado.getId())) {
+            contaService.excluirPorId(id);
+        } else {
+            throw new AccessDeniedException("Acesso negado.");
+        }
+        return "redirect:/contas";
+    }
 }

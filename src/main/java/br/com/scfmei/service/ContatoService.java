@@ -1,6 +1,8 @@
+// src/main/java/br/com/scfmei/service/ContatoService.java
 package br.com.scfmei.service;
 
 import br.com.scfmei.domain.Contato;
+import br.com.scfmei.domain.Usuario; // Importe Usuario
 import br.com.scfmei.repository.ContatoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,18 +12,19 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ContatoService { // Nome da classe atualizado
+public class ContatoService {
 
     @Autowired
-    private ContatoRepository contatoRepository; // Usa o novo ContatoRepository
+    private ContatoRepository contatoRepository;
 
     @Transactional(readOnly = true)
-    public List<Contato> buscarTodos() {
-        return contatoRepository.findAll();
+    public List<Contato> buscarTodosPorUsuario(Usuario usuario) {
+        return contatoRepository.findByUsuario(usuario);
     }
 
     @Transactional
-    public Contato salvar(Contato contato) {
+    public Contato salvar(Contato contato, Usuario usuario) {
+        contato.setUsuario(usuario); // Associa o contato ao usuário logado
         return contatoRepository.save(contato);
     }
 
