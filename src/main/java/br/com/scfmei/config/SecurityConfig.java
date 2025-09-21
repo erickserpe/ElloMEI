@@ -17,11 +17,10 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // O MÉTODO userDetailsService() FOI REMOVIDO DAQUI!
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // As regras de filtro continuam as mesmas
+        // As regras de filtro
         http
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/login", "/registro", "/webjars/**", "/css/**").permitAll()

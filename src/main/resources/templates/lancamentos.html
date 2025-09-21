@@ -27,20 +27,23 @@
                     <label for="contaId" class="form-label">Conta</label>
                     <select id="contaId" name="contaId" class="form-select">
                         <option value="">Todas</option>
-                        <option th:each="conta : ${listaDeContas}"
-                                th:value="${conta.id}"
-                                th:text="${conta.nomeConta}"
-                                th:selected="${conta.id == contaIdSel}"></option>
+                        <option th:each="conta : ${listaDeContas}" th:value="${conta.id}" th:text="${conta.nomeConta}" th:selected="${conta.id == contaIdSel}"></option>
                     </select>
                 </div>
                 <div class="col-md-2">
                     <label for="pessoaId" class="form-label">Pessoa</label>
-                    <select id="pessoaId" name="pessoaId" class="form-select">
-                        <option value="">Todas</option>
-                        <option th:each="contato : ${listaDePessoas}"
-                                th:value="${contato.id}"
-                                th:text="${contato.nome}"
-                                th:selected="${contato.id == pessoaIdSel}"></option>
+                    <select id="pessoaId" name="contatoId" class="form-select"> <option value="">Todas</option>
+                        <option th:each="contato : ${listaDePessoas}" th:value="${contato.id}" th:text="${contato.getNomeExibicao()}" th:selected="${contato.id == pessoaIdSel}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="status" class="form-label">Status</label>
+                    <select id="status" name="status" class="form-select">
+                        <option value="">Todos</option>
+                        <option th:each="s : ${T(br.com.scfmei.domain.StatusLancamento).values()}"
+                                th:value="${s}"
+                                th:text="${s.descricao}"
+                                th:selected="${s == statusSel}"></option>
                     </select>
                 </div>
                 <div class="col-auto d-flex align-items-end">
@@ -57,10 +60,8 @@
             <th>Data</th>
             <th>Descrição</th>
             <th>Conta</th>
-            <th>Com Nota?</th>
             <th>Tipo</th>
-            <th>Valor</th>
-            <th>Grupo</th>
+            <th>Status</th> <th>Valor</th>
             <th>Ações</th>
         </tr>
         </thead>
@@ -69,13 +70,12 @@
             <td th:text="${#temporals.format(lancamento.data, 'dd/MM/yyyy')}"></td>
             <td th:text="${lancamento.descricao}"></td>
             <td th:text="${lancamento.conta.nomeConta}"></td>
-            <td>
-                <span th:if="${lancamento.comNotaFiscal}" class="badge bg-success">Sim</span>
-                <span th:unless="${lancamento.comNotaFiscal != null && lancamento.comNotaFiscal}" class="badge bg-secondary">Não</span>
-            </td>
             <td th:text="${lancamento.tipo}"></td>
+            <td>
+                <span th:if="${lancamento.status.name() == 'PAGO'}" class="badge bg-success" th:text="${lancamento.status.descricao}"></span>
+                <span th:if="${lancamento.status.name() == 'A_PAGAR'}" class="badge bg-warning text-dark" th:text="${lancamento.status.descricao}"></span>
+            </td>
             <td th:text="${'R$ ' + #numbers.formatDecimal(lancamento.valor, 1, 'POINT', 2, 'COMMA')}"></td>
-            <td><small th:text="${#strings.substring(lancamento.grupoOperacao, 0, 8)}"></small></td>
             <td>
                 <a th:href="@{/lancamentos/editar/{id}(id=${lancamento.id})}" class="btn btn-warning btn-sm">Editar</a>
                 <a th:href="@{/lancamentos/excluir/{id}(id=${lancamento.id})}" class="btn btn-danger btn-sm">Excluir</a>

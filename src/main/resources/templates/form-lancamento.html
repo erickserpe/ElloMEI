@@ -91,6 +91,15 @@
                             <label class="form-label">Valor</label>
                             <input type="number" step="0.01" class="form-control valor-pagamento" th:field="*{pagamentos[__${stat.index}__].valor}" required>
                         </div>
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select" id="status" th:field="*{status}" required>
+                                    <option th:each="statusOpt : ${T(br.com.scfmei.domain.StatusLancamento).values()}"
+                                            th:value="${statusOpt}" th:text="${statusOpt.descricao}"></option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="col-md-1 d-flex align-items-end">
                             <button type="button" class="btn btn-danger btn-sm remover-pagamento" style="display: none;">X</button>
                         </div>

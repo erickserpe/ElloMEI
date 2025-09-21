@@ -2,6 +2,7 @@ package br.com.scfmei.repository;
 
 import br.com.scfmei.domain.ChartData;
 import br.com.scfmei.domain.Lancamento;
+import br.com.scfmei.domain.StatusLancamento;
 import br.com.scfmei.domain.TipoLancamento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,6 +17,7 @@ import java.util.List;
 public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
 
     List<Lancamento> findByGrupoOperacao(String grupoOperacao);
+    List<Lancamento> findByStatusOrderByDataAsc(StatusLancamento status);
 
     @Query("SELECT l FROM Lancamento l WHERE " +
             "(:dataInicio IS NULL OR l.data >= :dataInicio) AND " +
@@ -25,7 +27,8 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
             "(:tipo IS NULL OR l.tipo = :tipo) AND " +
             "(:categoriaId IS NULL OR l.categoriaDespesa.id = :categoriaId) AND " +
             "(:comNotaFiscal IS NULL OR l.comNotaFiscal = :comNotaFiscal) AND " +
-            "(:descricao IS NULL OR l.descricao LIKE %:descricao%) " + // <-- FILTRO NOVO
+            "(:descricao IS NULL OR l.descricao LIKE %:descricao%) AND " +
+            "(:status IS NULL OR l.status = :status) " + // <-- NOVA LINHA
             "ORDER BY l.data DESC, l.id DESC")
     List<Lancamento> findComFiltros(
             @Param("dataInicio") LocalDate dataInicio,
@@ -35,7 +38,8 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
             @Param("tipo") TipoLancamento tipo,
             @Param("categoriaId") Long categoriaId,
             @Param("comNotaFiscal") Boolean comNotaFiscal,
-            @Param("descricao") String descricao // <-- PARÂMETRO NOVO
+            @Param("descricao") String descricao,
+            @Param("status") StatusLancamento status // <-- NOVO PARÂMETRO
     );
 
     @Query("SELECT new br.com.scfmei.domain.ChartData(c.nome, SUM(l.valor)) " +
@@ -60,4 +64,5 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
             @Param("dataInicio") LocalDate dataInicio,
             @Param("dataFim") LocalDate dataFim
     );
+
 }

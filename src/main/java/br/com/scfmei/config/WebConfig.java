@@ -5,16 +5,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Configuration // "Carimbo" que diz ao Spring que esta é uma classe de configuração
+@Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    // Pega o valor da propriedade 'file.upload-dir' do nosso application.properties
+    // Pega o valor da propriedade 'file.upload-dir' do application.properties
     @Value("${file.upload-dir}")
     private String uploadDir;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Este método cria a "ponte" entre a URL e a pasta física
+        // método ponte entre a URL e a pasta física
 
         // Mapeia a URL /uploads/qualquer-coisa para a pasta física ./uploads/
         registry.addResourceHandler("/uploads/**")

@@ -1,13 +1,13 @@
 package br.com.scfmei.service;
 
 import br.com.scfmei.domain.*;
-        import br.com.scfmei.repository.ComprovanteRepository;
+import br.com.scfmei.repository.ComprovanteRepository;
 import br.com.scfmei.repository.LancamentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import java.math.BigDecimal;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +48,7 @@ public class LancamentoService {
 
         for (PagamentoDTO pagamento : form.getPagamentos()) {
             if (pagamento.getValor() == null || pagamento.getConta() == null) continue;
+
             Lancamento lancamento = new Lancamento();
             lancamento.setDescricao(form.getDescricao());
             lancamento.setData(form.getData());
@@ -56,10 +57,16 @@ public class LancamentoService {
             lancamento.setContato(form.getContato());
             lancamento.setComNotaFiscal(form.getComNotaFiscal());
             lancamento.setGrupoOperacao(grupoOperacao);
+
+            // Define o status do lançamento a partir do formulário
+            lancamento.setStatus(form.getStatus());
+
             Conta conta = contaService.buscarPorId(pagamento.getConta()).orElseThrow(() -> new RuntimeException("Conta não encontrada!"));
             lancamento.setConta(conta);
             lancamento.setValor(pagamento.getValor());
+
             Lancamento lancamentoSalvo = lancamentoRepository.save(lancamento);
+
             if (!comprovantePaths.isEmpty()) {
                 for (String path : comprovantePaths) {
                     Comprovante comprovante = new Comprovante();
@@ -68,7 +75,11 @@ public class LancamentoService {
                     comprovanteRepository.save(comprovante);
                 }
             }
-            aplicarLancamentoNaConta(lancamentoSalvo);
+
+            // Apenas aplica a mudança no saldo da conta se o lançamento já estiver "Pago"
+            if (lancamentoSalvo.getStatus() == StatusLancamento.PAGO) {
+                aplicarLancamentoNaConta(lancamentoSalvo);
+            }
         }
     }
 
@@ -79,6 +90,7 @@ public class LancamentoService {
         if (grupoOperacao == null) { grupoOperacao = umLancamentoDoGrupo.getId().toString(); }
         List<Lancamento> lancamentosDoGrupo = lancamentoRepository.findByGrupoOperacao(grupoOperacao);
         if(lancamentosDoGrupo.isEmpty()){ lancamentosDoGrupo.add(umLancamentoDoGrupo); }
+
         LancamentoFormDTO form = new LancamentoFormDTO();
         form.setGrupoOperacao(umLancamentoDoGrupo.getGrupoOperacao());
         form.setDescricao(umLancamentoDoGrupo.getDescricao());
@@ -88,6 +100,8 @@ public class LancamentoService {
         form.setContato(umLancamentoDoGrupo.getContato());
         form.setComNotaFiscal(umLancamentoDoGrupo.getComNotaFiscal());
         form.setComprovantes(umLancamentoDoGrupo.getComprovantes());
+        form.setStatus(umLancamentoDoGrupo.getStatus()); // Carrega o status para o formulário
+
         List<PagamentoDTO> pagamentos = lancamentosDoGrupo.stream().map(l -> {
             PagamentoDTO dto = new PagamentoDTO();
             dto.setConta(l.getConta().getId());
@@ -102,7 +116,9 @@ public class LancamentoService {
         Lancamento umLancamentoDoGrupo = buscarPorId(lancamentoId).orElseThrow(() -> new RuntimeException("Lançamento não encontrado!"));
         String grupoOperacao = umLancamentoDoGrupo.getGrupoOperacao();
         if (grupoOperacao == null || grupoOperacao.isBlank()) {
-            reverterLancamentoNaConta(umLancamentoDoGrupo);
+            if (umLancamentoDoGrupo.getStatus() == StatusLancamento.PAGO) {
+                reverterLancamentoNaConta(umLancamentoDoGrupo);
+            }
             lancamentoRepository.delete(umLancamentoDoGrupo);
         } else {
             excluirOperacaoPorGrupo(grupoOperacao);
@@ -113,14 +129,33 @@ public class LancamentoService {
         if (grupoOperacao == null || grupoOperacao.isBlank()) return;
         List<Lancamento> lancamentosDoGrupo = lancamentoRepository.findByGrupoOperacao(grupoOperacao);
         for (Lancamento lancamento : lancamentosDoGrupo) {
-            reverterLancamentoNaConta(lancamento);
+            // Apenas reverte o saldo se o lançamento já estava pago
+            if (lancamento.getStatus() == StatusLancamento.PAGO) {
+                reverterLancamentoNaConta(lancamento);
+            }
             lancamentoRepository.delete(lancamento);
         }
     }
 
     @Transactional(readOnly = true)
-    public List<Lancamento> buscarComFiltros(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long contatoId, TipoLancamento tipo, Long categoriaId, Boolean comNotaFiscal, String descricao) {
-        return lancamentoRepository.findComFiltros(dataInicio, dataFim, contaId, contatoId, tipo, categoriaId, comNotaFiscal, descricao);
+    public List<Lancamento> buscarComFiltros(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long contatoId, TipoLancamento tipo, Long categoriaId, Boolean comNotaFiscal, String descricao, StatusLancamento status) { // <-- Adicionado status
+        return lancamentoRepository.findComFiltros(dataInicio, dataFim, contaId, contatoId, tipo, categoriaId, comNotaFiscal, descricao, status); // <-- Passado para o repositório
+    }
+
+    @Transactional(readOnly = true)
+    public List<Lancamento> buscarContasAPagar() {
+        return lancamentoRepository.findByStatusOrderByDataAsc(StatusLancamento.A_PAGAR);
+    }
+
+    public void pagarConta(Long lancamentoId) {
+        Lancamento lancamento = buscarPorId(lancamentoId)
+                .orElseThrow(() -> new RuntimeException("Lançamento não encontrado!"));
+
+        if (lancamento.getStatus() == StatusLancamento.A_PAGAR) {
+            lancamento.setStatus(StatusLancamento.PAGO);
+            aplicarLancamentoNaConta(lancamento); // Agora sim, aplica a mudança no saldo
+            lancamentoRepository.save(lancamento);
+        }
     }
 
     private void aplicarLancamentoNaConta(Lancamento lancamento) {

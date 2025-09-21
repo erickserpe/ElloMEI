@@ -2,6 +2,7 @@ package br.com.scfmei.controller;
 
 import br.com.scfmei.domain.Lancamento;
 import br.com.scfmei.domain.LancamentoFormDTO;
+import br.com.scfmei.domain.StatusLancamento;
 import br.com.scfmei.service.CategoriaDespesaService;
 import br.com.scfmei.service.ContaService;
 import br.com.scfmei.service.LancamentoService;
@@ -33,24 +34,20 @@ public class LancamentoController {
                                     @RequestParam(required = false) LocalDate dataFim,
                                     @RequestParam(required = false) Long contaId,
                                     @RequestParam(required = false) Long contatoId,
+                                    @RequestParam(required = false) StatusLancamento status, // <-- NOVO PARÂMETRO
                                     Model model) {
 
-        // --- A CORREÇÃO ESTÁ AQUI ---
-        // Agora passamos os 8 argumentos necessários, com 'null' para os que não são usados nesta tela.
-        List<Lancamento> lancamentos = lancamentoService.buscarComFiltros(dataInicio, dataFim, contaId, contatoId, null, null, null, null);
+        List<Lancamento> lancamentos = lancamentoService.buscarComFiltros(dataInicio, dataFim, contaId, contatoId, null, null, null, null, status); // <-- Passando para o service
         model.addAttribute("listaDeLancamentos", lancamentos);
 
-        // Adiciona listas para os dropdowns de filtro
-        model.addAttribute("listaDeContas", contaService.buscarTodas());
-        model.addAttribute("listaDePessoas", contatoService.buscarTodos());
+        // ... (código para adicionar listas de contas e pessoas)
 
         // Devolve os filtros selecionados para a view
         model.addAttribute("dataInicioSel", dataInicio);
         model.addAttribute("dataFimSel", dataFim);
         model.addAttribute("contaIdSel", contaId);
-        // O nome do atributo no model para o HTML deve corresponder ao que o HTML espera.
-        // Se o seu `lancamentos.html` usa `pessoaIdSel`, mantemos assim, mas passando o valor de `contatoId`.
         model.addAttribute("pessoaIdSel", contatoId);
+        model.addAttribute("statusSel", status); // <-- DEVOLVE O STATUS SELECIONADO
 
         return "lancamentos";
     }

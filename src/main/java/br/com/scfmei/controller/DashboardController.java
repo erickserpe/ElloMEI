@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import br.com.scfmei.domain.StatusLancamento;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -45,6 +46,7 @@ public class DashboardController {
             @RequestParam(required = false) Long categoriaId,
             @RequestParam(required = false) Boolean comNotaFiscal,
             @RequestParam(required = false) String descricao,
+            @RequestParam(required = false) StatusLancamento status,
             Model model) {
 
         // 1. Busca dados para os dropdowns dos filtros
@@ -54,7 +56,7 @@ public class DashboardController {
 
         // 2. Busca os lançamentos com filtros aplicados
         List<Lancamento> lancamentosFiltrados = lancamentoService.buscarComFiltros(
-                dataInicio, dataFim, contaId, contatoId, tipo, categoriaId, comNotaFiscal, descricao
+                dataInicio, dataFim, contaId, contatoId, tipo, categoriaId, comNotaFiscal, descricao, status
         );
 
         // 3. Calcula KPIs

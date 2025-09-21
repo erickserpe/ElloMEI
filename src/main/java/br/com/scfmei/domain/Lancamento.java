@@ -52,6 +52,10 @@ public class Lancamento {
     @OneToMany(mappedBy = "lancamento", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Comprovante> comprovantes = new ArrayList<>();
 
+    @NotNull(message = "Status é obrigatório.")
+    @Enumerated(EnumType.STRING)
+    private StatusLancamento status;
+
     // Getters e Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -75,4 +79,6 @@ public class Lancamento {
     public void setComNotaFiscal(Boolean comNotaFiscal) { this.comNotaFiscal = comNotaFiscal; }
     public List<Comprovante> getComprovantes() { return comprovantes; }
     public void setComprovantes(List<Comprovante> comprovantes) { this.comprovantes = comprovantes; }
+    public StatusLancamento getStatus() { return status; }
+    public void setStatus(StatusLancamento status) { this.status = status; }
 }

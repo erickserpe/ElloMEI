@@ -4,6 +4,7 @@ import br.com.scfmei.domain.Lancamento;
 import br.com.scfmei.domain.TipoLancamento;
 import br.com.scfmei.service.DashboardService;
 import br.com.scfmei.service.LancamentoService;
+import br.com.scfmei.domain.StatusLancamento;
 import br.com.scfmei.service.PdfService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -40,7 +42,8 @@ public class RelatorioController {
             @RequestParam(required = false) TipoLancamento tipo,
             @RequestParam(required = false) Long categoriaId,
             @RequestParam(required = false) Boolean comNotaFiscal,
-            @RequestParam(required = false) String descricao) {
+            @RequestParam(required = false) String descricao,
+            @RequestParam(required = false) StatusLancamento status) {
 
         Map<String, Object> variaveis = new HashMap<>();
         String templateNome;
@@ -57,13 +60,15 @@ public class RelatorioController {
             if ("ESTIMADO_CUSTOS".equals(tipoVisao)) {
                 tituloVisao = "Meta (Baseado em Compras)";
                 faturamentoAnual = dashboardService.getMetaFaturamentoBaseadoEmCustos(anoAtual);
+                // CORREÇÃO AQUI: Adicionado o parâmetro 'status'
                 lancamentos = lancamentoService.buscarComFiltros(
-                        dataInicio, dataFim, contaId, contatoId, TipoLancamento.SAIDA, categoriaId, true, descricao);
+                        dataInicio, dataFim, contaId, contatoId, TipoLancamento.SAIDA, categoriaId, true, descricao, status);
             } else { // OFICIAL ou BANCÁRIO
                 tituloVisao = "OFICIAL".equals(tipoVisao) ? "Faturamento Oficial" : "Faturamento Bancário";
                 faturamentoAnual = dashboardService.getFaturamentoOficial(anoAtual);
+                // CORREÇÃO AQUI: Adicionado o parâmetro 'status'
                 lancamentos = lancamentoService.buscarComFiltros(
-                        dataInicio, dataFim, contaId, contatoId, TipoLancamento.ENTRADA, categoriaId, comNotaFiscal, descricao);
+                        dataInicio, dataFim, contaId, contatoId, TipoLancamento.ENTRADA, categoriaId, comNotaFiscal, descricao, status);
             }
 
             BigDecimal totalPeriodo = lancamentos.stream()
@@ -92,7 +97,8 @@ public class RelatorioController {
 
         } else { // Lógica para relatório genérico
             templateNome = "relatorio_lancamentos";
-            lancamentos = lancamentoService.buscarComFiltros(dataInicio, dataFim, contaId, contatoId, tipo, categoriaId, comNotaFiscal, descricao);
+            // CORREÇÃO AQUI: Adicionado o parâmetro 'status'
+            lancamentos = lancamentoService.buscarComFiltros(dataInicio, dataFim, contaId, contatoId, tipo, categoriaId, comNotaFiscal, descricao, status);
             BigDecimal total = lancamentos.stream().map(Lancamento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add);
             variaveis.put("total", total);
         }

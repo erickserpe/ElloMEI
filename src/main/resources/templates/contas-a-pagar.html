@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout-base(~{::title}, ~{::#contas-a-pagar-content})}">
+<head>
+    <title>Contas a Pagar</title>
+</head>
+<body>
+<div id="contas-a-pagar-content">
+    <h1 class="mb-3">Contas a Pagar</h1>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover table-bordered">
+            <thead class="table-dark">
+            <tr>
+                <th>Vencimento</th>
+                <th>Descrição</th>
+                <th>Valor</th>
+                <th>Comprovantes</th>
+                <th style="width: 220px;">Ações</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(contasAPagar)}">
+                <td colspan="5" class="text-center">Nenhuma conta a pagar no momento.</td>
+            </tr>
+            <tr th:each="conta : ${contasAPagar}">
+                <td th:text="${#temporals.format(conta.data, 'dd/MM/yyyy')}"></td>
+                <td th:text="${conta.descricao}"></td>
+                <td th:text="${'R$ ' + #numbers.formatDecimal(conta.valor, 1, 'POINT', 2, 'COMMA')}"></td>
+                <td>
+                    <div th:if="${!#lists.isEmpty(conta.comprovantes)}">
+                        <div th:each="comp : ${conta.comprovantes}">
+                            <a th:href="@{/uploads/{filename}(filename=${comp.pathArquivo})}"
+                               th:text="${#strings.substringAfter(comp.pathArquivo, '_')}"
+                               target="_blank" class="d-block">
+                                <i class="bi bi-file-earmark-text"></i> Ver Anexo
+                            </a>
+                        </div>
+                    </div>
+                    <span th:if="${#lists.isEmpty(conta.comprovantes)}" class="text-muted">Nenhum</span>
+                </td>
+                <td class="d-flex justify-content-start align-items-center gap-2">
+                    <a th:href="@{/lancamentos/editar/{id}(id=${conta.id})}" class="btn btn-warning btn-sm">
+                        <i class="bi bi-pencil-fill"></i> Visualizar
+                    </a>
+
+                    <form th:action="@{/contas-a-pagar/pagar/{id}(id=${conta.id})}" method="post" class="mb-0">
+                        <button type="submit" class="btn btn-success btn-sm">
+                            <i class="bi bi-check-lg"></i> Pagar
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

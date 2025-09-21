@@ -21,6 +21,7 @@ public class LancamentoFormDTO {
     public LancamentoFormDTO() {
         this.pagamentos.add(new PagamentoDTO());
     }
+    private StatusLancamento status;
 
     // --- Getters e Setters ---
 
@@ -39,12 +40,12 @@ public class LancamentoFormDTO {
     public void setComNotaFiscal(Boolean comNotaFiscal) { this.comNotaFiscal = comNotaFiscal; }
     public List<PagamentoDTO> getPagamentos() { return pagamentos; }
     public void setPagamentos(List<PagamentoDTO> pagamentos) { this.pagamentos = pagamentos; }
-
-    // --- MÉTODOS QUE FALTAVAM ---
     public List<Comprovante> getComprovantes() {
         return comprovantes;
     }
     public void setComprovantes(List<Comprovante> comprovantes) {
         this.comprovantes = comprovantes;
     }
+    public StatusLancamento getStatus() { return status; }
+    public void setStatus(StatusLancamento status) { this.status = status; }
 }
