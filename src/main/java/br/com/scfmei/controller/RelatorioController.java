@@ -1,10 +1,9 @@
 package br.com.scfmei.controller;
 
-import br.com.scfmei.domain.Lancamento;
-import br.com.scfmei.domain.TipoLancamento;
+import br.com.scfmei.domain.*;
+import br.com.scfmei.repository.UsuarioRepository;
 import br.com.scfmei.service.DashboardService;
 import br.com.scfmei.service.LancamentoService;
-import br.com.scfmei.domain.StatusLancamento;
 import br.com.scfmei.service.PdfService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -16,9 +15,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +31,15 @@ public class RelatorioController {
     @Autowired private PdfService pdfService;
     @Autowired private DashboardService dashboardService;
 
+
+    @Autowired private UsuarioRepository usuarioRepository;
+
+    private Usuario getUsuarioLogado(Principal principal) {
+        return usuarioRepository.findByUsername(principal.getName())
+                .orElseThrow(() -> new IllegalStateException("Usuário logado não encontrado."));
+    }
+
+
     @GetMapping("/faturamento/dinamico/pdf")
     public ResponseEntity<byte[]> gerarRelatorioFaturamentoDinamico(
             @RequestParam String tipoVisao,
@@ -43,8 +51,10 @@ public class RelatorioController {
             @RequestParam(required = false) Long categoriaId,
             @RequestParam(required = false) Boolean comNotaFiscal,
             @RequestParam(required = false) String descricao,
-            @RequestParam(required = false) StatusLancamento status) {
+            @RequestParam(required = false) StatusLancamento status,
+            Principal principal) { // Adicionado Principal
 
+        Usuario usuario = getUsuarioLogado(principal);
         Map<String, Object> variaveis = new HashMap<>();
         String templateNome;
         List<Lancamento> lancamentos;
@@ -53,52 +63,44 @@ public class RelatorioController {
 
             templateNome = "relatorio_faturamento_mei";
             int anoAtual = (dataFim != null) ? dataFim.getYear() : LocalDate.now().getYear();
-
-            BigDecimal faturamentoAnual = BigDecimal.ZERO;
             String tituloVisao = "";
 
             if ("ESTIMADO_CUSTOS".equals(tipoVisao)) {
                 tituloVisao = "Meta (Baseado em Compras)";
-                faturamentoAnual = dashboardService.getMetaFaturamentoBaseadoEmCustos(anoAtual);
-                // CORREÇÃO AQUI: Adicionado o parâmetro 'status'
-                lancamentos = lancamentoService.buscarComFiltros(
-                        dataInicio, dataFim, contaId, contatoId, TipoLancamento.SAIDA, categoriaId, true, descricao, status);
-            } else { // OFICIAL ou BANCÁRIO
+
+                BigDecimal faturamentoAnual = dashboardService.getMetaFaturamentoBaseadoEmCustos(anoAtual, usuario);
+                lancamentos = lancamentoService.buscarComFiltros(dataInicio, dataFim, contaId, contatoId, TipoLancamento.SAIDA, categoriaId, true, descricao, status, usuario);
+                variaveis.put("faturamentoAnual", faturamentoAnual);
+
+            } else {
                 tituloVisao = "OFICIAL".equals(tipoVisao) ? "Faturamento Oficial" : "Faturamento Bancário";
-                faturamentoAnual = dashboardService.getFaturamentoOficial(anoAtual);
-                // CORREÇÃO AQUI: Adicionado o parâmetro 'status'
-                lancamentos = lancamentoService.buscarComFiltros(
-                        dataInicio, dataFim, contaId, contatoId, TipoLancamento.ENTRADA, categoriaId, comNotaFiscal, descricao, status);
+
+                BigDecimal faturamentoAnual = dashboardService.getFaturamentoOficial(anoAtual, usuario);
+                lancamentos = lancamentoService.buscarComFiltros(dataInicio, dataFim, contaId, contatoId, TipoLancamento.ENTRADA, categoriaId, comNotaFiscal, descricao, status, usuario);
+                variaveis.put("faturamentoAnual", faturamentoAnual);
             }
 
             BigDecimal totalPeriodo = lancamentos.stream()
                     .map(Lancamento::getValor)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+            BigDecimal faturamentoAnual = (BigDecimal) variaveis.get("faturamentoAnual");
             BigDecimal limiteAnual = new BigDecimal("81000");
             BigDecimal limiteMensal = limiteAnual.divide(BigDecimal.valueOf(12), 2, RoundingMode.HALF_UP);
-
-            BigDecimal percentualAnual = faturamentoAnual
-                    .divide(limiteAnual, 4, RoundingMode.HALF_UP)
-                    .multiply(BigDecimal.valueOf(100));
-
+            BigDecimal percentualAnual = faturamentoAnual.divide(limiteAnual, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
             BigDecimal faturamentoMensal = faturamentoAnual.divide(BigDecimal.valueOf(12), 2, RoundingMode.HALF_UP);
-
-            BigDecimal percentualMensal = faturamentoMensal
-                    .divide(limiteMensal, 4, RoundingMode.HALF_UP)
-                    .multiply(BigDecimal.valueOf(100));
+            BigDecimal percentualMensal = faturamentoMensal.divide(limiteMensal, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
 
             variaveis.put("tituloVisao", tituloVisao);
-            variaveis.put("faturamentoAnual", faturamentoAnual);
             variaveis.put("percentualAnual", percentualAnual);
             variaveis.put("faturamentoMensal", faturamentoMensal);
             variaveis.put("percentualMensal", percentualMensal);
             variaveis.put("totalPeriodo", totalPeriodo);
 
-        } else { // Lógica para relatório genérico
+        } else {
             templateNome = "relatorio_lancamentos";
-            // CORREÇÃO AQUI: Adicionado o parâmetro 'status'
-            lancamentos = lancamentoService.buscarComFiltros(dataInicio, dataFim, contaId, contatoId, tipo, categoriaId, comNotaFiscal, descricao, status);
+
+            lancamentos = lancamentoService.buscarComFiltros(dataInicio, dataFim, contaId, contatoId, tipo, categoriaId, comNotaFiscal, descricao, status, usuario);
             BigDecimal total = lancamentos.stream().map(Lancamento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add);
             variaveis.put("total", total);
         }

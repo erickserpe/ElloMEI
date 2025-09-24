@@ -1,46 +1,39 @@
 <!DOCTYPE html>
 <html lang="pt-br" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
-
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4" th:fragment="menu-principal">
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom" th:fragment="menu-principal">
     <div class="container-fluid">
-        <a class="navbar-brand" th:href="@{/}">SCF-MEI</a>
+        <a class="navbar-brand fw-bold" th:href="@{/}">Ello MEI</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0" sec:authorize="isAuthenticated()">
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/}">Dashboard</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/lancamentos}">Lançamentos</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/contas}">Contas</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/categorias}">Categorias</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/contatoes}">Pessoas</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/contas-a-pagar}">Contas a Pagar</a>
+                <li class="nav-item"><a class="nav-link" th:href="@{/}">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/lancamentos}">Lançamentos</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/contas-a-pagar}">Contas a Pagar</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarCadastros" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Cadastros
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarCadastros">
+                        <li><a class="dropdown-item" th:href="@{/contas}">Contas</a></li>
+                        <li><a class="dropdown-item" th:href="@{/categorias}">Categorias</a></li>
+                        <li><a class="dropdown-item" th:href="@{/contatoes}">Contatos</a></li>
+                    </ul>
                 </li>
             </ul>
 
             <div class="d-flex" sec:authorize="isAuthenticated()">
                 <span class="navbar-text me-3">
-                    Olá, <span sec:authentication="name">Usuário</span>!
+                    Olá, <span sec:authentication="name" class="fw-bold">Usuário</span>!
                 </span>
                 <form th:action="@{/logout}" method="post">
-                    <button class="btn btn-outline-light" type="submit">Logout</button>
+                    <button class="btn btn-outline-secondary btn-sm" type="submit">Sair</button>
                 </form>
             </div>
         </div>
     </div>
 </nav>
-
 </body>
 </html>

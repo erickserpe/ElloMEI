@@ -1,6 +1,7 @@
 package br.com.scfmei.service;
 
 import br.com.scfmei.domain.Conta;
+import br.com.scfmei.domain.Usuario;
 import br.com.scfmei.repository.ContaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,49 +10,34 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-@Service // "Carimbo" que identifica esta classe como um Serviço gerenciado pelo Spring
+@Service
 public class ContaService {
 
-    @Autowired // Mágica da Injeção de Dependência: Pede ao Spring para nos dar uma instância pronta do ContaRepository
+    @Autowired
     private ContaRepository contaRepository;
 
-    /**
-     * Busca todas as contas existentes no banco de dados.
-     * @return Uma lista de todas as contas.
-     */
-    @Transactional(readOnly = true) // Otimização para operações que apenas leem dados
-    public List<Conta> buscarTodas() {
-        return contaRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<Conta> buscarTodasPorUsuario(Usuario usuario) {
+        return contaRepository.findByUsuario(usuario);
     }
 
-    /**
-     * Salva uma nova conta no banco de dados, aplicando regras de negócio.
-     * @param conta O objeto Conta a ser salvo.
-     * @return A conta salva com seu ID preenchido.
-     */
     @Transactional
-    public Conta salvar(Conta conta) {
-        // Exemplo de Regra de Negócio: Ao criar uma nova conta, o saldo atual é igual ao inicial.
-        if (conta.getId() == null) { // Apenas para contas novas
+    public Conta salvar(Conta conta, Usuario usuario) {
+        conta.setUsuario(usuario);
+
+        if (conta.getId() == null) {
             conta.setSaldoAtual(conta.getSaldoInicial());
         }
         return contaRepository.save(conta);
     }
-    /**
-     * Busca uma única conta pelo seu ID.
-     * @param id O ID da conta a ser buscada.
-     * @return Um Optional contendo a conta se encontrada, ou vazio se não.
-     */
+
     @Transactional(readOnly = true)
     public Optional<Conta> buscarPorId(Long id) {
-        return contaRepository.findById(id); // O JpaRepository já nos dá este método!
+        return contaRepository.findById(id);
     }
-    /**
-     * Exclui uma conta do banco de dados pelo seu ID.
-     * @param id O ID da conta a ser excluída.
-     */
+
     @Transactional
     public void excluirPorId(Long id) {
-        contaRepository.deleteById(id); // O JpaRepository também nos dá este método!
+        contaRepository.deleteById(id);
     }
 }

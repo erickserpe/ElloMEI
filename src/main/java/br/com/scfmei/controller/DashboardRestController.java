@@ -5,6 +5,7 @@ import br.com.scfmei.domain.ChartData;
 import br.com.scfmei.domain.Usuario;
 import br.com.scfmei.repository.UsuarioRepository;
 import br.com.scfmei.service.DashboardService;
+import br.com.scfmei.service.LancamentoService; // Importe para o faturamento mensal
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +27,7 @@ public class DashboardRestController {
 
     @Autowired private DashboardService dashboardService;
     @Autowired private UsuarioRepository usuarioRepository;
+    @Autowired private LancamentoService lancamentoService; // Necessário para o faturamento
 
     private Usuario getUsuarioLogado(Principal principal) {
         return usuarioRepository.findByUsername(principal.getName())
@@ -38,7 +40,7 @@ public class DashboardRestController {
             @RequestParam(required = false) LocalDate dataFim,
             @RequestParam(required = false) Long contaId,
             @RequestParam(required = false) Long contatoId,
-            Principal principal) { // Pega o usuário logado
+            Principal principal) {
 
         Usuario usuario = getUsuarioLogado(principal);
         List<ChartData> data = dashboardService.getDespesasPorCategoria(dataInicio, dataFim, contaId, contatoId, usuario);

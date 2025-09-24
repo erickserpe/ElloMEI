@@ -43,21 +43,20 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
             @Param("usuario") Usuario usuario
     );
 
-    // --- CONSULTA ATUALIZADA ---
     @Query("SELECT new br.com.scfmei.domain.ChartData(c.nome, SUM(l.valor)) " +
             "FROM Lancamento l JOIN l.categoriaDespesa c " +
-            "WHERE l.tipo = 'SAIDA' " +
+            "WHERE l.tipo = 'SAIDA' AND l.status = 'PAGO' " + // <-- CORREÇÃO AQUI
             "AND l.data >= :inicioDoMes AND l.data <= :fimDoMes " +
             "AND (:contaId IS NULL OR l.conta.id = :contaId) " +
             "AND (:contatoId IS NULL OR l.contato.id = :contatoId) " +
-            "AND l.usuario = :usuario " + // <-- FILTRO DE USUÁRIO ADICIONADO
+            "AND l.usuario = :usuario " +
             "GROUP BY c.nome")
     List<ChartData> findDespesasPorCategoriaComFiltros(
             @Param("inicioDoMes") LocalDate inicioDoMes,
             @Param("fimDoMes") LocalDate fimDoMes,
             @Param("contaId") Long contaId,
             @Param("contatoId") Long contatoId,
-            @Param("usuario") Usuario usuario // <-- NOVO PARÂMETRO
+            @Param("usuario") Usuario usuario
     );
 
     // --- CONSULTA ATUALIZADA ---

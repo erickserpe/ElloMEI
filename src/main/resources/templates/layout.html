@@ -3,35 +3,58 @@
       th:fragment="layout-base (title, content)">
 <head>
     <meta charset="UTF-8">
-    <title th:replace="${title}">SCF-MEI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:replace="${title}">Ello MEI</title>
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}"/>
     <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.css}"/>
+    <link rel="stylesheet" th:href="@{/css/custom.css}" />
 </head>
-<style>
-    body {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-    }
-    main {
-        flex-grow: 1;
-    }
-</style>
 <body>
 
-<header th:replace="~{menu :: menu-principal}"></header>
+<div class="wrapper">
+    <nav id="sidebar">
+        <div class="sidebar-header"><h3>Ello MEI</h3></div>
+        <ul class="list-unstyled components">
+            <li class="active"><a th:href="@{/}"><i class="bi bi-grid-fill me-2"></i> Dashboard</a></li>
+            <li><a th:href="@{/lancamentos}"><i class="bi bi-arrow-down-up me-2"></i> Lançamentos</a></li>
+            <li><a th:href="@{/contas-a-pagar}"><i class="bi bi-calendar-week me-2"></i> Contas a Pagar</a></li>
+            <li><a th:href="@{/contas}"><i class="bi bi-wallet2 me-2"></i> Contas</a></li>
+            <li><a th:href="@{/categorias}"><i class="bi bi-tag-fill me-2"></i> Categorias</a></li>
+            <li><a th:href="@{/contatoes}"><i class="bi bi-people-fill me-2"></i> Contatos</a></li>
+        </ul>
+        <div class="p-3 mt-auto">
+            <div class="d-flex align-items-center text-white-50 mb-2">
+                <span>Olá, <span sec:authentication="name" class="fw-bold">Usuário</span>!</span>
+            </div>
+            <form th:action="@{/logout}" method="post"><button class="btn btn-outline-light w-100" type="submit">Sair</button></form>
+        </div>
+    </nav>
 
-<main class="container py-4">
-    <div th:replace="${content}">
+    <div id="content">
+        <nav class="navbar navbar-expand-lg navbar-light bg-transparent d-md-none">
+            <div class="container-fluid">
+                <button type="button" id="sidebarCollapse" class="btn btn-dark">
+                    <i class="bi bi-list"></i>
+                </button>
+            </div>
+        </nav>
+        <div class="p-4" th:replace="${content}">
+        </div>
     </div>
-</main>
-
-<footer class="container mt-auto text-muted text-center py-3">
-    <hr>
-    <p>&copy; 2025 SCF-MEI. Todos os direitos reservados.</p>
-</footer>
+</div>
 
 <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const sidebarCollapse = document.getElementById('sidebarCollapse');
+        const sidebar = document.getElementById('sidebar');
+        if (sidebarCollapse) {
+            sidebarCollapse.addEventListener('click', function () {
+                sidebar.classList.toggle('active');
+            });
+        }
+    });
+</script>
 
 </body>
 </html>

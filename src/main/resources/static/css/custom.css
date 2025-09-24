@@ -1,0 +1,131 @@
+/* /src/main/resources/static/css/custom.css */
+
+/* --- 1. FONTES E VARIÁVEIS GLOBAIS --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+:root {
+    --bs-primary: #3B82F6;
+    --bs-font-sans-serif: 'Poppins', sans-serif;
+    --app-bg: #F4F7FC; /* Fundo cinza bem claro da inspiração */
+    --sidebar-bg: #1E293B; /* Azul escuro da sidebar */
+    --sidebar-header-bg: #0F172A;
+    --sidebar-link-color: #CBD5E1;
+    --sidebar-link-hover-bg: #334155;
+    --sidebar-link-active-border: var(--bs-primary);
+}
+
+/* --- 2. LAYOUT PRINCIPAL E SIDEBAR --- */
+.wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+    background-color: var(--app-bg);
+}
+
+body {
+    font-family: var(--bs-font-sans-serif);
+    background-color: var(--app-bg);
+}
+
+#sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    background: var(--sidebar-bg);
+    color: #fff;
+    transition: all 0.3s;
+    min-height: 100vh;
+}
+
+#sidebar .sidebar-header {
+    padding: 20px;
+    background: var(--sidebar-header-bg);
+}
+
+#sidebar .sidebar-header h3 {
+    color: #fff;
+    font-weight: 700;
+}
+
+#sidebar ul.components li a {
+    padding: 15px 20px;
+    font-size: 1.1em;
+    display: block;
+    color: var(--sidebar-link-color);
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+#sidebar ul.components li a:hover, #sidebar ul.components li.active > a {
+    color: #fff;
+    background: var(--sidebar-link-hover-bg);
+    border-left: 3px solid var(--sidebar-link-active-border);
+}
+
+#content {
+    width: calc(100% - 250px);
+    transition: all 0.3s;
+}
+
+/* --- 3. RESPONSIVIDADE DA SIDEBAR --- */
+#sidebarCollapse {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -250px;
+        position: fixed;
+        height: 100vh;
+        z-index: 999;
+    }
+    #sidebar.active {
+        margin-left: 0;
+    }
+    #content {
+        width: 100%;
+    }
+    #sidebarCollapse {
+        display: block;
+    }
+}
+
+/* --- 4. ESTILOS DE COMPONENTES DO DASHBOARD --- */
+.card {
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+    border-radius: 0.75rem;
+}
+
+.kpi-card-gradient {
+    color: white;
+    border-radius: 12px;
+}
+.kpi-card-gradient .kpi-icon { font-size: 2rem; opacity: 0.7; }
+.kpi-card-gradient .kpi-title { font-weight: 500; font-size: 0.9rem; }
+.kpi-card-gradient .kpi-value { font-size: 1.75rem; font-weight: 700; }
+
+.bg-gradient-1 { background-image: linear-gradient(to right, #4facfe 0%, #00f2fe 100%); }
+.bg-gradient-2 { background-image: linear-gradient(to right, #43e97b 0%, #38f9d7 100%); }
+.bg-gradient-3 { background-image: linear-gradient(to right, #ff8177 0%, #ff867a 0%, #ff8c7f 21%, #f99185 52%, #cf556c 78%, #b12a5b 100%);}
+
+/* --- Estilos da Página de Login --- */
+.access-page-wrapper {
+    background: linear-gradient(135deg, #a88beb 0%, #f7ce68 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.access-card {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 1rem;
+    padding: 2.5rem;
+    width: 100%;
+}
+
+@media (min-width: 576px) { .access-card { max-width: 480px; } }
+@media (min-width: 992px) { .access-card.register-card { max-width: 720px; } }

@@ -4,6 +4,7 @@ import br.com.scfmei.domain.*;
 import br.com.scfmei.repository.ComprovanteRepository;
 import br.com.scfmei.repository.LancamentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,16 +37,26 @@ public class LancamentoService {
 
     private void salvarNovaOperacao(LancamentoFormDTO form, MultipartFile comprovanteFile, Usuario usuario) {
         String grupoOperacao = UUID.randomUUID().toString();
-        // ... (lógica de comprovantes)
+        List<String> comprovantePaths = new ArrayList<>();
+        if (comprovanteFile != null && !comprovanteFile.isEmpty()) {
+            comprovantePaths = fileStorageService.storeFile(comprovanteFile);
+        } else if (form.getGrupoOperacao() != null && form.getComprovantes() != null && !form.getComprovantes().isEmpty()) {
+            comprovantePaths = form.getComprovantes().stream().map(Comprovante::getPathArquivo).collect(Collectors.toList());
+        }
 
         for (PagamentoDTO pagamento : form.getPagamentos()) {
             if (pagamento.getValor() == null || pagamento.getConta() == null) continue;
 
             Lancamento lancamento = new Lancamento();
-            // ... (setters de dados do formulário)
+            lancamento.setDescricao(form.getDescricao());
+            lancamento.setData(form.getData());
+            lancamento.setTipo(form.getTipo());
+            lancamento.setCategoriaDespesa(form.getCategoriaDespesa());
+            lancamento.setContato(form.getContato());
+            lancamento.setComNotaFiscal(form.getComNotaFiscal());
             lancamento.setGrupoOperacao(grupoOperacao);
             lancamento.setStatus(form.getStatus());
-            lancamento.setUsuario(usuario); // ASSOCIA O LANÇAMENTO AO USUÁRIO
+            lancamento.setUsuario(usuario);
 
             Conta conta = contaService.buscarPorId(pagamento.getConta()).orElseThrow(() -> new RuntimeException("Conta não encontrada!"));
             lancamento.setConta(conta);
@@ -53,7 +64,14 @@ public class LancamentoService {
 
             Lancamento lancamentoSalvo = lancamentoRepository.save(lancamento);
 
-            // ... (lógica de salvar comprovantes)
+            if (!comprovantePaths.isEmpty()) {
+                for (String path : comprovantePaths) {
+                    Comprovante comprovante = new Comprovante();
+                    comprovante.setPathArquivo(path);
+                    comprovante.setLancamento(lancamentoSalvo);
+                    comprovanteRepository.save(comprovante);
+                }
+            }
 
             if (lancamentoSalvo.getStatus() == StatusLancamento.PAGO) {
                 aplicarLancamentoNaConta(lancamentoSalvo);
@@ -64,20 +82,38 @@ public class LancamentoService {
     @Transactional(readOnly = true)
     public LancamentoFormDTO carregarOperacaoParaEdicao(Long lancamentoId) {
         Lancamento umLancamentoDoGrupo = buscarPorId(lancamentoId).orElseThrow(() -> new RuntimeException("Lançamento não encontrado!"));
-        // ... (lógica existente para carregar o grupo)
-        // O controller garantirá que o usuário só possa carregar seus próprios lançamentos.
+        String grupoOperacao = umLancamentoDoGrupo.getGrupoOperacao();
+        if (grupoOperacao == null) { grupoOperacao = umLancamentoDoGrupo.getId().toString(); }
+        List<Lancamento> lancamentosDoGrupo = lancamentoRepository.findByGrupoOperacaoAndUsuario(grupoOperacao, umLancamentoDoGrupo.getUsuario());
+        if(lancamentosDoGrupo.isEmpty()){ lancamentosDoGrupo.add(umLancamentoDoGrupo); }
 
         LancamentoFormDTO form = new LancamentoFormDTO();
-        // ... (setters existentes)
+        form.setGrupoOperacao(umLancamentoDoGrupo.getGrupoOperacao());
+        form.setDescricao(umLancamentoDoGrupo.getDescricao());
+        form.setData(umLancamentoDoGrupo.getData());
+        form.setTipo(umLancamentoDoGrupo.getTipo());
+        form.setCategoriaDespesa(umLancamentoDoGrupo.getCategoriaDespesa());
+        form.setContato(umLancamentoDoGrupo.getContato());
+        form.setComNotaFiscal(umLancamentoDoGrupo.getComNotaFiscal());
+        form.setComprovantes(umLancamentoDoGrupo.getComprovantes());
         form.setStatus(umLancamentoDoGrupo.getStatus());
 
-        // ... (lógica de pagamentos)
+        List<PagamentoDTO> pagamentos = lancamentosDoGrupo.stream().map(l -> {
+            PagamentoDTO dto = new PagamentoDTO();
+            dto.setConta(l.getConta().getId());
+            dto.setValor(l.getValor());
+            return dto;
+        }).collect(Collectors.toList());
+        form.setPagamentos(pagamentos);
         return form;
     }
 
     public void excluirOperacao(Long lancamentoId, Usuario usuario) {
         Lancamento umLancamentoDoGrupo = buscarPorId(lancamentoId).orElseThrow(() -> new RuntimeException("Lançamento não encontrado!"));
-        // A checagem de permissão é feita no controller antes de chamar este método.
+        if (!umLancamentoDoGrupo.getUsuario().getId().equals(usuario.getId())) {
+            throw new AccessDeniedException("Acesso negado.");
+        }
+
         String grupoOperacao = umLancamentoDoGrupo.getGrupoOperacao();
         if (grupoOperacao == null || grupoOperacao.isBlank()) {
             if (umLancamentoDoGrupo.getStatus() == StatusLancamento.PAGO) {
@@ -112,9 +148,8 @@ public class LancamentoService {
 
     public void pagarConta(Long lancamentoId, Usuario usuario) {
         Lancamento lancamento = buscarPorId(lancamentoId).orElseThrow(() -> new RuntimeException("Lançamento não encontrado!"));
-        // Validação de segurança
         if (!lancamento.getUsuario().getId().equals(usuario.getId())) {
-            throw new org.springframework.security.access.AccessDeniedException("Acesso negado.");
+            throw new AccessDeniedException("Acesso negado.");
         }
 
         if (lancamento.getStatus() == StatusLancamento.A_PAGAR) {
@@ -131,7 +166,8 @@ public class LancamentoService {
         } else {
             conta.setSaldoAtual(conta.getSaldoAtual().subtract(lancamento.getValor()));
         }
-        contaService.salvar(conta);
+        // CORREÇÃO AQUI
+        contaService.salvar(conta, lancamento.getUsuario());
     }
 
     private void reverterLancamentoNaConta(Lancamento lancamento) {
@@ -141,6 +177,7 @@ public class LancamentoService {
         } else {
             conta.setSaldoAtual(conta.getSaldoAtual().add(lancamento.getValor()));
         }
-        contaService.salvar(conta);
+        // CORREÇÃO AQUI
+        contaService.salvar(conta, lancamento.getUsuario());
     }
 }

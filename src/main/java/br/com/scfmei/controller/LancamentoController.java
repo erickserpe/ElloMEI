@@ -30,19 +30,35 @@ public class LancamentoController {
     }
 
     @GetMapping
-    public String listarLancamentos(@RequestParam(required = false) LocalDate dataInicio,
-                                    @RequestParam(required = false) LocalDate dataFim,
-                                    // ... outros request params
-                                    Principal principal, Model model) {
+    public String listarLancamentos(
+
+            @RequestParam(required = false) LocalDate dataInicio,
+            @RequestParam(required = false) LocalDate dataFim,
+            @RequestParam(required = false) Long contaId,
+            @RequestParam(required = false) Long contatoId,
+            @RequestParam(required = false) TipoLancamento tipo,
+            @RequestParam(required = false) Long categoriaId,
+            @RequestParam(required = false) Boolean comNotaFiscal,
+            @RequestParam(required = false) String descricao,
+            @RequestParam(required = false) StatusLancamento status,
+
+            Principal principal, Model model) {
+
         Usuario usuario = getUsuarioLogado(principal);
         List<Lancamento> lancamentos = lancamentoService.buscarComFiltros(dataInicio, dataFim, contaId, contatoId, tipo, categoriaId, comNotaFiscal, descricao, status, usuario);
         model.addAttribute("listaDeLancamentos", lancamentos);
 
-        // Carrega apenas os dados do usuário logado para os filtros
         model.addAttribute("listaDeContas", contaService.buscarTodasPorUsuario(usuario));
         model.addAttribute("listaDePessoas", contatoService.buscarTodosPorUsuario(usuario));
 
-        // ... devolve filtros selecionados para a view
+
+        model.addAttribute("dataInicioSel", dataInicio);
+        model.addAttribute("dataFimSel", dataFim);
+        model.addAttribute("contaIdSel", contaId);
+        model.addAttribute("pessoaIdSel", contatoId);
+        model.addAttribute("statusSel", status);
+
+
         return "lancamentos";
     }
 
@@ -56,7 +72,7 @@ public class LancamentoController {
     public String mostrarFormularioDeNovoLancamento(Model model, Principal principal) {
         carregarDadosDoFormulario(model, getUsuarioLogado(principal));
         model.addAttribute("lancamentoForm", new LancamentoFormDTO());
-        return "form-lancamento";
+        return "form-lancamento"; // <-- CORRIGIDO
     }
 
     @GetMapping("/editar/{id}")

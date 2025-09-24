@@ -1,61 +1,75 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout :: layout-base(~{::title}, ~{::#registro-content})}">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Cadastro de Novo Usuário</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Ello MEI</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{/css/custom.css}" />
 </head>
 <body>
-<div id="registro-content">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card">
-                <div class="card-body">
-                    <h2 class="card-title text-center mb-4">Crie sua Conta</h2>
-                    <form th:action="@{/registro}" method="post" th:object="${usuario}">
-                        <h5 class="mb-3">Dados de Acesso</h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="username" class="form-label">Usuário (Login)</label>
-                                <input type="text" class="form-control" th:field="*{username}" id="username" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="password" class="form-label">Senha</label>
-                                <input type="password" class="form-control" th:field="*{password}" id="password" required>
-                            </div>
-                        </div>
-                        <hr>
-                        <h5 class="mb-3">Dados Pessoais e da Empresa</h5>
-                        <div class="mb-3">
-                            <label for="nomeCompleto" class="form-label">Seu Nome Completo</label>
-                            <input type="text" class="form-control" th:field="*{nomeCompleto}" id="nomeCompleto">
-                        </div>
-                        <div class="mb-3">
-                            <label for="nomeFantasia" class="form-label">Nome Fantasia (MEI)</label>
-                            <input type="text" class="form-control" th:field="*{nomeFantasia}" id="nomeFantasia">
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="cpf" class="form-label">CPF</label>
-                                <input type="text" class="form-control" th:field="*{cpf}" id="cpf">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="cnpj" class="form-label">CNPJ</label>
-                                <input type="text" class="form-control" th:field="*{cnpj}" id="cnpj">
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="razaoSocial" class="form-label">Razão Social</label>
-                            <input type="text" class="form-control" th:field="*{razaoSocial}" id="razaoSocial">
-                        </div>
-
-                        <button type="submit" class="w-100 btn btn-lg btn-primary mt-3">Cadastrar</button>
-                        <div class="text-center mt-3">
-                            <a th:href="@{/login}">Já tem uma conta? Faça o login</a>
-                        </div>
-                    </form>
+<div class="access-page-wrapper">
+    <div class="access-card register-card shadow">
+        <div class="text-center mb-4">
+            <h2 class="card-title fw-bold">Crie sua Conta</h2>
+            <p class="text-black-50">Preencha os dados para começar a organizar suas finanças.</p>
+        </div>
+        <form th:action="@{/registro}" method="post" th:object="${usuario}">
+            <h5 class="mb-3">Dados de Acesso</h5>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" th:field="*{username}" id="username" placeholder="Usuário (Login)" required>
+                        <label for="username">Usuário (Login)</label>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                        <input type="password" class="form-control" th:field="*{password}" id="password" placeholder="Senha" required>
+                        <label for="password">Senha</label>
+                    </div>
                 </div>
             </div>
-        </div>
+            <hr class="my-3">
+            <h5 class="mb-3">Dados Pessoais e da Empresa</h5>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" th:field="*{nomeCompleto}" id="nomeCompleto" placeholder="Seu Nome Completo">
+                        <label for="nomeCompleto">Seu Nome Completo</label>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" th:field="*{nomeFantasia}" id="nomeFantasia" placeholder="Nome Fantasia (MEI)">
+                        <label for="nomeFantasia">Nome Fantasia (MEI)</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" th:field="*{cpf}" id="cpf" placeholder="CPF">
+                        <label for="cpf">CPF</label>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" th:field="*{cnpj}" id="cnpj" placeholder="CNPJ">
+                        <label for="cnpj">CNPJ</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" th:field="*{razaoSocial}" id="razaoSocial" placeholder="Razão Social">
+                <label for="razaoSocial">Razão Social</label>
+            </div>
+
+            <button type="submit" class="w-100 btn btn-lg btn-primary mt-3">Cadastrar</button>
+            <div class="text-center mt-3">
+                <small>Já tem uma conta? <a th:href="@{/login}" class="fw-bold text-dark">Faça o login</a></small>
+            </div>
+        </form>
     </div>
 </div>
 </body>

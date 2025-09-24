@@ -1,44 +1,43 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout :: layout-base(~{::title}, ~{::#login-content})}">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Login - SCF MEI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Ello MEI</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{/css/custom.css}" />
 </head>
 <body>
-<div id="login-content">
-    <div class="row justify-content-center">
-        <div class="col-md-5 col-lg-4">
-            <div class="card">
-                <div class="card-body">
-                    <h2 class="card-title text-center mb-4">Bem-vindo!</h2>
-                    <form th:action="@{/login}" method="post">
-                        <h3 class="h5 mb-3 fw-normal text-center">Acesse o seu sistema</h3>
-
-                        <div th:if="${param.error}" class="alert alert-danger">
-                            Usuário ou senha inválidos.
-                        </div>
-                        <div th:if="${param.logout}" class="alert alert-success">
-                            Você foi desconectado com sucesso.
-                        </div>
-
-                        <div class="form-floating mb-2">
-                            <input type="text" class="form-control" id="username" name="username" placeholder="Usuário" required autofocus>
-                            <label for="username">Usuário</label>
-                        </div>
-                        <div class="form-floating">
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Senha" required>
-                            <label for="password">Senha</label>
-                        </div>
-
-                        <button class="w-100 btn btn-lg btn-primary mt-3" type="submit">Entrar</button>
-
-                        <div class="text-center mt-3">
-                            <p>Não tem uma conta? <a th:href="@{/registro}">Cadastre-se aqui</a></p>
-                        </div>
-                    </form>
-                </div>
-            </div>
+<div class="access-page-wrapper">
+    <div class="access-card shadow">
+        <div class="text-center mb-4">
+            <h2 class="card-title fw-bold">Ello MEI</h2>
+            <p class="text-black-50">Acesse sua conta para continuar.</p>
         </div>
+
+        <form th:action="@{/login}" method="post">
+            <div th:if="${param.error}" class="alert alert-danger">
+                Usuário ou senha inválidos.
+            </div>
+            <div th:if="${param.logout}" class="alert alert-success">
+                Você foi desconectado com sucesso.
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="username" name="username" placeholder="Usuário" required autofocus>
+                <label for="username">Usuário</label>
+            </div>
+            <div class="form-floating">
+                <input type="password" class="form-control" id="password" name="password" placeholder="Senha" required>
+                <label for="password">Senha</label>
+            </div>
+
+            <button class="w-100 btn btn-lg btn-primary mt-4" type="submit">Entrar</button>
+
+            <div class="text-center mt-3">
+                <small>Não tem uma conta? <a th:href="@{/registro}" class="fw-bold text-dark">Cadastre-se aqui</a></small>
+            </div>
+        </form>
     </div>
 </div>
 </body>

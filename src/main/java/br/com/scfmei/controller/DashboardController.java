@@ -1,6 +1,5 @@
 package br.com.scfmei.controller;
 
-
 import br.com.scfmei.domain.*;
 import br.com.scfmei.repository.UsuarioRepository;
 import br.com.scfmei.service.*;
@@ -42,22 +41,21 @@ public class DashboardController {
             @RequestParam(required = false) String descricao,
             @RequestParam(required = false) StatusLancamento status,
             Principal principal,
-            Model model)
-     {
+            Model model) {
 
         Usuario usuario = getUsuarioLogado(principal);
 
-        // 1. Busca dados para os dropdowns dos filtros (agora filtrados por usuário)
+        // 1. Busca dados para os dropdowns dos filtros
         model.addAttribute("listaDeContas", contaService.buscarTodasPorUsuario(usuario));
         model.addAttribute("listaDePessoas", contatoService.buscarTodosPorUsuario(usuario));
         model.addAttribute("listaDeCategorias", categoriaService.buscarTodasPorUsuario(usuario));
 
-        // 2. Busca os lançamentos com filtros aplicados (agora filtrados por usuário)
+        // 2. Busca os lançamentos com filtros aplicados
         List<Lancamento> lancamentosFiltrados = lancamentoService.buscarComFiltros(
                 dataInicio, dataFim, contaId, contatoId, tipo, categoriaId, comNotaFiscal, descricao, status, usuario
         );
 
-        // 3. Calcula KPIs (agora baseados nos dados do usuário)
+        // 3. Calcula KPIs
         BigDecimal totalEntradas = lancamentosFiltrados.stream()
                 .filter(l -> l.getTipo() == TipoLancamento.ENTRADA && l.getStatus() == StatusLancamento.PAGO)
                 .map(Lancamento::getValor)
@@ -72,8 +70,15 @@ public class DashboardController {
         model.addAttribute("totalEntradas", totalEntradas);
         model.addAttribute("totalSaidas", totalSaidas);
 
-        // 4. Devolve filtros selecionados para a view
-        // ... (todos os model.addAttribute para os filtros selecionados)
+        // 4. Devolve filtros selecionados para a view (completo)
+        model.addAttribute("dataInicioSel", dataInicio);
+        model.addAttribute("dataFimSel", dataFim);
+        model.addAttribute("contaIdSel", contaId);
+        model.addAttribute("contatoIdSel", contatoId);
+        model.addAttribute("tipoSel", tipo);
+        model.addAttribute("categoriaIdSel", categoriaId);
+        model.addAttribute("comNotaFiscalSel", comNotaFiscal);
+        model.addAttribute("descricaoSel", descricao);
         model.addAttribute("statusSel", status);
 
         return "dashboard";

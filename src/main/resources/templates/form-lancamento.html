@@ -45,7 +45,7 @@
                         <label for="contato" class="form-label">Pessoa/Fornecedor</label>
                         <select class="form-select" id="contato" th:field="*{contato}">
                             <option value="">Nenhuma</option>
-                            <option th:each="p : ${listaDePessoas}" th:value="${p.id}" th:text="${p.nome}"></option>
+                            <option th:each="p : ${listaDePessoas}" th:value="${p.id}" th:text="${p.getNomeExibicao()}"></option>
                         </select>
                     </div>
                 </div>
