@@ -28,9 +28,7 @@ public class Usuario {
     private String roles; // Papéis/Permissões do usuário
     private LocalDate dataAberturaMei;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_id", nullable = false)
-    private Usuario usuario;
+    // --- CORREÇÃO: A RELAÇÃO INCORRETA FOI REMOVIDA DAQUI ---
 
     // Getters e Setters...
     public Long getId() { return id; }
@@ -57,6 +55,4 @@ public class Usuario {
     public void setDataAberturaMei(LocalDate dataAberturaMei) {
         this.dataAberturaMei = dataAberturaMei;
     }
-    public Usuario getUsuario() { return usuario; }
-    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
 }

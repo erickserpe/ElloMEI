@@ -5,8 +5,9 @@
     <title>Lançamentos Financeiros - Ello MEI</title>
 </head>
 <body>
-<div id="lancamentos-content">
-    <div class="d-flex justify-content-between align-items-center mb-5">
+<div id="lancamentos-content" class="p-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h2 fw-bold text-gray-900 mb-1">
                 <i class="bi bi-list-ul text-primary me-2"></i>
@@ -14,21 +15,22 @@
             </h1>
             <p class="text-muted mb-0">Gerencie todas as suas transações financeiras</p>
         </div>
-        <a th:href="@{/lancamentos/novo}" class="btn btn-primary shadow-sm d-flex align-items-center">
+        <a th:href="@{/lancamentos/novo}" class="btn btn-primary d-flex align-items-center">
             <i class="bi bi-plus-circle me-2"></i>
             <span class="d-none d-sm-inline">Novo Lançamento</span>
             <span class="d-sm-none">Novo</span>
         </a>
     </div>
 
-    <div class="card mb-4 shadow-sm">
-        <div class="card-header bg-white border-bottom py-4">
-            <h5 class="mb-0 fw-semibold text-gray-900">
-                <i class="bi bi-funnel text-primary me-2"></i>
+    <!-- Filters Card -->
+    <div class="filter-card mb-4">
+        <div class="filter-card-header">
+            <h6>
+                <i class="bi bi-funnel text-primary"></i>
                 Filtros de Pesquisa
-            </h5>
+            </h6>
         </div>
-        <div class="card-body p-4">
+        <div class="filter-card-body">
             <form th:action="@{/lancamentos}" method="get">
                 <div class="row g-4">
                     <div class="col-md-3">
@@ -103,45 +105,28 @@
         </div>
     </div>
 
-    <div class="card shadow-sm">
-        <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-4">
-            <h5 class="mb-0 fw-semibold text-gray-900">
+    <!-- Transactions Table Card -->
+    <div class="content-card">
+        <div class="content-card-header d-flex justify-content-between align-items-center">
+            <h5>
                 <i class="bi bi-table text-primary me-2"></i>
                 Lista de Lançamentos
             </h5>
             <span class="badge bg-primary-100 text-primary-700 px-3 py-2 rounded-pill fw-medium"
                   th:text="${'Total: ' + listaDeLancamentos.size() + ' registros'}"></span>
         </div>
-        <div class="card-body p-0">
+        <div class="content-card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="bg-gray-50">
+                <table class="table table-modern mb-0">
+                    <thead>
                     <tr>
-                        <th class="px-4 py-3 fw-semibold text-gray-700 border-0">
-                            <i class="bi bi-calendar3 me-1"></i>
-                            Data
-                        </th>
-                        <th class="py-3 fw-semibold text-gray-700 border-0">
-                            <i class="bi bi-card-text me-1"></i>
-                            Descrição
-                        </th>
-                        <th class="py-3 fw-semibold text-gray-700 border-0">
-                            <i class="bi bi-wallet2 me-1"></i>
-                            Conta
-                        </th>
-                        <th class="py-3 fw-semibold text-gray-700 border-0">
-                            <i class="bi bi-arrow-up-down me-1"></i>
-                            Tipo
-                        </th>
-                        <th class="py-3 fw-semibold text-gray-700 border-0">
-                            <i class="bi bi-check-circle me-1"></i>
-                            Status
-                        </th>
-                        <th class="text-end px-4 py-3 fw-semibold text-gray-700 border-0">
-                            <i class="bi bi-currency-dollar me-1"></i>
-                            Valor
-                        </th>
-                        <th class="text-center py-3 fw-semibold text-gray-700 border-0">Ações</th>
+                        <th>Data</th>
+                        <th>Descrição</th>
+                        <th>Conta</th>
+                        <th>Tipo</th>
+                        <th>Status</th>
+                        <th>Valor</th>
+                        <th style="width: 120px;">Ações</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -187,18 +172,18 @@
                                   th:class="${lancamento.tipo.name() == 'ENTRADA' ? 'text-success fw-bold fs-6' : 'text-danger fw-bold fs-6'}">
                             </span>
                         </td>
-                        <td class="text-center py-3">
-                            <div class="btn-group btn-group-sm">
+                        <td>
+                            <div class="btn-group-actions">
                                 <a th:href="@{/lancamentos/editar/{id}(id=${lancamento.id})}"
-                                   class="btn btn-outline-primary btn-sm"
+                                   class="btn-action btn-action-edit"
                                    title="Editar lançamento">
-                                    <i class="bi bi-pencil-square"></i>
+                                    <i class="bi bi-pencil"></i>
                                 </a>
                                 <a th:href="@{/lancamentos/excluir/{id}(id=${lancamento.id})}"
-                                   class="btn btn-outline-danger btn-sm"
+                                   class="btn-action btn-action-delete"
                                    title="Excluir lançamento"
                                    onclick="return confirm('Tem certeza que deseja excluir este lançamento?')">
-                                    <i class="bi bi-trash3"></i>
+                                    <i class="bi bi-trash"></i>
                                 </a>
                             </div>
                         </td>

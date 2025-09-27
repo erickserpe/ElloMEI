@@ -2,6 +2,7 @@
 package br.com.scfmei.controller;
 
 import br.com.scfmei.domain.ChartData;
+import br.com.scfmei.domain.StatusLancamento;
 import br.com.scfmei.domain.Usuario;
 import br.com.scfmei.repository.UsuarioRepository;
 import br.com.scfmei.service.DashboardService;
@@ -40,10 +41,12 @@ public class DashboardRestController {
             @RequestParam(required = false) LocalDate dataFim,
             @RequestParam(required = false) Long contaId,
             @RequestParam(required = false) Long contatoId,
+            @RequestParam(required = false) Long categoriaId,
+            @RequestParam(required = false) StatusLancamento status,
             Principal principal) {
 
         Usuario usuario = getUsuarioLogado(principal);
-        List<ChartData> data = dashboardService.getDespesasPorCategoria(dataInicio, dataFim, contaId, contatoId, usuario);
+        List<ChartData> data = dashboardService.getDespesasPorCategoria(dataInicio, dataFim, contaId, contatoId, categoriaId, status, usuario);
         return ResponseEntity.ok(data);
     }
 

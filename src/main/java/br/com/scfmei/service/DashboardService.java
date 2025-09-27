@@ -51,14 +51,14 @@ public class DashboardService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public List<ChartData> getDespesasPorCategoria(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long contatoId, Usuario usuario) {
+    public List<ChartData> getDespesasPorCategoria(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long contatoId, Long categoriaId, StatusLancamento status, Usuario usuario) {
         if (dataInicio == null || dataFim == null) {
             YearMonth mesAtual = YearMonth.now();
             dataInicio = mesAtual.atDay(1);
             dataFim = mesAtual.atEndOfMonth();
         }
 
-        return lancamentoRepository.findDespesasPorCategoriaComFiltros(dataInicio, dataFim, contaId, contatoId, usuario);
+        return lancamentoRepository.findDespesasPorCategoriaComFiltros(dataInicio, dataFim, contaId, contatoId, categoriaId, status, usuario);
     }
 
     public Map<String, List<?>> getFluxoDeCaixaUltimos12Meses(Usuario usuario) {

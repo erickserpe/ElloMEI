@@ -5,23 +5,24 @@
     <title>Dashboard - Ello MEI</title>
 </head>
 <body>
-<div id="dashboard-content">
-
-    <div class="d-flex justify-content-between align-items-center mb-5">
+<div id="dashboard-content" class="p-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h2 fw-bold text-gray-900 mb-1">Dashboard</h1>
             <p class="text-muted mb-0">Visão geral do seu negócio</p>
         </div>
-        <a th:href="@{/lancamentos/novo}" class="btn btn-primary shadow-sm d-flex align-items-center">
+        <a th:href="@{/lancamentos/novo}" class="btn btn-primary d-flex align-items-center">
             <i class="bi bi-plus-circle me-2"></i>
             <span class="d-none d-sm-inline">Novo Lançamento</span>
             <span class="d-sm-none">Novo</span>
         </a>
     </div>
 
-    <div class="row g-4 mb-5">
+    <!-- KPI Cards - Gradient Backgrounds Preserved -->
+    <div class="row g-4 mb-4">
         <div class="col-lg-4 col-md-6">
-            <div class="card kpi-card-gradient bg-gradient-1 shadow-md">
+            <div class="card kpi-card-gradient bg-gradient-1">
                 <div class="card-body d-flex justify-content-between align-items-center p-4">
                     <div class="flex-grow-1">
                         <h5 class="kpi-title mb-2">Saldo Total</h5>
@@ -34,7 +35,7 @@
             </div>
         </div>
         <div class="col-lg-4 col-md-6">
-            <div class="card kpi-card-gradient bg-gradient-2 shadow-md">
+            <div class="card kpi-card-gradient bg-gradient-2">
                 <div class="card-body d-flex justify-content-between align-items-center p-4">
                     <div class="flex-grow-1">
                         <h5 class="kpi-title mb-2">Entradas no Período</h5>
@@ -47,7 +48,7 @@
             </div>
         </div>
         <div class="col-lg-4 col-md-12">
-            <div class="card kpi-card-gradient bg-gradient-3 shadow-md">
+            <div class="card kpi-card-gradient bg-gradient-3">
                 <div class="card-body d-flex justify-content-between align-items-center p-4">
                     <div class="flex-grow-1">
                         <h5 class="kpi-title mb-2">Saídas no Período</h5>
@@ -61,141 +62,192 @@
         </div>
     </div>
 
-    <div class="accordion mb-5" id="accordionFiltros">
-        <div class="accordion-item border-0 shadow-sm rounded-lg overflow-hidden">
-            <h2 class="accordion-header" id="headingFiltros">
-                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFiltros" aria-expanded="false" aria-controls="collapseFiltros">
-                    <i class="bi bi-funnel me-2 text-primary"></i>
-                    Filtros Avançados e Relatórios
-                </button>
-            </h2>
-            <div id="collapseFiltros" class="accordion-collapse collapse" aria-labelledby="headingFiltros" data-bs-parent="#accordionFiltros">
-                <div class="accordion-body p-4">
-                    <!-- Filtros -->
-                    <form th:action="@{/}" method="get" id="global-filter-form">
-                        <div class="row g-3">
-                            <div class="col-md-3">
-                                <label for="dataInicio" class="form-label">Data de Início</label>
-                                <input type="date" id="dataInicio" name="dataInicio" class="form-control form-control-sm"
-                                       th:value="${dataInicioSel != null ? #temporals.format(dataInicioSel, 'yyyy-MM-dd') : ''}">
-                            </div>
-                            <div class="col-md-3">
-                                <label for="dataFim" class="form-label">Data Fim</label>
-                                <input type="date" id="dataFim" name="dataFim" class="form-control form-control-sm"
-                                       th:value="${dataFimSel != null ? #temporals.format(dataFimSel, 'yyyy-MM-dd') : ''}">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="descricao" class="form-label">Buscar na Descrição</label>
-                                <input type="text" id="descricao" name="descricao" class="form-control form-control-sm"
-                                       placeholder="Ex: Gasolina, Compra de material..." th:value="${descricaoSel}">
-                            </div>
-                            <div class="col-md-3">
-                                <label for="contaId" class="form-label">Conta</label>
-                                <select id="contaId" name="contaId" class="form-select form-select-sm">
-                                    <option value="">Todas</option>
-                                    <option th:each="conta : ${listaDeContas}" th:value="${conta.id}"
-                                            th:text="${conta.nomeConta}" th:selected="${conta.id == contaIdSel}"></option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="contatoId" class="form-label">Pessoa/Empresa</label>
-                                <select id="contatoId" name="contatoId" class="form-select form-select-sm">
-                                    <option value="">Todos</option>
-                                    <option th:each="contato : ${listaDePessoas}" th:value="${contato.id}"
-                                            th:text="${contato.getNomeExibicao()}" th:selected="${contato.id == contatoIdSel}"></option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="categoriaId" class="form-label">Categoria de Despesa</label>
-                                <select id="categoriaId" name="categoriaId" class="form-select form-select-sm">
-                                    <option value="">Todas</option>
-                                    <option th:each="cat : ${listaDeCategorias}" th:value="${cat.id}"
-                                            th:text="${cat.nome}" th:selected="${cat.id == categoriaIdSel}"></option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="status" class="form-label">Status do Lançamento</label>
-                                <select id="status" name="status" class="form-select form-select-sm">
-                                    <option value="">Todos</option>
-                                    <option th:each="s : ${T(br.com.scfmei.domain.StatusLancamento).values()}"
-                                            th:value="${s}" th:text="${s.descricao}" th:selected="${s == statusSel}"></option>
-                                </select>
+    <!-- Advanced Filters Card -->
+    <div class="content-card mb-4">
+        <div class="content-card-header" style="cursor: pointer;" onclick="toggleFilters()">
+            <h5>
+                <i class="bi bi-funnel text-primary me-2"></i>
+                Filtros Avançados e Relatórios
+                <i class="bi bi-chevron-down float-end" id="filtersToggleIcon"></i>
+            </h5>
+        </div>
+        <div class="content-card-body" style="display: none;" id="filtersContent">
+            <!-- Filters Form -->
+            <form th:action="@{/dashboard}" method="get" id="global-filter-form">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label for="dataInicio" class="form-label fw-medium">
+                            <i class="bi bi-calendar-event me-1"></i>
+                            Data de Início
+                        </label>
+                        <input type="date" id="dataInicio" name="dataInicio" class="form-control"
+                               th:value="${dataInicioSel != null ? #temporals.format(dataInicioSel, 'yyyy-MM-dd') : ''}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="dataFim" class="form-label fw-medium">
+                            <i class="bi bi-calendar-check me-1"></i>
+                            Data Fim
+                        </label>
+                        <input type="date" id="dataFim" name="dataFim" class="form-control"
+                               th:value="${dataFimSel != null ? #temporals.format(dataFimSel, 'yyyy-MM-dd') : ''}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="descricao" class="form-label fw-medium">
+                            <i class="bi bi-search me-1"></i>
+                            Buscar na Descrição
+                        </label>
+                        <input type="text" id="descricao" name="descricao" class="form-control"
+                               placeholder="Ex: Gasolina, Compra de material..." th:value="${descricaoSel}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="contaId" class="form-label fw-medium">
+                            <i class="bi bi-wallet2 me-1"></i>
+                            Conta
+                        </label>
+                        <select id="contaId" name="contaId" class="form-select">
+                            <option value="">Todas as contas</option>
+                            <option th:each="conta : ${listaDeContas}" th:value="${conta.id}"
+                                    th:text="${conta.nomeConta}" th:selected="${conta.id == contaIdSel}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="contatoId" class="form-label fw-medium">
+                            <i class="bi bi-person me-1"></i>
+                            Pessoa/Empresa
+                        </label>
+                        <select id="contatoId" name="contatoId" class="form-select">
+                            <option value="">Todos os contatos</option>
+                            <option th:each="contato : ${listaDePessoas}" th:value="${contato.id}"
+                                    th:text="${contato.getNomeExibicao()}" th:selected="${contato.id == contatoIdSel}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="categoriaId" class="form-label fw-medium">
+                            <i class="bi bi-tags me-1"></i>
+                            Categoria de Despesa
+                        </label>
+                        <select id="categoriaId" name="categoriaId" class="form-select">
+                            <option value="">Todas as categorias</option>
+                            <option th:each="cat : ${listaDeCategorias}" th:value="${cat.id}"
+                                    th:text="${cat.nome}" th:selected="${cat.id == categoriaIdSel}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="status" class="form-label fw-medium">
+                            <i class="bi bi-check-circle me-1"></i>
+                            Status do Lançamento
+                        </label>
+                        <select id="status" name="status" class="form-select">
+                            <option value="">Todos os status</option>
+                            <option th:each="s : ${T(br.com.scfmei.domain.StatusLancamento).values()}"
+                                    th:value="${s}" th:text="${s.descricao}" th:selected="${s == statusSel}"></option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Filter Actions -->
+                <div class="d-flex justify-content-end align-items-center gap-3 mt-4 pt-3 border-top">
+                    <a th:href="@{/dashboard}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-clockwise me-2"></i>
+                        Limpar Filtros
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-funnel-fill me-2"></i>
+                        Aplicar Filtros
+                    </button>
+                </div>
+            </form>
+
+            <!-- Reports Section -->
+            <div class="mt-4 pt-4 border-top">
+                <h6 class="mb-3 fw-semibold text-gray-900">
+                    <i class="bi bi-file-earmark-pdf text-primary me-2"></i>
+                    Gerar Relatórios
+                </h6>
+                <div class="row g-3">
+                    <!-- MEI Billing Report -->
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body p-3">
+                                <h6 class="card-title fw-semibold text-gray-900 mb-2">
+                                    <i class="bi bi-calculator text-primary me-2"></i>
+                                    Relatório de Faturamento MEI
+                                </h6>
+                                <p class="card-text small text-muted mb-3">
+                                    Relatório detalhado do faturamento conforme limites do MEI
+                                </p>
+                                <div class="d-flex gap-2 align-items-center">
+                                    <button type="button" class="btn btn-outline-primary btn-sm"
+                                            onclick="gerarRelatorioFaturamentoMEI()">
+                                        <i class="bi bi-file-earmark-pdf me-1"></i>
+                                        Gerar PDF
+                                    </button>
+                                    <select id="tipo-relatorio-mei" class="form-select form-select-sm" style="width: auto;">
+                                        <option value="OFICIAL">Visão Oficial</option>
+                                        <option value="BANCARIO">Visão Bancária</option>
+                                        <option value="ESTIMADO_CUSTOS">Por Compras</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                        <hr class="my-3">
-                        <div class="d-flex justify-content-end align-items-center">
-                            <a th:href="@{/}" class="btn btn-outline-secondary me-2">Limpar</a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-funnel-fill me-2"></i>Aplicar Filtros
-                            </button>
+                    </div>
+
+                    <!-- General Analysis Report -->
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body p-3">
+                                <h6 class="card-title fw-semibold text-gray-900 mb-2">
+                                    <i class="bi bi-graph-up text-success me-2"></i>
+                                    Relatório de Análise Geral
+                                </h6>
+                                <p class="card-text small text-muted mb-3">
+                                    Análise completa com todos os lançamentos do período
+                                </p>
+                                <button type="button" class="btn btn-outline-success btn-sm"
+                                        onclick="gerarRelatorioAnaliseGeral()">
+                                    <i class="bi bi-graph-up me-1"></i>
+                                    Gerar Análise
+                                </button>
+                            </div>
                         </div>
-                    </form>
+                    </div>
 
-                    <!-- Seção de Relatórios -->
-                    <div class="mt-4 pt-3 border-top">
-                        <h6 class="mb-3"><i class="bi bi-file-earmark-pdf me-2"></i>Gerar Relatórios</h6>
-                        <div class="row g-3">
-                            <!-- Relatório de Faturamento MEI -->
-                            <div class="col-md-6">
-                                <div class="card relatorio-card">
-                                    <div class="card-body">
-                                        <h6 class="card-title">Relatório de Faturamento MEI</h6>
-                                        <p class="card-text small text-muted">Relatório detalhado do faturamento conforme limites do MEI</p>
-                                        <div class="d-flex gap-2">
-                                            <button type="button" class="btn btn-outline-primary btn-sm btn-relatorio"
-                                                    onclick="gerarRelatorioFaturamentoMEI()">
-                                                <i class="bi bi-file-earmark-pdf me-1"></i>Gerar PDF
-                                            </button>
-                                            <select id="tipo-relatorio-mei" class="form-select form-select-sm" style="width: auto;">
-                                                <option value="OFICIAL">Visão Oficial</option>
-                                                <option value="BANCARIO">Visão Bancária</option>
-                                                <option value="ESTIMADO_CUSTOS">Por Compras</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
+                    <!-- Purchase with Invoice Report -->
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body p-3">
+                                <h6 class="card-title fw-semibold text-gray-900 mb-2">
+                                    <i class="bi bi-receipt text-info me-2"></i>
+                                    Compras com Nota Fiscal
+                                </h6>
+                                <p class="card-text small text-muted mb-3">
+                                    Relatório de compras com comprovantes fiscais
+                                </p>
+                                <button type="button" class="btn btn-outline-info btn-sm"
+                                        onclick="gerarRelatorioComprasNota()">
+                                    <i class="bi bi-receipt me-1"></i>
+                                    Gerar Relatório
+                                </button>
                             </div>
+                        </div>
+                    </div>
 
-                            <!-- Relatório de Análise Geral -->
-                            <div class="col-md-6">
-                                <div class="card relatorio-card">
-                                    <div class="card-body">
-                                        <h6 class="card-title">Relatório de Análise Geral</h6>
-                                        <p class="card-text small text-muted">Análise completa com todos os lançamentos do período</p>
-                                        <button type="button" class="btn btn-outline-success btn-sm btn-relatorio"
-                                                onclick="gerarRelatorioAnaliseGeral()">
-                                            <i class="bi bi-graph-up me-1"></i>Gerar Análise
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Relatório de Compras com Nota Fiscal -->
-                            <div class="col-md-6">
-                                <div class="card relatorio-card">
-                                    <div class="card-body">
-                                        <h6 class="card-title">Compras com Nota Fiscal</h6>
-                                        <p class="card-text small text-muted">Relatório de compras com comprovantes fiscais</p>
-                                        <button type="button" class="btn btn-outline-info btn-sm btn-relatorio"
-                                                onclick="gerarRelatorioComprasNota()">
-                                            <i class="bi bi-receipt me-1"></i>Gerar Relatório
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Relatório de Lançamentos Detalhados -->
-                            <div class="col-md-6">
-                                <div class="card relatorio-card">
-                                    <div class="card-body">
-                                        <h6 class="card-title">Lançamentos Detalhados</h6>
-                                        <p class="card-text small text-muted">Relatório completo de todos os lançamentos</p>
-                                        <button type="button" class="btn btn-outline-warning btn-sm btn-relatorio"
-                                                onclick="gerarRelatorioLancamentos()">
-                                            <i class="bi bi-list-check me-1"></i>Gerar Relatório
-                                        </button>
-                                    </div>
-                                </div>
+                    <!-- Detailed Transactions Report -->
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body p-3">
+                                <h6 class="card-title fw-semibold text-gray-900 mb-2">
+                                    <i class="bi bi-list-check text-warning me-2"></i>
+                                    Lançamentos Detalhados
+                                </h6>
+                                <p class="card-text small text-muted mb-3">
+                                    Relatório completo de todos os lançamentos
+                                </p>
+                                <button type="button" class="btn btn-outline-warning btn-sm"
+                                        onclick="gerarRelatorioLancamentos()">
+                                    <i class="bi bi-list-check me-1"></i>
+                                    Gerar Relatório
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -204,74 +256,84 @@
         </div>
     </div>
 
+    <!-- Charts and Analytics Section -->
     <div class="row g-4">
-        <div class="col-lg-7">
-            <div class="card h-100 shadow-sm">
-                <div class="card-header bg-white border-bottom py-4">
-                    <h5 class="mb-0 fw-semibold text-gray-900">
+        <!-- Cash Flow Chart -->
+        <div class="col-lg-8">
+            <div class="content-card h-100">
+                <div class="content-card-header">
+                    <h5>
                         <i class="bi bi-graph-up text-primary me-2"></i>
                         Fluxo de Caixa (Últimos 12 Meses)
                     </h5>
                 </div>
-                <div class="card-body d-flex align-items-center justify-content-center p-4" style="min-height: 350px;">
+                <div class="content-card-body d-flex align-items-center justify-content-center" style="min-height: 400px;">
                     <canvas id="fluxoDeCaixaChart"></canvas>
                 </div>
             </div>
         </div>
-        <div class="col-lg-5">
-            <div class="d-flex flex-column gap-4">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-white border-bottom py-4">
-                        <h5 class="mb-0 fw-semibold text-gray-900">
+
+        <!-- Right Column - Category Chart and MEI Widget -->
+        <div class="col-lg-4">
+            <div class="d-flex flex-column gap-4 h-100">
+                <!-- Expenses by Category Chart -->
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h5>
                             <i class="bi bi-pie-chart text-primary me-2"></i>
                             Despesas por Categoria
                         </h5>
                     </div>
-                    <div class="card-body d-flex align-items-center justify-content-center p-4" style="min-height: 250px;">
+                    <div class="content-card-body d-flex align-items-center justify-content-center" style="min-height: 280px;">
                         <canvas id="despesasPorCategoriaChart"></canvas>
                     </div>
                 </div>
-                <div class="card shadow-sm">
-                    <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-4">
-                        <h5 class="mb-0 fw-semibold text-gray-900">
+
+                <!-- MEI Billing Control Widget -->
+                <div class="content-card flex-grow-1">
+                    <div class="content-card-header d-flex justify-content-between align-items-center">
+                        <h5>
                             <i class="bi bi-speedometer2 text-primary me-2"></i>
                             Controle de Faturamento MEI
                         </h5>
-                        <select id="faturamento-filter" class="form-select form-select-sm border-gray-300" style="width: auto;">
+                        <select id="faturamento-filter" class="form-select form-select-sm" style="width: auto;">
                             <option value="OFICIAL" selected>Oficial</option>
                             <option value="BANCARIO">Bancário</option>
                             <option value="ESTIMADO_CUSTOS">Por Compras</option>
                         </select>
                     </div>
-                    <div class="card-body p-4">
+                    <div class="content-card-body">
+                        <!-- Annual Billing Progress -->
                         <div class="mb-4">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="fw-semibold text-gray-700">Faturamento Anual</span>
                                 <div class="text-end">
                                     <span id="faturamento-anual-valor" class="fw-bold text-gray-900">R$ 0,00</span>
-                                    <span class="text-muted"> / R$ 81.000,00</span>
+                                    <span class="text-muted small"> / R$ 81.000,00</span>
                                 </div>
                             </div>
-                            <div class="progress rounded-pill" style="height: 12px;">
-                                <div id="faturamento-anual-barra" class="progress-bar rounded-pill" role="progressbar" style="width: 0%;">
-                                    <span class="visually-hidden">0%</span>
+                            <div class="progress rounded-pill" style="height: 10px;">
+                                <div id="faturamento-anual-barra" class="progress-bar bg-primary rounded-pill"
+                                     role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
                                 </div>
                             </div>
                             <div class="text-end mt-1">
                                 <small id="faturamento-anual-percent" class="text-muted">0%</small>
                             </div>
                         </div>
+
+                        <!-- Monthly Billing Progress -->
                         <div>
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span id="faturamento-mensal-titulo" class="fw-semibold text-gray-700">Faturamento Mensal</span>
                                 <div class="text-end">
                                     <span id="faturamento-mensal-valor" class="fw-bold text-gray-900">R$ 0,00</span>
-                                    <span id="faturamento-mensal-teto" class="text-muted"> / R$ 6.750,00</span>
+                                    <span id="faturamento-mensal-teto" class="text-muted small"> / R$ 6.750,00</span>
                                 </div>
                             </div>
-                            <div class="progress rounded-pill" style="height: 12px;">
-                                <div id="faturamento-mensal-barra" class="progress-bar bg-success rounded-pill" role="progressbar" style="width: 0%;">
-                                    <span class="visually-hidden">0%</span>
+                            <div class="progress rounded-pill" style="height: 10px;">
+                                <div id="faturamento-mensal-barra" class="progress-bar bg-success rounded-pill"
+                                     role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
                                 </div>
                             </div>
                             <div class="text-end mt-1">
@@ -284,49 +346,152 @@
         </div>
     </div>
 
+    <!-- Chart.js Library -->
     <script th:src="@{/webjars/chartjs/4.4.3/dist/chart.umd.js}"></script>
+
+    <!-- Dashboard JavaScript -->
     <script th:inline="javascript">
         document.addEventListener('DOMContentLoaded', function() {
 
+            // Expenses by Category Chart (Doughnut)
             function carregarGraficoPizza() {
+                // Get filter parameters from Thymeleaf variables
                 const dataInicio = /*[[${dataInicioSel}]]*/ null;
                 const dataFim = /*[[${dataFimSel}]]*/ null;
                 const contaId = /*[[${contaIdSel}]]*/ null;
                 const contatoId = /*[[${contatoIdSel}]]*/ null;
+                const categoriaId = /*[[${categoriaIdSel}]]*/ null;
+                const status = /*[[${statusSel}]]*/ null;
+
+                // Debug logging
+                console.log('Chart filters:', { dataInicio, dataFim, contaId, contatoId, categoriaId, status });
+
+                // Build API URL with filter parameters
                 let apiUrl = '/api/dashboard/despesas-por-categoria?';
                 if (dataInicio) apiUrl += `dataInicio=${dataInicio}&`;
                 if (dataFim) apiUrl += `dataFim=${dataFim}&`;
                 if (contaId) apiUrl += `contaId=${contaId}&`;
                 if (contatoId) apiUrl += `contatoId=${contatoId}&`;
+                if (categoriaId) apiUrl += `categoriaId=${categoriaId}&`;
+                if (status) apiUrl += `status=${status}&`;
+
+                // Remove trailing & if present
+                apiUrl = apiUrl.replace(/&$/, '');
+                console.log('API URL:', apiUrl);
 
                 fetch(apiUrl)
-                    .then(response => response.json())
+                    .then(response => {
+                        console.log('API Response status:', response.status);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
+                        console.log('Chart data received:', data);
                         const ctx = document.getElementById('despesasPorCategoriaChart');
-                        if (window.graficoPizza) { window.graficoPizza.destroy(); }
+
+                        // Destroy existing chart if it exists
+                        if (window.graficoPizza) {
+                            window.graficoPizza.destroy();
+                        }
+
+                        // Check if we have data
                         if (!data || data.length === 0) {
+                            console.log('No data available for chart');
+                            // Clear canvas and show message
+                            const context = ctx.getContext('2d');
+                            context.clearRect(0, 0, ctx.width, ctx.height);
+                            context.font = '16px Arial';
+                            context.fillStyle = '#6B7280';
+                            context.textAlign = 'center';
+                            context.fillText('Nenhuma despesa encontrada', ctx.width / 2, ctx.height / 2);
                             return;
                         }
-                        window.graficoPizza = new Chart(ctx, {
-                            type: 'doughnut',
-                            data: {
-                                labels: data.map(item => item.label),
-                                datasets: [{
-                                    data: data.map(item => item.value),
-                                    backgroundColor: ['#0073e6', '#198754', '#ffc107', '#dc3545', '#6c757d', '#0dcaf0']
-                                }]
-                            },
-                            options: { responsive: true, maintainAspectRatio: false }
-                        });
+
+                        // Create new doughnut chart
+                        try {
+                            window.graficoPizza = new Chart(ctx, {
+                                type: 'doughnut',
+                                data: {
+                                    labels: data.map(item => item.label || 'Sem categoria'),
+                                    datasets: [{
+                                        data: data.map(item => parseFloat(item.value) || 0),
+                                        backgroundColor: [
+                                            '#3B82F6', '#10B981', '#F59E0B', '#EF4444',
+                                            '#8B5CF6', '#06B6D4', '#84CC16', '#F97316',
+                                            '#EC4899', '#14B8A6', '#F472B6', '#A78BFA'
+                                        ],
+                                        borderWidth: 2,
+                                        borderColor: '#ffffff',
+                                        hoverBorderWidth: 3
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: {
+                                            position: 'bottom',
+                                            labels: {
+                                                padding: 15,
+                                                usePointStyle: true,
+                                                font: {
+                                                    size: 12
+                                                }
+                                            }
+                                        },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function(context) {
+                                                    const label = context.label || '';
+                                                    const value = new Intl.NumberFormat('pt-BR', {
+                                                        style: 'currency',
+                                                        currency: 'BRL'
+                                                    }).format(context.parsed);
+                                                    return `${label}: ${value}`;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                            console.log('Chart created successfully');
+                        } catch (chartError) {
+                            console.error('Error creating chart:', chartError);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading category chart:', error);
+
+                        // Show error message on canvas
+                        const ctx = document.getElementById('despesasPorCategoriaChart');
+                        if (ctx) {
+                            const context = ctx.getContext('2d');
+                            context.clearRect(0, 0, ctx.width, ctx.height);
+                            context.font = '14px Arial';
+                            context.fillStyle = '#EF4444';
+                            context.textAlign = 'center';
+                            context.fillText('Erro ao carregar dados', ctx.width / 2, ctx.height / 2 - 10);
+                            context.fillText('Verifique o console para detalhes', ctx.width / 2, ctx.height / 2 + 10);
+                        }
                     });
             }
 
+            // Cash Flow Chart (Bar)
             function carregarGraficoFluxoDeCaixa() {
                 fetch('/api/dashboard/fluxo-caixa-mensal')
                     .then(response => response.json())
                     .then(data => {
                         const ctx = document.getElementById('fluxoDeCaixaChart');
-                        new Chart(ctx, {
+
+                        // Destroy existing chart if it exists
+                        if (window.graficoFluxo) {
+                            window.graficoFluxo.destroy();
+                        }
+
+                        // Create new bar chart
+                        window.graficoFluxo = new Chart(ctx, {
                             type: 'bar',
                             data: {
                                 labels: data.labels,
@@ -334,64 +499,123 @@
                                     {
                                         label: 'Entradas',
                                         data: data.entradas,
-                                        backgroundColor: 'rgba(25, 135, 84, 0.7)'
+                                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                                        borderColor: 'rgba(16, 185, 129, 1)',
+                                        borderWidth: 1
                                     },
                                     {
                                         label: 'Saídas',
                                         data: data.saidas,
-                                        backgroundColor: 'rgba(220, 53, 69, 0.7)'
+                                        backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                                        borderColor: 'rgba(239, 68, 68, 1)',
+                                        borderWidth: 1
                                     }
                                 ]
                             },
                             options: {
-                                scales: { y: { beginAtZero: true } },
                                 responsive: true,
-                                maintainAspectRatio: false
+                                maintainAspectRatio: false,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: {
+                                            callback: function(value) {
+                                                return new Intl.NumberFormat('pt-BR', {
+                                                    style: 'currency',
+                                                    currency: 'BRL'
+                                                }).format(value);
+                                            }
+                                        }
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        position: 'top'
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(context) {
+                                                return context.dataset.label + ': ' +
+                                                    new Intl.NumberFormat('pt-BR', {
+                                                        style: 'currency',
+                                                        currency: 'BRL'
+                                                    }).format(context.parsed.y);
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         });
+                    })
+                    .catch(error => {
+                        console.error('Error loading cash flow chart:', error);
                     });
             }
 
+            // Currency formatting utility
             function formatarMoeda(valor) {
-                if(valor === null || valor === undefined) return 'R$ 0,00';
-                return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
+                if (valor === null || valor === undefined) return 'R$ 0,00';
+                return new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                }).format(valor);
             }
 
+            // MEI Billing Widget Update Function
             function atualizarWidgetFaturamento(tipoCalculo) {
                 fetch(`/api/dashboard/faturamento-widget?tipoCalculo=${tipoCalculo}`)
                     .then(response => response.json())
                     .then(data => {
+                        // Get DOM elements
                         const valorAnualEl = document.getElementById('faturamento-anual-valor');
                         const barraAnualEl = document.getElementById('faturamento-anual-barra');
+                        const percentAnualEl = document.getElementById('faturamento-anual-percent');
                         const valorMensalEl = document.getElementById('faturamento-mensal-valor');
                         const barraMensalEl = document.getElementById('faturamento-mensal-barra');
+                        const percentMensalEl = document.getElementById('faturamento-mensal-percent');
                         const tituloMensalEl = document.getElementById('faturamento-mensal-titulo');
                         const tetoMensalEl = document.getElementById('faturamento-mensal-teto');
 
+                        // Update annual billing
                         const faturamentoAnual = data.faturamentoAnual || 0;
-                        const percentualAnual = (faturamentoAnual / 81000 * 100).toFixed(1);
-                        valorAnualEl.innerText = formatarMoeda(faturamentoAnual);
-                        barraAnualEl.style.width = `${percentualAnual}%`;
-                        document.getElementById('faturamento-anual-percent').innerText = `${percentualAnual}%`;
+                        const percentualAnual = Math.min((faturamentoAnual / 81000 * 100), 100).toFixed(1);
 
-                        const faturamentoMensal = data.faturamentoMensal || 0;
-                        const percentualMensal = (faturamentoMensal / 6750 * 100).toFixed(1);
-                        valorMensalEl.innerText = formatarMoeda(faturamentoMensal);
-                        barraMensalEl.style.width = `${percentualMensal}%`;
-                        document.getElementById('faturamento-mensal-percent').innerText = `${percentualMensal}%`;
-
-                        tetoMensalEl.style.display = 'inline';
-                        if (tipoCalculo === 'ESTIMADO_CUSTOS') {
-                            tituloMensalEl.innerText = 'Meta Mensal';
-                            tetoMensalEl.style.display = 'none';
-                        } else {
-                            tituloMensalEl.innerText = 'Faturamento Mensal';
-                            tetoMensalEl.innerText = '/ R$ 6.750,00';
+                        if (valorAnualEl) valorAnualEl.innerText = formatarMoeda(faturamentoAnual);
+                        if (barraAnualEl) {
+                            barraAnualEl.style.width = `${percentualAnual}%`;
+                            barraAnualEl.setAttribute('aria-valuenow', percentualAnual);
                         }
+                        if (percentAnualEl) percentAnualEl.innerText = `${percentualAnual}%`;
+
+                        // Update monthly billing
+                        const faturamentoMensal = data.faturamentoMensal || 0;
+                        const percentualMensal = Math.min((faturamentoMensal / 6750 * 100), 100).toFixed(1);
+
+                        if (valorMensalEl) valorMensalEl.innerText = formatarMoeda(faturamentoMensal);
+                        if (barraMensalEl) {
+                            barraMensalEl.style.width = `${percentualMensal}%`;
+                            barraMensalEl.setAttribute('aria-valuenow', percentualMensal);
+                        }
+                        if (percentMensalEl) percentMensalEl.innerText = `${percentualMensal}%`;
+
+                        // Handle special case for "Por Compras" calculation
+                        if (tipoCalculo === 'ESTIMADO_CUSTOS') {
+                            if (tituloMensalEl) tituloMensalEl.innerText = 'Meta Mensal';
+                            if (tetoMensalEl) tetoMensalEl.style.display = 'none';
+                        } else {
+                            if (tituloMensalEl) tituloMensalEl.innerText = 'Faturamento Mensal';
+                            if (tetoMensalEl) {
+                                tetoMensalEl.style.display = 'inline';
+                                tetoMensalEl.innerText = ' / R$ 6.750,00';
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error updating MEI billing widget:', error);
                     });
             }
 
-            // Funções para gerar relatórios
+            // Report Generation Functions
             window.gerarRelatorioFaturamentoMEI = function() {
                 const tipoVisao = document.getElementById('tipo-relatorio-mei').value;
                 const dataInicio = document.getElementById('dataInicio').value;
@@ -432,19 +656,39 @@
                 window.open(reportUrl, '_blank');
             };
 
-            // Configuração do filtro de faturamento
+            // MEI Billing Filter Event Listener
             const filtroFaturamentoEl = document.getElementById('faturamento-filter');
-            if(filtroFaturamentoEl) {
-                filtroFaturamentoEl.addEventListener('change', (event) => {
+            if (filtroFaturamentoEl) {
+                filtroFaturamentoEl.addEventListener('change', function(event) {
                     atualizarWidgetFaturamento(event.target.value);
                 });
             }
 
-            // Inicialização
-            carregarGraficoPizza();
-            carregarGraficoFluxoDeCaixa();
-            atualizarWidgetFaturamento('OFICIAL');
+            // Initialize Dashboard Components
+            try {
+                carregarGraficoPizza();
+                carregarGraficoFluxoDeCaixa();
+                atualizarWidgetFaturamento('OFICIAL');
+            } catch (error) {
+                console.error('Error initializing dashboard:', error);
+            }
         });
+
+        // Filter Toggle Function
+        function toggleFilters() {
+            const filtersContent = document.getElementById('filtersContent');
+            const toggleIcon = document.getElementById('filtersToggleIcon');
+
+            if (filtersContent && toggleIcon) {
+                if (filtersContent.style.display === 'none' || filtersContent.style.display === '') {
+                    filtersContent.style.display = 'block';
+                    toggleIcon.className = 'bi bi-chevron-up float-end';
+                } else {
+                    filtersContent.style.display = 'none';
+                    toggleIcon.className = 'bi bi-chevron-down float-end';
+                }
+            }
+        }
     </script>
 </div>
 </body>
