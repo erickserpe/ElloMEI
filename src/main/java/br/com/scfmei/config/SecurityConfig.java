@@ -23,16 +23,21 @@ public class SecurityConfig {
         // As regras de filtro
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/login", "/registro", "/webjars/**", "/css/**").permitAll()
+                        // Permitir acesso público à landing page, login, registro e recursos estáticos
+                        .requestMatchers("/", "/home", "/demo", "/login", "/registro",
+                                        "/webjars/**", "/css/**", "/js/**", "/images/**").permitAll()
+                        // Todas as outras rotas requerem autenticação
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
                         .permitAll()
-                        .defaultSuccessUrl("/", true)
+                        // Redirecionar usuários autenticados para o dashboard
+                        .defaultSuccessUrl("/dashboard", true)
                 )
                 .logout(logout -> logout
-                        .logoutSuccessUrl("/login?logout")
+                        // Após logout, redirecionar para a landing page
+                        .logoutSuccessUrl("/?logout")
                 );
         return http.build();
     }

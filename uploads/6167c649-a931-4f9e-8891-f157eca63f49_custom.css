@@ -1,0 +1,185 @@
+/* =================================================================
+   1. FONTES E VARIÁVEIS GLOBAIS
+   - Definição da fonte Poppins e das cores e variáveis principais.
+   ================================================================= */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+:root {
+    --bs-primary: #3B82F6;
+    --bs-font-sans-serif: 'Poppins', sans-serif;
+    --app-bg: #F4F7FC;
+    --sidebar-bg: #1E293B;
+    --sidebar-header-bg: #0F172A;
+    --sidebar-link-color: #CBD5E1;
+    --sidebar-link-hover-bg: #334155;
+    --sidebar-link-active-border: var(--bs-primary);
+    --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+body {
+    font-family: var(--bs-font-sans-serif);
+    background-color: var(--app-bg);
+}
+
+/* =================================================================
+   2. ESTILOS DAS PÁGINAS DE LOGIN E REGISTRO (Glassmorphism)
+   - Efeito de vidro para as telas de acesso.
+   ================================================================= */
+.access-page-wrapper {
+    background-color: #f0f4ff;
+    background-image:
+            radial-gradient(at 0% 0%, hsla(253, 100%, 95%, 1) 0px, transparent 50%),
+            radial-gradient(at 98% 1%, hsla(211, 100%, 90%, 1) 0px, transparent 50%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.access-card {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 1rem;
+    padding: 2.5rem;
+    width: 100%;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+}
+
+@media (min-width: 576px) { .access-card { max-width: 480px; } }
+@media (min-width: 992px) { .access-card.register-card { max-width: 800px; } }
+
+
+/* =================================================================
+   3. LAYOUT PRINCIPAL E SIDEBAR
+   - Estrutura principal da aplicação após o login.
+   ================================================================= */
+.wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+}
+
+#sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    background: var(--sidebar-bg);
+    color: #fff;
+    transition: all 0.3s;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#sidebar .sidebar-header {
+    padding: 20px;
+    background: var(--sidebar-header-bg);
+    flex-shrink: 0;
+}
+
+#sidebar .sidebar-header h3 {
+    color: #fff;
+    font-weight: 700;
+}
+
+#sidebar ul.components {
+    padding: 20px 0;
+    border-bottom: 1px solid #475569;
+    flex-grow: 1;
+}
+
+#sidebar ul.components li a {
+    padding: 15px 20px;
+    font-size: 1.0em;
+    display: block;
+    color: var(--sidebar-link-color);
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+#sidebar ul.components li a:hover,
+#sidebar ul.components li.active > a {
+    color: #fff;
+    background: var(--sidebar-link-hover-bg);
+    border-left: 3px solid var(--sidebar-link-active-border);
+}
+
+#content {
+    width: 100%;
+    min-height: 100vh;
+    transition: all 0.3s;
+}
+
+/* =================================================================
+   4. COMPONENTES DO DASHBOARD E ESTILOS GERAIS
+   - Estilos para cards, KPIs e botões.
+   ================================================================= */
+.card {
+    border: none;
+    box-shadow: var(--card-shadow);
+    border-radius: 0.75rem;
+}
+
+.kpi-card-gradient {
+    color: white;
+    border-radius: 12px;
+}
+.kpi-card-gradient .kpi-icon {
+    font-size: 2.2rem;
+    opacity: 0.7;
+}
+.kpi-card-gradient .kpi-title {
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+.kpi-card-gradient .kpi-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.bg-gradient-1 { background-image: linear-gradient(to right, #4facfe 0%, #00f2fe 100%); }
+.bg-gradient-2 { background-image: linear-gradient(to right, #43e97b 0%, #38f9d7 100%); }
+.bg-gradient-3 { background-image: linear-gradient(to right, #ff8177 0%, #ff867a 0%, #ff8c7f 21%, #f99185 52%, #cf556c 78%, #b12a5b 100%);}
+
+.btn-relatorio {
+    transition: all 0.3s ease;
+}
+.btn-relatorio:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.relatorio-card {
+    transition: all 0.2s ease-in-out;
+    border-left: 4px solid var(--bs-primary);
+}
+.relatorio-card:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-3px);
+    box-shadow: var(--card-shadow);
+}
+
+
+/* =================================================================
+   5. RESPONSIVIDADE
+   - Ajustes para dispositivos móveis.
+   ================================================================= */
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -250px;
+        position: fixed;
+        height: 100vh;
+        z-index: 999;
+    }
+    #sidebar.active {
+        margin-left: 0;
+    }
+    #content {
+        width: 100%;
+    }
+    #sidebarCollapse {
+        display: block;
+    }
+}

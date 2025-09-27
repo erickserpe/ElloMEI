@@ -7,71 +7,198 @@
 <body>
 <div id="dashboard-content">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h2">Dashboard</h1>
-        <a th:href="@{/lancamentos/novo}" class="btn btn-primary shadow-sm">
-            <i class="bi bi-plus-circle me-1"></i> Novo Lançamento
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="h2 fw-bold text-gray-900 mb-1">Dashboard</h1>
+            <p class="text-muted mb-0">Visão geral do seu negócio</p>
+        </div>
+        <a th:href="@{/lancamentos/novo}" class="btn btn-primary shadow-sm d-flex align-items-center">
+            <i class="bi bi-plus-circle me-2"></i>
+            <span class="d-none d-sm-inline">Novo Lançamento</span>
+            <span class="d-sm-none">Novo</span>
         </a>
     </div>
 
-    <div class="row g-4 mb-4">
+    <div class="row g-4 mb-5">
         <div class="col-lg-4 col-md-6">
-            <div class="card kpi-card-gradient bg-gradient-1 shadow-sm">
-                <div class="card-body d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="kpi-title">Saldo Total</h5>
-                        <p class="kpi-value" th:text="${#numbers.formatCurrency(saldoTotal)}">R$ 0,00</p>
+            <div class="card kpi-card-gradient bg-gradient-1 shadow-md">
+                <div class="card-body d-flex justify-content-between align-items-center p-4">
+                    <div class="flex-grow-1">
+                        <h5 class="kpi-title mb-2">Saldo Total</h5>
+                        <p class="kpi-value mb-0" th:text="${#numbers.formatCurrency(saldoTotal)}">R$ 0,00</p>
                     </div>
-                    <i class="bi bi-wallet2 kpi-icon"></i>
+                    <div class="ms-3">
+                        <i class="bi bi-wallet2 kpi-icon"></i>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-lg-4 col-md-6">
-            <div class="card kpi-card-gradient bg-gradient-2 shadow-sm">
-                <div class="card-body d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="kpi-title">Entradas no Período</h5>
-                        <p class="kpi-value" th:text="${#numbers.formatCurrency(totalEntradas)}">R$ 0,00</p>
+            <div class="card kpi-card-gradient bg-gradient-2 shadow-md">
+                <div class="card-body d-flex justify-content-between align-items-center p-4">
+                    <div class="flex-grow-1">
+                        <h5 class="kpi-title mb-2">Entradas no Período</h5>
+                        <p class="kpi-value mb-0" th:text="${#numbers.formatCurrency(totalEntradas)}">R$ 0,00</p>
                     </div>
-                    <i class="bi bi-arrow-down-circle kpi-icon"></i>
+                    <div class="ms-3">
+                        <i class="bi bi-arrow-down-circle kpi-icon"></i>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-lg-4 col-md-12">
-            <div class="card kpi-card-gradient bg-gradient-3 shadow-sm">
-                <div class="card-body d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="kpi-title">Saídas no Período</h5>
-                        <p class="kpi-value" th:text="${#numbers.formatCurrency(totalSaidas)}">R$ 0,00</p>
+            <div class="card kpi-card-gradient bg-gradient-3 shadow-md">
+                <div class="card-body d-flex justify-content-between align-items-center p-4">
+                    <div class="flex-grow-1">
+                        <h5 class="kpi-title mb-2">Saídas no Período</h5>
+                        <p class="kpi-value mb-0" th:text="${#numbers.formatCurrency(totalSaidas)}">R$ 0,00</p>
                     </div>
-                    <i class="bi bi-arrow-up-circle kpi-icon"></i>
+                    <div class="ms-3">
+                        <i class="bi bi-arrow-up-circle kpi-icon"></i>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="accordion mb-4" id="accordionFiltros">
-        <div class="accordion-item">
+    <div class="accordion mb-5" id="accordionFiltros">
+        <div class="accordion-item border-0 shadow-sm rounded-lg overflow-hidden">
             <h2 class="accordion-header" id="headingFiltros">
-                <button class="accordion-button collapsed bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFiltros" aria-expanded="false" aria-controls="collapseFiltros">
-                    <i class="bi bi-filter me-2"></i> Filtros Avançados e Relatórios
+                <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFiltros" aria-expanded="false" aria-controls="collapseFiltros">
+                    <i class="bi bi-funnel me-2 text-primary"></i>
+                    Filtros Avançados e Relatórios
                 </button>
             </h2>
             <div id="collapseFiltros" class="accordion-collapse collapse" aria-labelledby="headingFiltros" data-bs-parent="#accordionFiltros">
-                <div class="accordion-body">
+                <div class="accordion-body p-4">
+                    <!-- Filtros -->
                     <form th:action="@{/}" method="get" id="global-filter-form">
                         <div class="row g-3">
-                            <div class="col-md-3"><label for="dataInicio" class="form-label">Data de Início</label><input type="date" id="dataInicio" name="dataInicio" class="form-control form-control-sm" th:value="${dataInicioSel != null ? #temporals.format(dataInicioSel, 'yyyy-MM-dd') : ''}"></div>
-                            <div class="col-md-3"><label for="dataFim" class="form-label">Data Fim</label><input type="date" id="dataFim" name="dataFim" class="form-control form-control-sm" th:value="${dataFimSel != null ? #temporals.format(dataFimSel, 'yyyy-MM-dd') : ''}"></div>
-                            <div class="col-md-6"><label for="descricao" class="form-label">Buscar na Descrição</label><input type="text" id="descricao" name="descricao" class="form-control form-control-sm" placeholder="Ex: Gasolina, Compra de material..." th:value="${descricaoSel}"></div>
-                            <div class="col-md-3"><label for="contaId" class="form-label">Conta</label><select id="contaId" name="contaId" class="form-select form-select-sm"><option value="">Todas</option><option th:each="conta : ${listaDeContas}" th:value="${conta.id}" th:text="${conta.nomeConta}" th:selected="${conta.id == contaIdSel}"></option></select></div>
-                            <div class="col-md-3"><label for="contatoId" class="form-label">Pessoa/Empresa</label><select id="contatoId" name="contatoId" class="form-select form-select-sm"><option value="">Todos</option><option th:each="contato : ${listaDePessoas}" th:value="${contato.id}" th:text="${contato.getNomeExibicao()}" th:selected="${contato.id == contatoIdSel}"></option></select></div>
-                            <div class="col-md-3"><label for="categoriaId" class="form-label">Categoria de Despesa</label><select id="categoriaId" name="categoriaId" class="form-select form-select-sm"><option value="">Todas</option><option th:each="cat : ${listaDeCategorias}" th:value="${cat.id}" th:text="${cat.nome}" th:selected="${cat.id == categoriaIdSel}"></option></select></div>
-                            <div class="col-md-3"><label for="status" class="form-label">Status do Lançamento</label><select id="status" name="status" class="form-select form-select-sm"><option value="">Todos</option><option th:each="s : ${T(br.com.scfmei.domain.StatusLancamento).values()}" th:value="${s}" th:text="${s.descricao}" th:selected="${s == statusSel}"></option></select></div>
+                            <div class="col-md-3">
+                                <label for="dataInicio" class="form-label">Data de Início</label>
+                                <input type="date" id="dataInicio" name="dataInicio" class="form-control form-control-sm"
+                                       th:value="${dataInicioSel != null ? #temporals.format(dataInicioSel, 'yyyy-MM-dd') : ''}">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="dataFim" class="form-label">Data Fim</label>
+                                <input type="date" id="dataFim" name="dataFim" class="form-control form-control-sm"
+                                       th:value="${dataFimSel != null ? #temporals.format(dataFimSel, 'yyyy-MM-dd') : ''}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="descricao" class="form-label">Buscar na Descrição</label>
+                                <input type="text" id="descricao" name="descricao" class="form-control form-control-sm"
+                                       placeholder="Ex: Gasolina, Compra de material..." th:value="${descricaoSel}">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="contaId" class="form-label">Conta</label>
+                                <select id="contaId" name="contaId" class="form-select form-select-sm">
+                                    <option value="">Todas</option>
+                                    <option th:each="conta : ${listaDeContas}" th:value="${conta.id}"
+                                            th:text="${conta.nomeConta}" th:selected="${conta.id == contaIdSel}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="contatoId" class="form-label">Pessoa/Empresa</label>
+                                <select id="contatoId" name="contatoId" class="form-select form-select-sm">
+                                    <option value="">Todos</option>
+                                    <option th:each="contato : ${listaDePessoas}" th:value="${contato.id}"
+                                            th:text="${contato.getNomeExibicao()}" th:selected="${contato.id == contatoIdSel}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="categoriaId" class="form-label">Categoria de Despesa</label>
+                                <select id="categoriaId" name="categoriaId" class="form-select form-select-sm">
+                                    <option value="">Todas</option>
+                                    <option th:each="cat : ${listaDeCategorias}" th:value="${cat.id}"
+                                            th:text="${cat.nome}" th:selected="${cat.id == categoriaIdSel}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="status" class="form-label">Status do Lançamento</label>
+                                <select id="status" name="status" class="form-select form-select-sm">
+                                    <option value="">Todos</option>
+                                    <option th:each="s : ${T(br.com.scfmei.domain.StatusLancamento).values()}"
+                                            th:value="${s}" th:text="${s.descricao}" th:selected="${s == statusSel}"></option>
+                                </select>
+                            </div>
                         </div>
                         <hr class="my-3">
-                        <div class="d-flex justify-content-end align-items-center"><a th:href="@{/}" class="btn btn-outline-secondary me-2">Limpar</a><button type="submit" class="btn btn-primary"><i class="bi bi-funnel-fill me-2"></i>Aplicar</button></div>
+                        <div class="d-flex justify-content-end align-items-center">
+                            <a th:href="@{/}" class="btn btn-outline-secondary me-2">Limpar</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-funnel-fill me-2"></i>Aplicar Filtros
+                            </button>
+                        </div>
                     </form>
+
+                    <!-- Seção de Relatórios -->
+                    <div class="mt-4 pt-3 border-top">
+                        <h6 class="mb-3"><i class="bi bi-file-earmark-pdf me-2"></i>Gerar Relatórios</h6>
+                        <div class="row g-3">
+                            <!-- Relatório de Faturamento MEI -->
+                            <div class="col-md-6">
+                                <div class="card relatorio-card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Relatório de Faturamento MEI</h6>
+                                        <p class="card-text small text-muted">Relatório detalhado do faturamento conforme limites do MEI</p>
+                                        <div class="d-flex gap-2">
+                                            <button type="button" class="btn btn-outline-primary btn-sm btn-relatorio"
+                                                    onclick="gerarRelatorioFaturamentoMEI()">
+                                                <i class="bi bi-file-earmark-pdf me-1"></i>Gerar PDF
+                                            </button>
+                                            <select id="tipo-relatorio-mei" class="form-select form-select-sm" style="width: auto;">
+                                                <option value="OFICIAL">Visão Oficial</option>
+                                                <option value="BANCARIO">Visão Bancária</option>
+                                                <option value="ESTIMADO_CUSTOS">Por Compras</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Relatório de Análise Geral -->
+                            <div class="col-md-6">
+                                <div class="card relatorio-card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Relatório de Análise Geral</h6>
+                                        <p class="card-text small text-muted">Análise completa com todos os lançamentos do período</p>
+                                        <button type="button" class="btn btn-outline-success btn-sm btn-relatorio"
+                                                onclick="gerarRelatorioAnaliseGeral()">
+                                            <i class="bi bi-graph-up me-1"></i>Gerar Análise
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Relatório de Compras com Nota Fiscal -->
+                            <div class="col-md-6">
+                                <div class="card relatorio-card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Compras com Nota Fiscal</h6>
+                                        <p class="card-text small text-muted">Relatório de compras com comprovantes fiscais</p>
+                                        <button type="button" class="btn btn-outline-info btn-sm btn-relatorio"
+                                                onclick="gerarRelatorioComprasNota()">
+                                            <i class="bi bi-receipt me-1"></i>Gerar Relatório
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Relatório de Lançamentos Detalhados -->
+                            <div class="col-md-6">
+                                <div class="card relatorio-card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Lançamentos Detalhados</h6>
+                                        <p class="card-text small text-muted">Relatório completo de todos os lançamentos</p>
+                                        <button type="button" class="btn btn-outline-warning btn-sm btn-relatorio"
+                                                onclick="gerarRelatorioLancamentos()">
+                                            <i class="bi bi-list-check me-1"></i>Gerar Relatório
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -79,15 +206,80 @@
 
     <div class="row g-4">
         <div class="col-lg-7">
-            <div class="card h-100">
-                <div class="card-header bg-transparent pt-3 border-0"><h5 class="mb-0">Fluxo de Caixa (Últimos 12 Meses)</h5></div>
-                <div class="card-body d-flex align-items-center justify-content-center" style="min-height: 350px;"><canvas id="fluxoDeCaixaChart"></canvas></div>
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-white border-bottom py-4">
+                    <h5 class="mb-0 fw-semibold text-gray-900">
+                        <i class="bi bi-graph-up text-primary me-2"></i>
+                        Fluxo de Caixa (Últimos 12 Meses)
+                    </h5>
+                </div>
+                <div class="card-body d-flex align-items-center justify-content-center p-4" style="min-height: 350px;">
+                    <canvas id="fluxoDeCaixaChart"></canvas>
+                </div>
             </div>
         </div>
         <div class="col-lg-5">
             <div class="d-flex flex-column gap-4">
-                <div class="card"><div class="card-header bg-transparent pt-3 border-0"><h5 class="mb-0">Despesas por Categoria</h5></div><div class="card-body d-flex align-items-center justify-content-center" style="min-height: 250px;"><canvas id="despesasPorCategoriaChart"></canvas></div></div>
-                <div class="card"><div class="card-header d-flex justify-content-between align-items-center"><span>Controle de Faturamento MEI</span><select id="faturamento-filter" class="form-select form-select-sm" style="width: auto;"><option value="OFICIAL" selected>Oficial</option><option value="BANCARIO">Bancário</option><option value="ESTIMADO_CUSTOS">Por Compras</option></select></div><div class="card-body"><div class="mb-3"><div class="d-flex justify-content-between"><strong>Faturamento Anual</strong><div><span id="faturamento-anual-valor">R$ 0,00</span> / <span>R$ 81.000,00</span></div></div><div class="progress" style="height: 20px;"><div id="faturamento-anual-barra" class="progress-bar" role="progressbar" style="width: 0%;">0%</div></div></div><div><div class="d-flex justify-content-between"><strong id="faturamento-mensal-titulo">Faturamento Mensal</strong><div><span id="faturamento-mensal-valor">R$ 0,00</span> / <span id="faturamento-mensal-teto">R$ 6.750,00</span></div></div><div class="progress" style="height: 20px;"><div id="faturamento-mensal-barra" class="progress-bar bg-success" role="progressbar" style="width: 0%;">0%</div></div></div></div></div>
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white border-bottom py-4">
+                        <h5 class="mb-0 fw-semibold text-gray-900">
+                            <i class="bi bi-pie-chart text-primary me-2"></i>
+                            Despesas por Categoria
+                        </h5>
+                    </div>
+                    <div class="card-body d-flex align-items-center justify-content-center p-4" style="min-height: 250px;">
+                        <canvas id="despesasPorCategoriaChart"></canvas>
+                    </div>
+                </div>
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-4">
+                        <h5 class="mb-0 fw-semibold text-gray-900">
+                            <i class="bi bi-speedometer2 text-primary me-2"></i>
+                            Controle de Faturamento MEI
+                        </h5>
+                        <select id="faturamento-filter" class="form-select form-select-sm border-gray-300" style="width: auto;">
+                            <option value="OFICIAL" selected>Oficial</option>
+                            <option value="BANCARIO">Bancário</option>
+                            <option value="ESTIMADO_CUSTOS">Por Compras</option>
+                        </select>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-semibold text-gray-700">Faturamento Anual</span>
+                                <div class="text-end">
+                                    <span id="faturamento-anual-valor" class="fw-bold text-gray-900">R$ 0,00</span>
+                                    <span class="text-muted"> / R$ 81.000,00</span>
+                                </div>
+                            </div>
+                            <div class="progress rounded-pill" style="height: 12px;">
+                                <div id="faturamento-anual-barra" class="progress-bar rounded-pill" role="progressbar" style="width: 0%;">
+                                    <span class="visually-hidden">0%</span>
+                                </div>
+                            </div>
+                            <div class="text-end mt-1">
+                                <small id="faturamento-anual-percent" class="text-muted">0%</small>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span id="faturamento-mensal-titulo" class="fw-semibold text-gray-700">Faturamento Mensal</span>
+                                <div class="text-end">
+                                    <span id="faturamento-mensal-valor" class="fw-bold text-gray-900">R$ 0,00</span>
+                                    <span id="faturamento-mensal-teto" class="text-muted"> / R$ 6.750,00</span>
+                                </div>
+                            </div>
+                            <div class="progress rounded-pill" style="height: 12px;">
+                                <div id="faturamento-mensal-barra" class="progress-bar bg-success rounded-pill" role="progressbar" style="width: 0%;">
+                                    <span class="visually-hidden">0%</span>
+                                </div>
+                            </div>
+                            <div class="text-end mt-1">
+                                <small id="faturamento-mensal-percent" class="text-muted">0%</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -175,16 +367,19 @@
                         const barraMensalEl = document.getElementById('faturamento-mensal-barra');
                         const tituloMensalEl = document.getElementById('faturamento-mensal-titulo');
                         const tetoMensalEl = document.getElementById('faturamento-mensal-teto');
+
                         const faturamentoAnual = data.faturamentoAnual || 0;
                         const percentualAnual = (faturamentoAnual / 81000 * 100).toFixed(1);
                         valorAnualEl.innerText = formatarMoeda(faturamentoAnual);
                         barraAnualEl.style.width = `${percentualAnual}%`;
-                        barraAnualEl.innerText = `${percentualAnual}%`;
+                        document.getElementById('faturamento-anual-percent').innerText = `${percentualAnual}%`;
+
                         const faturamentoMensal = data.faturamentoMensal || 0;
                         const percentualMensal = (faturamentoMensal / 6750 * 100).toFixed(1);
                         valorMensalEl.innerText = formatarMoeda(faturamentoMensal);
                         barraMensalEl.style.width = `${percentualMensal}%`;
-                        barraMensalEl.innerText = `${percentualMensal}%`;
+                        document.getElementById('faturamento-mensal-percent').innerText = `${percentualMensal}%`;
+
                         tetoMensalEl.style.display = 'inline';
                         if (tipoCalculo === 'ESTIMADO_CUSTOS') {
                             tituloMensalEl.innerText = 'Meta Mensal';
@@ -196,35 +391,48 @@
                     });
             }
 
-            function configurarBotaoPdfAnalise() {
-                const pdfButton = document.getElementById('gerar-relatorio-btn');
-                if(pdfButton) {
-                    pdfButton.addEventListener('click', function() {
-                        const form = document.getElementById('global-filter-form');
-                        const formData = new FormData(form);
-                        const params = new URLSearchParams(formData);
-                        params.append('tipoVisao', 'ANALISE_GERAL');
-                        const reportUrl = `/relatorios/faturamento/dinamico/pdf?${params.toString()}`;
-                        window.open(reportUrl, '_blank');
-                    });
-                }
-            }
+            // Funções para gerar relatórios
+            window.gerarRelatorioFaturamentoMEI = function() {
+                const tipoVisao = document.getElementById('tipo-relatorio-mei').value;
+                const dataInicio = document.getElementById('dataInicio').value;
+                const dataFim = document.getElementById('dataFim').value;
 
-            function configurarBotaoPdfFaturamentoMEI() {
-                const meiPdfButton = document.getElementById('gerar-relatorio-mei-btn');
-                if(meiPdfButton) {
-                    meiPdfButton.addEventListener('click', function() {
-                        const tipoVisao = document.getElementById('faturamento-filter').value;
-                        const dataInicio = document.getElementById('dataInicio').value;
-                        const dataFim = document.getElementById('dataFim').value;
-                        let reportUrl = `/relatorios/faturamento/dinamico/pdf?tipoVisao=${tipoVisao}`;
-                        if (dataInicio) reportUrl += `&dataInicio=${dataInicio}`;
-                        if (dataFim) reportUrl += `&dataFim=${dataFim}`;
-                        window.open(reportUrl, '_blank');
-                    });
-                }
-            }
+                let reportUrl = `/relatorios/faturamento/dinamico/pdf?tipoVisao=${tipoVisao}`;
+                if (dataInicio) reportUrl += `&dataInicio=${dataInicio}`;
+                if (dataFim) reportUrl += `&dataFim=${dataFim}`;
 
+                window.open(reportUrl, '_blank');
+            };
+
+            window.gerarRelatorioAnaliseGeral = function() {
+                const form = document.getElementById('global-filter-form');
+                const formData = new FormData(form);
+                const params = new URLSearchParams(formData);
+                params.append('tipoVisao', 'ANALISE_GERAL');
+
+                const reportUrl = `/relatorios/faturamento/dinamico/pdf?${params.toString()}`;
+                window.open(reportUrl, '_blank');
+            };
+
+            window.gerarRelatorioComprasNota = function() {
+                const form = document.getElementById('global-filter-form');
+                const formData = new FormData(form);
+                const params = new URLSearchParams(formData);
+
+                const reportUrl = `/relatorios/compras-com-nota/pdf?${params.toString()}`;
+                window.open(reportUrl, '_blank');
+            };
+
+            window.gerarRelatorioLancamentos = function() {
+                const form = document.getElementById('global-filter-form');
+                const formData = new FormData(form);
+                const params = new URLSearchParams(formData);
+
+                const reportUrl = `/relatorios/lancamentos/pdf?${params.toString()}`;
+                window.open(reportUrl, '_blank');
+            };
+
+            // Configuração do filtro de faturamento
             const filtroFaturamentoEl = document.getElementById('faturamento-filter');
             if(filtroFaturamentoEl) {
                 filtroFaturamentoEl.addEventListener('change', (event) => {
@@ -232,11 +440,10 @@
                 });
             }
 
+            // Inicialização
             carregarGraficoPizza();
             carregarGraficoFluxoDeCaixa();
             atualizarWidgetFaturamento('OFICIAL');
-            configurarBotaoPdfAnalise();
-            configurarBotaoPdfFaturamentoMEI();
         });
     </script>
 </div>

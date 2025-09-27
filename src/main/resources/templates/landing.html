@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ello MEI - Gestão Financeira para Microempreendedores</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link th:href="@{/css/landing.css}" rel="stylesheet">
+    <style>
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Navigation active state */
+        .nav-link.active {
+            color: var(--primary-blue) !important;
+            font-weight: 600;
+        }
+        
+        /* Section spacing */
+        .section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        
+        .section:not(#home) {
+            padding-top: 100px;
+        }
+        
+        /* About section styling */
+        #about {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(224, 231, 255, 0.05) 100%);
+        }
+        
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .about-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #1E293B;
+            margin-bottom: 2rem;
+            line-height: 1.2;
+        }
+        
+        .about-text {
+            font-size: 1.25rem;
+            color: #64748B;
+            line-height: 1.8;
+            margin-bottom: 3rem;
+        }
+        
+        /* Contact section styling */
+        #contact {
+            background: var(--off-white);
+        }
+        
+        .contact-content {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .contact-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1E293B;
+            margin-bottom: 2rem;
+        }
+        
+        .contact-info {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            box-shadow: var(--glass-shadow);
+            padding: 3rem;
+            margin-bottom: 2rem;
+        }
+        
+        .contact-email {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .contact-email:hover {
+            color: #2563EB;
+            text-decoration: none;
+        }
+        
+        /* Hero section adjustments for single page */
+        .hero-content {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+        }
+        
+        .hero-text {
+            flex: 1;
+        }
+        
+        .hero-visual {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .login-card {
+            max-width: 400px;
+            margin-top: 2rem;
+        }
+        
+        @media (max-width: 992px) {
+            .hero-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .about-title {
+                font-size: 2.5rem;
+            }
+            
+            .contact-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top glass-nav">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#home">
+                <div class="brand-icon me-2">
+                    <i class="bi bi-piggy-bank"></i>
+                </div>
+                Ello MEI
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link smooth-scroll" href="#home">Início</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link smooth-scroll" href="#about">Sobre</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link smooth-scroll" href="#contact">Contato</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section (Home) -->
+    <section id="home" class="section hero-section">
+        <div class="ambient-gradient gradient-1"></div>
+        <div class="ambient-gradient gradient-2"></div>
+        <div class="ambient-gradient gradient-3"></div>
+        
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1 class="hero-title">
+                        A gestão financeira do seu MEI, simplificada e inteligente.
+                    </h1>
+                    <p class="hero-subtitle">
+                        Controle suas finanças, emita relatórios e mantenha seu negócio em dia, tudo num único lugar.
+                    </p>
+                    
+                    <div class="hero-features">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="bi bi-graph-up-arrow"></i>
+                            </div>
+                            <span>Controle de receitas e despesas</span>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="bi bi-calendar-check"></i>
+                            </div>
+                            <span>Gestão de contas a pagar</span>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="bi bi-pie-chart"></i>
+                            </div>
+                            <span>Relatórios detalhados</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Login Card -->
+                    <div class="glass-card login-card">
+                        <h4 class="fw-bold mb-3 text-center">Acesse sua conta</h4>
+                        <form th:action="@{/login}" method="post">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">
+                                    <i class="bi bi-person me-2"></i>
+                                    Usuário
+                                </label>
+                                <input type="text" class="form-control glass-input" id="username" name="username" 
+                                       placeholder="Digite seu usuário" required>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="password" class="form-label">
+                                    <i class="bi bi-lock me-2"></i>
+                                    Senha
+                                </label>
+                                <input type="password" class="form-control glass-input" id="password" name="password" 
+                                       placeholder="Digite sua senha" required>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary btn-lg w-100 glass-btn mb-3">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>
+                                Entrar
+                            </button>
+                        </form>
+                        
+                        <div class="text-center">
+                            <p class="mb-0 text-muted">
+                                Não tem uma conta? 
+                                <a th:href="@{/registro}" class="text-primary fw-semibold text-decoration-none">
+                                    Cadastre-se aqui
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="hero-visual">
+                    <div class="glass-piggy-bank">
+                        <div class="piggy-bank-icon">
+                            <i class="bi bi-piggy-bank"></i>
+                            <div class="currency-symbol">R$</div>
+                        </div>
+                        <div class="floating-elements">
+                            <div class="floating-coin coin-1">
+                                <i class="bi bi-coin"></i>
+                            </div>
+                            <div class="floating-coin coin-2">
+                                <i class="bi bi-currency-dollar"></i>
+                            </div>
+                            <div class="floating-coin coin-3">
+                                <i class="bi bi-graph-up"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="container">
+            <div class="about-content">
+                <h2 class="about-title">Feito para o MEI Brasileiro</h2>
+                <p class="about-text">
+                    O Ello MEI nasceu de uma necessidade simples: dar ao Microempreendedor Individual uma ferramenta financeira que realmente entende a sua realidade. Chega de planilhas complicadas e sistemas caros feitos para grandes empresas. Centralize as suas finanças, entenda a saúde do seu negócio com um dashboard intuitivo e tenha a tranquilidade de estar sempre em dia com as suas obrigações. O nosso foco é a sua autonomia.
+                </p>
+                
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="glass-card text-center h-100">
+                            <div class="feature-icon mx-auto mb-3" style="width: 80px; height: 80px;">
+                                <i class="bi bi-shield-check"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Segurança Total</h5>
+                            <p class="text-muted">Seus dados financeiros protegidos com criptografia de ponta.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="glass-card text-center h-100">
+                            <div class="feature-icon mx-auto mb-3" style="width: 80px; height: 80px;">
+                                <i class="bi bi-lightning"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Rápido e Eficiente</h5>
+                            <p class="text-muted">Interface otimizada para agilizar suas tarefas diárias.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="glass-card text-center h-100">
+                            <div class="feature-icon mx-auto mb-3" style="width: 80px; height: 80px;">
+                                <i class="bi bi-headset"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Suporte Dedicado</h5>
+                            <p class="text-muted">Equipe especializada pronta para ajudar você a crescer.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <div class="container">
+            <div class="contact-content">
+                <h2 class="contact-title">Fale Conosco</h2>
+
+                <div class="contact-info">
+                    <div class="mb-4">
+                        <i class="bi bi-envelope-fill text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <p class="text-muted mb-3">
+                        Tem alguma dúvida, sugestão ou precisa de ajuda? A sua opinião é fundamental para nós. Envie um e-mail para contato@ellomei.com.br e a nossa equipa responderá o mais breve possível.
+                    </p>
+                    <a href="mailto:contato@ellomei.com.br" class="contact-email">
+                        <i class="bi bi-envelope"></i>
+                        contato@ellomei.com.br
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="glass-footer py-4">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center">
+                        <div class="brand-icon me-2">
+                            <i class="bi bi-piggy-bank"></i>
+                        </div>
+                        <span class="fw-bold">Ello MEI</span>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0 text-muted">© 2024 Ello MEI. Todos os direitos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const offsetTop = target.offsetTop - 80; // Account for fixed navbar
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Update active navigation link on scroll
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('.section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop && window.pageYOffset < sectionTop + sectionHeight) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,88 +1,257 @@
 <!DOCTYPE html>
 <html lang="pt-br" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout :: layout-base(~{::title}, ~{::div})}">
+      th:replace="~{layout :: layout-base(~{::title}, ~{::#lancamentos-content})}">
 <head>
-    <title>Lançamentos Financeiros</title>
+    <title>Lançamentos Financeiros - Ello MEI</title>
 </head>
 <body>
-<div>
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>Lançamentos</h1>
-        <a th:href="@{/lancamentos/novo}" class="btn btn-primary">Novo Lançamento</a>
+<div id="lancamentos-content">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="h2 fw-bold text-gray-900 mb-1">
+                <i class="bi bi-list-ul text-primary me-2"></i>
+                Lançamentos Financeiros
+            </h1>
+            <p class="text-muted mb-0">Gerencie todas as suas transações financeiras</p>
+        </div>
+        <a th:href="@{/lancamentos/novo}" class="btn btn-primary shadow-sm d-flex align-items-center">
+            <i class="bi bi-plus-circle me-2"></i>
+            <span class="d-none d-sm-inline">Novo Lançamento</span>
+            <span class="d-sm-none">Novo</span>
+        </a>
     </div>
 
-    <div class="card mb-4">
-        <div class="card-header">Filtros</div>
-        <div class="card-body">
-            <form th:action="@{/lancamentos}" method="get" class="row g-3 align-items-center">
-                <div class="col-md-3">
-                    <label for="dataInicio" class="form-label">Data de Início</label>
-                    <input type="date" id="dataInicio" name="dataInicio" class="form-control" th:value="${dataInicioSel != null ? #temporals.format(dataInicioSel, 'yyyy-MM-dd') : ''}">
-                </div>
-                <div class="col-md-3">
-                    <label for="dataFim" class="form-label">Data Fim</label>
-                    <input type="date" id="dataFim" name="dataFim" class="form-control" th:value="${dataFimSel != null ? #temporals.format(dataFimSel, 'yyyy-MM-dd') : ''}">
-                </div>
-                <div class="col-md-2">
-                    <label for="contaId" class="form-label">Conta</label>
-                    <select id="contaId" name="contaId" class="form-select">
-                        <option value="">Todas</option>
-                        <option th:each="conta : ${listaDeContas}" th:value="${conta.id}" th:text="${conta.nomeConta}" th:selected="${conta.id == contaIdSel}"></option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label for="pessoaId" class="form-label">Pessoa</label>
-                    <select id="pessoaId" name="contatoId" class="form-select"> <option value="">Todas</option>
-                        <option th:each="contato : ${listaDePessoas}" th:value="${contato.id}" th:text="${contato.getNomeExibicao()}" th:selected="${contato.id == pessoaIdSel}"></option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label for="status" class="form-label">Status</label>
-                    <select id="status" name="status" class="form-select">
-                        <option value="">Todos</option>
-                        <option th:each="s : ${T(br.com.scfmei.domain.StatusLancamento).values()}"
-                                th:value="${s}"
-                                th:text="${s.descricao}"
-                                th:selected="${s == statusSel}"></option>
-                    </select>
-                </div>
-                <div class="col-auto d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary me-2">Filtrar</button>
-                    <a th:href="@{/lancamentos}" class="btn btn-outline-secondary">Limpar</a>
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-white border-bottom py-4">
+            <h5 class="mb-0 fw-semibold text-gray-900">
+                <i class="bi bi-funnel text-primary me-2"></i>
+                Filtros de Pesquisa
+            </h5>
+        </div>
+        <div class="card-body p-4">
+            <form th:action="@{/lancamentos}" method="get">
+                <div class="row g-4">
+                    <div class="col-md-3">
+                        <label for="dataInicio" class="form-label fw-medium">
+                            <i class="bi bi-calendar-event me-1"></i>
+                            Data de Início
+                        </label>
+                        <input type="date" id="dataInicio" name="dataInicio" class="form-control"
+                               th:value="${dataInicioSel != null ? #temporals.format(dataInicioSel, 'yyyy-MM-dd') : ''}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="dataFim" class="form-label fw-medium">
+                            <i class="bi bi-calendar-check me-1"></i>
+                            Data Fim
+                        </label>
+                        <input type="date" id="dataFim" name="dataFim" class="form-control"
+                               th:value="${dataFimSel != null ? #temporals.format(dataFimSel, 'yyyy-MM-dd') : ''}">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="contaId" class="form-label fw-medium">
+                            <i class="bi bi-wallet2 me-1"></i>
+                            Conta
+                        </label>
+                        <select id="contaId" name="contaId" class="form-select">
+                            <option value="">Todas as contas</option>
+                            <option th:each="conta : ${listaDeContas}"
+                                    th:value="${conta.id}"
+                                    th:text="${conta.nomeConta}"
+                                    th:selected="${conta.id == contaIdSel}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="pessoaId" class="form-label fw-medium">
+                            <i class="bi bi-person me-1"></i>
+                            Pessoa
+                        </label>
+                        <select id="pessoaId" name="contatoId" class="form-select">
+                            <option value="">Todas as pessoas</option>
+                            <option th:each="contato : ${listaDePessoas}"
+                                    th:value="${contato.id}"
+                                    th:text="${contato.nomeExibicao}"
+                                    th:selected="${contato.id == pessoaIdSel}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="status" class="form-label fw-medium">
+                            <i class="bi bi-check-circle me-1"></i>
+                            Status
+                        </label>
+                        <select id="status" name="status" class="form-select">
+                            <option value="">Todos os status</option>
+                            <option th:each="s : ${T(br.com.scfmei.domain.StatusLancamento).values()}"
+                                    th:value="${s}"
+                                    th:text="${s.descricao}"
+                                    th:selected="${s == statusSel}"></option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <div class="d-flex justify-content-end align-items-center gap-3 pt-2">
+                            <a th:href="@{/lancamentos}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-clockwise me-2"></i>
+                                Limpar Filtros
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-search me-2"></i>
+                                Aplicar Filtros
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 
-    <table class="table table-striped table-hover table-bordered">
-        <thead class="table-dark">
-        <tr>
-            <th>Data</th>
-            <th>Descrição</th>
-            <th>Conta</th>
-            <th>Tipo</th>
-            <th>Status</th> <th>Valor</th>
-            <th>Ações</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="lancamento : ${listaDeLancamentos}">
-            <td th:text="${#temporals.format(lancamento.data, 'dd/MM/yyyy')}"></td>
-            <td th:text="${lancamento.descricao}"></td>
-            <td th:text="${lancamento.conta.nomeConta}"></td>
-            <td th:text="${lancamento.tipo}"></td>
-            <td>
-                <span th:if="${lancamento.status.name() == 'PAGO'}" class="badge bg-success" th:text="${lancamento.status.descricao}"></span>
-                <span th:if="${lancamento.status.name() == 'A_PAGAR'}" class="badge bg-warning text-dark" th:text="${lancamento.status.descricao}"></span>
-            </td>
-            <td th:text="${'R$ ' + #numbers.formatDecimal(lancamento.valor, 1, 'POINT', 2, 'COMMA')}"></td>
-            <td>
-                <a th:href="@{/lancamentos/editar/{id}(id=${lancamento.id})}" class="btn btn-warning btn-sm">Editar</a>
-                <a th:href="@{/lancamentos/excluir/{id}(id=${lancamento.id})}" class="btn btn-danger btn-sm">Excluir</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="card shadow-sm">
+        <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-4">
+            <h5 class="mb-0 fw-semibold text-gray-900">
+                <i class="bi bi-table text-primary me-2"></i>
+                Lista de Lançamentos
+            </h5>
+            <span class="badge bg-primary-100 text-primary-700 px-3 py-2 rounded-pill fw-medium"
+                  th:text="${'Total: ' + listaDeLancamentos.size() + ' registros'}"></span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 fw-semibold text-gray-700 border-0">
+                            <i class="bi bi-calendar3 me-1"></i>
+                            Data
+                        </th>
+                        <th class="py-3 fw-semibold text-gray-700 border-0">
+                            <i class="bi bi-card-text me-1"></i>
+                            Descrição
+                        </th>
+                        <th class="py-3 fw-semibold text-gray-700 border-0">
+                            <i class="bi bi-wallet2 me-1"></i>
+                            Conta
+                        </th>
+                        <th class="py-3 fw-semibold text-gray-700 border-0">
+                            <i class="bi bi-arrow-up-down me-1"></i>
+                            Tipo
+                        </th>
+                        <th class="py-3 fw-semibold text-gray-700 border-0">
+                            <i class="bi bi-check-circle me-1"></i>
+                            Status
+                        </th>
+                        <th class="text-end px-4 py-3 fw-semibold text-gray-700 border-0">
+                            <i class="bi bi-currency-dollar me-1"></i>
+                            Valor
+                        </th>
+                        <th class="text-center py-3 fw-semibold text-gray-700 border-0">Ações</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="lancamento : ${listaDeLancamentos}" class="align-middle border-bottom">
+                        <td class="px-4 py-3">
+                            <div class="d-flex flex-column">
+                                <span class="fw-bold text-gray-900" th:text="${#temporals.format(lancamento.data, 'dd/MM/yyyy')}"></span>
+                                <small class="text-muted" th:text="${#temporals.format(lancamento.data, 'EEEE', #locale)}"></small>
+                            </div>
+                        </td>
+                        <td class="py-3">
+                            <div class="d-flex flex-column">
+                                <span th:text="${lancamento.descricao}" class="fw-medium text-gray-900"></span>
+                                <small th:if="${lancamento.contato != null}"
+                                       th:text="${'Para: ' + lancamento.contato.nomeExibicao}"
+                                       class="text-muted mt-1">
+                                    <i class="bi bi-person me-1"></i>
+                                </small>
+                            </div>
+                        </td>
+                        <td class="py-3">
+                            <span th:text="${lancamento.contasDescricao}" class="text-gray-700"></span>
+                        </td>
+                        <td class="py-3">
+                            <span th:text="${lancamento.tipo}"
+                                  th:class="${lancamento.tipo.name() == 'ENTRADA' ? 'badge bg-success-100 text-success-700 px-3 py-2 rounded-pill' : 'badge bg-error-100 text-error-700 px-3 py-2 rounded-pill'}">
+                            </span>
+                        </td>
+                        <td class="py-3">
+                            <span th:if="${lancamento.status.name() == 'PAGO'}"
+                                  class="badge bg-success-100 text-success-700 px-3 py-2 rounded-pill"
+                                  th:text="${lancamento.status.descricao}">
+                                <i class="bi bi-check-circle me-1"></i>
+                            </span>
+                            <span th:if="${lancamento.status.name() == 'A_PAGAR'}"
+                                  class="badge bg-warning-100 text-warning-700 px-3 py-2 rounded-pill"
+                                  th:text="${lancamento.status.descricao}">
+                                <i class="bi bi-clock me-1"></i>
+                            </span>
+                        </td>
+                        <td class="text-end px-4 py-3">
+                            <span th:text="${#numbers.formatCurrency(lancamento.valorTotal)}"
+                                  th:class="${lancamento.tipo.name() == 'ENTRADA' ? 'text-success fw-bold fs-6' : 'text-danger fw-bold fs-6'}">
+                            </span>
+                        </td>
+                        <td class="text-center py-3">
+                            <div class="btn-group btn-group-sm">
+                                <a th:href="@{/lancamentos/editar/{id}(id=${lancamento.id})}"
+                                   class="btn btn-outline-primary btn-sm"
+                                   title="Editar lançamento">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a th:href="@{/lancamentos/excluir/{id}(id=${lancamento.id})}"
+                                   class="btn btn-outline-danger btn-sm"
+                                   title="Excluir lançamento"
+                                   onclick="return confirm('Tem certeza que deseja excluir este lançamento?')">
+                                    <i class="bi bi-trash3"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${listaDeLancamentos.empty}">
+                        <td colspan="7" class="text-center py-5">
+                            <div class="py-5">
+                                <i class="bi bi-inbox display-1 text-muted mb-3"></i>
+                                <h5 class="text-muted mb-2">Nenhum lançamento encontrado</h5>
+                                <p class="text-muted mb-4">Comece criando seu primeiro lançamento financeiro</p>
+                                <a th:href="@{/lancamentos/novo}" class="btn btn-primary">
+                                    <i class="bi bi-plus-circle me-2"></i>
+                                    Criar Primeiro Lançamento
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4" th:if="${!listaDeLancamentos.empty()}">
+        <div class="col-md-4">
+            <div class="card kpi-card-gradient bg-gradient-2">
+                <div class="card-body text-center">
+                    <i class="bi bi-arrow-down-circle display-6 text-white-50"></i>
+                    <h5 class="text-white mt-2">Total Entradas (Pagas)</h5>
+                    <p class="kpi-value text-white" th:text="${#numbers.formatCurrency(totalEntradas)}"></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card kpi-card-gradient bg-gradient-3">
+                <div class="card-body text-center">
+                    <i class="bi bi-arrow-up-circle display-6 text-white-50"></i>
+                    <h5 class="text-white mt-2">Total Saídas (Pagas)</h5>
+                    <p class="kpi-value text-white" th:text="${#numbers.formatCurrency(totalSaidas)}"></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card kpi-card-gradient bg-gradient-1">
+                <div class="card-body text-center">
+                    <i class="bi bi-wallet2 display-6 text-white-50"></i>
+                    <h5 class="text-white mt-2">Saldo do Período</h5>
+                    <p class="kpi-value text-white"
+                       th:text="${#numbers.formatCurrency(totalEntradas - totalSaidas)}"></p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 </html>

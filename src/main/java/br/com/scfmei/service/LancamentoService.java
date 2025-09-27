@@ -9,11 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -139,6 +137,64 @@ public class LancamentoService {
     @Transactional(readOnly = true)
     public List<Lancamento> buscarComFiltros(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long contatoId, TipoLancamento tipo, Long categoriaId, Boolean comNotaFiscal, String descricao, StatusLancamento status, Usuario usuario) {
         return lancamentoRepository.findComFiltros(dataInicio, dataFim, contaId, contatoId, tipo, categoriaId, comNotaFiscal, descricao, status, usuario);
+    }
+
+    @Transactional(readOnly = true)
+    public List<LancamentoGrupoDTO> buscarComFiltrosAgrupados(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long contatoId, TipoLancamento tipo, Long categoriaId, Boolean comNotaFiscal, String descricao, StatusLancamento status, Usuario usuario) {
+        List<Lancamento> lancamentos = lancamentoRepository.findComFiltros(dataInicio, dataFim, contaId, contatoId, tipo, categoriaId, comNotaFiscal, descricao, status, usuario);
+
+        // Agrupa os lançamentos por grupoOperacao (ou por ID se não tiver grupo)
+        Map<String, List<Lancamento>> grupos = lancamentos.stream()
+                .collect(Collectors.groupingBy(l ->
+                    l.getGrupoOperacao() != null ? l.getGrupoOperacao() : l.getId().toString()
+                ));
+
+        // Converte cada grupo em um LancamentoGrupoDTO
+        return grupos.values().stream()
+                .map(this::criarLancamentoGrupoDTO)
+                .sorted((g1, g2) -> {
+                    // Ordena por data decrescente, depois por ID decrescente
+                    int dateCompare = g2.getData().compareTo(g1.getData());
+                    return dateCompare != 0 ? dateCompare : g2.getId().compareTo(g1.getId());
+                })
+                .collect(Collectors.toList());
+    }
+
+    private LancamentoGrupoDTO criarLancamentoGrupoDTO(List<Lancamento> lancamentosDoGrupo) {
+        if (lancamentosDoGrupo.isEmpty()) return null;
+
+        Lancamento primeiro = lancamentosDoGrupo.get(0);
+
+        // Calcula o valor total do grupo
+        BigDecimal valorTotal = lancamentosDoGrupo.stream()
+                .map(Lancamento::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // Cria descrição das contas envolvidas
+        String contasDescricao = lancamentosDoGrupo.stream()
+                .map(l -> l.getConta().getNomeConta())
+                .distinct()
+                .collect(Collectors.joining(", "));
+
+        // Se há apenas uma conta, mostra só o nome. Se há múltiplas, mostra "Múltiplas contas"
+        if (lancamentosDoGrupo.size() > 1 && lancamentosDoGrupo.stream().map(l -> l.getConta().getId()).distinct().count() > 1) {
+            contasDescricao = "Múltiplas contas (" + contasDescricao + ")";
+        }
+
+        return new LancamentoGrupoDTO(
+                primeiro.getId(),
+                primeiro.getGrupoOperacao(),
+                primeiro.getDescricao(),
+                primeiro.getData(),
+                primeiro.getTipo(),
+                primeiro.getStatus(),
+                valorTotal,
+                contasDescricao,
+                primeiro.getCategoriaDespesa(),
+                primeiro.getContato(),
+                primeiro.getComNotaFiscal(),
+                primeiro.getComprovantes()
+        );
     }
 
     @Transactional(readOnly = true)

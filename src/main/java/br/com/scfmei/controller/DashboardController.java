@@ -29,7 +29,7 @@ public class DashboardController {
                 .orElseThrow(() -> new IllegalStateException("Usuário logado não encontrado."));
     }
 
-    @GetMapping("/")
+    @GetMapping("/dashboard")
     public String mostrarDashboard(
             @RequestParam(required = false) LocalDate dataInicio,
             @RequestParam(required = false) LocalDate dataFim,

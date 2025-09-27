@@ -3,74 +3,483 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro - Ello MEI</title>
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}"/>
-    <link rel="stylesheet" th:href="@{/css/custom.css}" />
+    <title>Create your Ello MEI Account</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link th:href="@{/css/landing.css}" rel="stylesheet">
+    <style>
+        /* Registration Page Specific Styles */
+        .registration-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding: 80px 0;
+        }
+        
+        .registration-card {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
+            box-shadow: 
+                var(--glass-shadow),
+                0 0 100px rgba(59, 130, 246, 0.1);
+            padding: 3rem;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .registration-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.3) 0%,
+                rgba(255, 255, 255, 0.1) 100%);
+            border-radius: var(--border-radius-lg);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .registration-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+        
+        .registration-subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .form-section {
+            margin-bottom: 2.5rem;
+        }
+        
+        .form-section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-blue);
+            position: relative;
+        }
+        
+        .form-section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: var(--primary-blue-light);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group {
+            position: relative;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-label i {
+            color: var(--primary-blue);
+            font-size: 1rem;
+        }
+        
+        .glass-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            color: var(--text-dark);
+        }
+        
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.4);
+            border-color: var(--primary-blue);
+            box-shadow: 
+                0 0 0 3px rgba(59, 130, 246, 0.1),
+                0 4px 20px rgba(59, 130, 246, 0.2);
+            outline: none;
+            transform: translateY(-1px);
+        }
+        
+        .glass-input::placeholder {
+            color: rgba(100, 116, 139, 0.7);
+        }
+        
+        .create-account-btn {
+            background: var(--primary-blue);
+            border: none;
+            border-radius: var(--border-radius);
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            padding: 1.25rem 3rem;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 
+                0 4px 20px rgba(59, 130, 246, 0.3),
+                0 0 40px rgba(59, 130, 246, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .create-account-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.2), 
+                transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .create-account-btn:hover {
+            background: var(--primary-blue-dark);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 30px rgba(59, 130, 246, 0.4),
+                0 0 60px rgba(59, 130, 246, 0.2);
+        }
+        
+        .create-account-btn:hover::before {
+            left: 100%;
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 2rem;
+            color: var(--text-muted);
+        }
+        
+        .login-link a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .login-link a:hover {
+            color: var(--primary-blue-dark);
+            text-decoration: none;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .registration-card {
+                padding: 2rem;
+                margin: 1rem;
+            }
+            
+            .registration-title {
+                font-size: 2rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .create-account-btn {
+                padding: 1rem 2rem;
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .registration-section {
+                padding: 40px 0;
+            }
+            
+            .registration-card {
+                padding: 1.5rem;
+            }
+            
+            .registration-title {
+                font-size: 1.75rem;
+            }
+            
+            .form-section-title {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="access-page-wrapper">
-    <div class="access-card register-card shadow">
-        <div class="text-center mb-4">
-            <h2 class="card-title fw-bold">Crie sua Conta</h2>
-            <p class="text-black-50">Preencha os dados para começar a organizar suas finanças.</p>
+    <!-- Registration Section -->
+    <section class="registration-section">
+        <!-- Ambient Gradients - Same as Landing Page -->
+        <div class="ambient-gradient gradient-1"></div>
+        <div class="ambient-gradient gradient-2"></div>
+        <div class="ambient-gradient gradient-3"></div>
+        
+        <div class="container">
+            <div class="registration-card">
+                <!-- Header -->
+                <div class="text-center mb-4">
+                    <a th:href="@{/}" class="text-decoration-none">
+                        <div class="d-flex align-items-center justify-content-center mb-3">
+                            <div class="brand-icon me-2">
+                                <i class="bi bi-piggy-bank"></i>
+                            </div>
+                            <span class="fw-bold fs-4" style="color: var(--text-dark);">Ello MEI</span>
+                        </div>
+                    </a>
+                    <h1 class="registration-title">Crie sua Conta no Ello MEI</h1>
+                    <p class="registration-subtitle">Comece a organizar as suas finanças em poucos passos. É rápido e seguro.</p>
+                </div>
+                
+                <!-- Registration Form -->
+                <form th:action="@{/registro}" method="post" th:object="${usuario}">
+                    <!-- Access Details Section -->
+                    <div class="form-section">
+                        <h3 class="form-section-title">
+                            <i class="bi bi-key-fill"></i>
+                            Dados de Acesso
+                        </h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="username" class="form-label">
+                                    <i class="bi bi-person"></i>
+                                    Usuário (Login)
+                                </label>
+                                <input type="text" class="glass-input" id="username" th:field="*{username}"
+                                       placeholder="Escolha um nome de usuário único" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="password" class="form-label">
+                                    <i class="bi bi-lock"></i>
+                                    Senha
+                                </label>
+                                <input type="password" class="glass-input" id="password" th:field="*{password}"
+                                       placeholder="Crie uma senha segura" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Personal & Company Information Section -->
+                    <div class="form-section">
+                        <h3 class="form-section-title">
+                            <i class="bi bi-building"></i>
+                            Dados Pessoais e da Empresa
+                        </h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nomeCompleto" class="form-label">
+                                    <i class="bi bi-person-badge"></i>
+                                    Nome Completo
+                                </label>
+                                <input type="text" class="glass-input" id="nomeCompleto" th:field="*{nomeCompleto}"
+                                       placeholder="Digite seu nome completo" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="nomeFantasia" class="form-label">
+                                    <i class="bi bi-shop"></i>
+                                    Nome Fantasia (MEI)
+                                </label>
+                                <input type="text" class="glass-input" id="nomeFantasia" th:field="*{nomeFantasia}"
+                                       placeholder="Nome do seu negócio ou atividade" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cpf" class="form-label">
+                                    <i class="bi bi-card-text"></i>
+                                    CPF
+                                </label>
+                                <input type="text" class="glass-input" id="cpf" th:field="*{cpf}" 
+                                       placeholder="000.000.000-00" maxlength="14">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="cnpj" class="form-label">
+                                    <i class="bi bi-building-check"></i>
+                                    CNPJ
+                                </label>
+                                <input type="text" class="glass-input" id="cnpj" th:field="*{cnpj}" 
+                                       placeholder="00.000.000/0000-00" maxlength="18">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group" style="grid-column: 1 / -1;">
+                                <label for="razaoSocial" class="form-label">
+                                    <i class="bi bi-building-gear"></i>
+                                    Razão Social
+                                </label>
+                                <input type="text" class="glass-input" id="razaoSocial" th:field="*{razaoSocial}"
+                                       placeholder="Razão social (se diferente do nome fantasia)">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <button type="submit" class="create-account-btn">
+                        <i class="bi bi-rocket-takeoff"></i>
+                        Criar Conta
+                    </button>
+                </form>
+                
+                <!-- Login Link -->
+                <div class="login-link">
+                    <p class="mb-0">
+                        Já tem uma conta?
+                        <a th:href="@{/login}">Faça o login</a>
+                    </p>
+                </div>
+            </div>
         </div>
-        <form th:action="@{/registro}" method="post" th:object="${usuario}">
-            <h5 class="mb-3">Dados de Acesso</h5>
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" th:field="*{username}" id="username" placeholder="Usuário (Login)" required>
-                        <label for="username">Usuário (Login)</label>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="form-floating">
-                        <input type="password" class="form-control" th:field="*{password}" id="password" placeholder="Senha" required>
-                        <label for="password">Senha</label>
-                    </div>
-                </div>
-            </div>
-            <hr class="my-3">
-            <h5 class="mb-3">Dados Pessoais e da Empresa</h5>
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" th:field="*{nomeCompleto}" id="nomeCompleto" placeholder="Seu Nome Completo">
-                        <label for="nomeCompleto">Seu Nome Completo</label>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" th:field="*{nomeFantasia}" id="nomeFantasia" placeholder="Nome Fantasia (MEI)">
-                        <label for="nomeFantasia">Nome Fantasia (MEI)</label>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" th:field="*{cpf}" id="cpf" placeholder="CPF">
-                        <label for="cpf">CPF</label>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" th:field="*{cnpj}" id="cnpj" placeholder="CNPJ">
-                        <label for="cnpj">CNPJ</label>
-                    </div>
-                </div>
-            </div>
-            <div class="form-floating mb-3">
-                <input type="text" class="form-control" th:field="*{razaoSocial}" id="razaoSocial" placeholder="Razão Social">
-                <label for="razaoSocial">Razão Social</label>
-            </div>
+    </section>
 
-            <button type="submit" class="w-100 btn btn-lg btn-primary mt-3">Cadastrar</button>
-            <div class="text-center mt-3">
-                <small>Já tem uma conta? <a th:href="@{/login}" class="fw-bold text-dark">Faça o login</a></small>
-            </div>
-        </form>
-    </div>
-</div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Input Masks and Validation -->
+    <script>
+        // CPF Mask
+        const cpfInput = document.getElementById('cpf');
+        if (cpfInput) {
+            cpfInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                e.target.value = value;
+            });
+        }
+        
+        // CNPJ Mask
+        const cnpjInput = document.getElementById('cnpj');
+        if (cnpjInput) {
+            cnpjInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                value = value.replace(/(\d{2})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1/$2');
+                value = value.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+                e.target.value = value;
+            });
+        }
+        
+        // Form Enhancement - Add floating labels effect
+        document.querySelectorAll('.glass-input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.classList.add('focused');
+            });
+            
+            input.addEventListener('blur', function() {
+                if (!this.value) {
+                    this.parentElement.classList.remove('focused');
+                }
+            });
+            
+            // Check if input has value on load
+            if (input.value) {
+                input.parentElement.classList.add('focused');
+            }
+        });
+        
+        // Button animation enhancement
+        const submitBtn = document.querySelector('.create-account-btn');
+        if (submitBtn) {
+            submitBtn.addEventListener('click', function(e) {
+                // Add ripple effect
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.classList.add('ripple');
+                
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        }
+    </script>
+    
+    <style>
+        /* Ripple effect for button */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+            pointer-events: none;
+        }
+        
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        
+        /* Enhanced focus states */
+        .form-group.focused .form-label {
+            color: var(--primary-blue);
+        }
+        
+        .form-group.focused .form-label i {
+            transform: scale(1.1);
+        }
+    </style>
 </body>
 </html>

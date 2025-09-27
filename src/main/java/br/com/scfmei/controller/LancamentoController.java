@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
@@ -31,33 +32,47 @@ public class LancamentoController {
 
     @GetMapping
     public String listarLancamentos(
-
             @RequestParam(required = false) LocalDate dataInicio,
             @RequestParam(required = false) LocalDate dataFim,
             @RequestParam(required = false) Long contaId,
-            @RequestParam(required = false) Long contatoId,
+            @RequestParam(required = false) Long contatoId, // Corrigido de pessoaId para contatoId
             @RequestParam(required = false) TipoLancamento tipo,
             @RequestParam(required = false) Long categoriaId,
             @RequestParam(required = false) Boolean comNotaFiscal,
             @RequestParam(required = false) String descricao,
             @RequestParam(required = false) StatusLancamento status,
-
             Principal principal, Model model) {
 
         Usuario usuario = getUsuarioLogado(principal);
-        List<Lancamento> lancamentos = lancamentoService.buscarComFiltros(dataInicio, dataFim, contaId, contatoId, tipo, categoriaId, comNotaFiscal, descricao, status, usuario);
-        model.addAttribute("listaDeLancamentos", lancamentos);
 
+        // Busca os lançamentos agrupados com base nos filtros
+        List<LancamentoGrupoDTO> lancamentosAgrupados = lancamentoService.buscarComFiltrosAgrupados(dataInicio, dataFim, contaId, contatoId, tipo, categoriaId, comNotaFiscal, descricao, status, usuario);
+        model.addAttribute("listaDeLancamentos", lancamentosAgrupados);
+
+        // Calcula os totais para os KPIs da página
+        BigDecimal totalEntradas = lancamentosAgrupados.stream()
+                .filter(l -> l.getTipo() == TipoLancamento.ENTRADA && l.getStatus() == StatusLancamento.PAGO)
+                .map(LancamentoGrupoDTO::getValorTotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalSaidas = lancamentosAgrupados.stream()
+                .filter(l -> l.getTipo() == TipoLancamento.SAIDA && l.getStatus() == StatusLancamento.PAGO)
+                .map(LancamentoGrupoDTO::getValorTotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        model.addAttribute("totalEntradas", totalEntradas);
+        model.addAttribute("totalSaidas", totalSaidas);
+
+        // Carrega dados para os dropdowns dos filtros
         model.addAttribute("listaDeContas", contaService.buscarTodasPorUsuario(usuario));
         model.addAttribute("listaDePessoas", contatoService.buscarTodosPorUsuario(usuario));
 
-
+        // Mantém os valores dos filtros selecionados na tela
         model.addAttribute("dataInicioSel", dataInicio);
         model.addAttribute("dataFimSel", dataFim);
         model.addAttribute("contaIdSel", contaId);
-        model.addAttribute("pessoaIdSel", contatoId);
+        model.addAttribute("pessoaIdSel", contatoId); // nome mantido para compatibilidade com o HTML
         model.addAttribute("statusSel", status);
-
 
         return "lancamentos";
     }
