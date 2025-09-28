@@ -117,4 +117,87 @@ public class RelatorioController {
 
         return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
     }
+
+    @GetMapping("/compras-com-nota/pdf")
+    public ResponseEntity<byte[]> gerarRelatorioComprasNota(
+            @RequestParam(required = false) LocalDate dataInicio,
+            @RequestParam(required = false) LocalDate dataFim,
+            @RequestParam(required = false) Long contaId,
+            @RequestParam(required = false) Long contatoId,
+            @RequestParam(required = false) Long categoriaId,
+            @RequestParam(required = false) String descricao,
+            @RequestParam(required = false) StatusLancamento status,
+            Principal principal) {
+
+        Usuario usuario = getUsuarioLogado(principal);
+
+        // Filter specifically for expenses (SAIDA) with an invoice (comNotaFiscal = true)
+        List<Lancamento> lancamentos = lancamentoService.buscarComFiltros(
+                dataInicio, dataFim, contaId, contatoId, TipoLancamento.SAIDA,
+                categoriaId, true, descricao, status, usuario);
+
+        BigDecimal total = lancamentos.stream()
+                .map(Lancamento::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        Map<String, Object> variaveis = new HashMap<>();
+        variaveis.put("lancamentos", lancamentos);
+        variaveis.put("total", total);
+        variaveis.put("dataInicio", dataInicio);
+        variaveis.put("dataFim", dataFim);
+
+        byte[] pdfBytes = pdfService.gerarPdfDeHtml("relatorio_compras_com_nota", variaveis);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "relatorio_compras_com_nota.pdf");
+
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/lancamentos/pdf")
+    public ResponseEntity<byte[]> gerarRelatorioLancamentos(
+            @RequestParam(required = false) LocalDate dataInicio,
+            @RequestParam(required = false) LocalDate dataFim,
+            @RequestParam(required = false) Long contaId,
+            @RequestParam(required = false) Long contatoId,
+            @RequestParam(required = false) TipoLancamento tipo,
+            @RequestParam(required = false) Long categoriaId,
+            @RequestParam(required = false) Boolean comNotaFiscal,
+            @RequestParam(required = false) String descricao,
+            @RequestParam(required = false) StatusLancamento status,
+            Principal principal) {
+
+        Usuario usuario = getUsuarioLogado(principal);
+
+        // Fetch all transactions based on filters without forcing type or invoice status
+        List<Lancamento> lancamentos = lancamentoService.buscarComFiltros(
+                dataInicio, dataFim, contaId, contatoId, tipo,
+                categoriaId, comNotaFiscal, descricao, status, usuario);
+
+        // Prepare variables for the PDF template
+        Map<String, Object> variaveis = new HashMap<>();
+        variaveis.put("lancamentos", lancamentos);
+        variaveis.put("dataInicio", dataInicio);
+        variaveis.put("dataFim", dataFim);
+
+        // Process file paths to be accessible in the PDF
+        for (Lancamento lancamento : lancamentos) {
+            for (Comprovante comprovante : lancamento.getComprovantes()) {
+                // Ensure the path starts with /uploads/ for PDF generation
+                String currentPath = comprovante.getPathArquivo();
+                if (currentPath != null && !currentPath.startsWith("/uploads/")) {
+                    comprovante.setPathArquivo("/uploads/" + currentPath);
+                }
+            }
+        }
+
+        byte[] pdfBytes = pdfService.gerarPdfDeHtml("relatorio_lancamentos", variaveis);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "relatorio_lancamentos_detalhados.pdf");
+
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+    }
 }

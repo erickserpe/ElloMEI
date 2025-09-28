@@ -46,7 +46,7 @@
             <td th:text="${lancamento.categoriaDespesa != null ? lancamento.categoriaDespesa.nome : '-'}"></td>
             <td th:text="${lancamento.tipo}"
                 th:class="${lancamento.tipo.name() == 'ENTRADA' ? 'entrada' : 'saida'}"></td>
-            <td th:text="${#numbers.formatDecimal(lancamento.valor, 1, 'POINT', 2, 'COMMA')}"
+            <td th:text="${#numbers.formatCurrency(lancamento.valor)}"
                 th:class="${lancamento.tipo.name() == 'ENTRADA' ? 'entrada' : 'saida'}"></td>
         </tr>
 
@@ -55,7 +55,7 @@
             <td colspan="6">
                 <strong>Comprovantes:</strong>
                 <th:block th:each="comp : ${lancamento.comprovantes}">
-                    <img th:src="@{${comp.caminho}}" alt="Comprovante" class="comprovante-img"/>
+                    <img th:src="${comp.pathArquivo}" alt="Comprovante" class="comprovante-img"/>
                 </th:block>
             </td>
         </tr>

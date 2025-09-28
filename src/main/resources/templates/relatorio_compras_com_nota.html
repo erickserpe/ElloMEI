@@ -34,8 +34,8 @@
     <tr th:each="lanc : ${lancamentos}">
         <td th:text="${#temporals.format(lanc.data, 'dd/MM/yyyy')}"></td>
         <td th:text="${lanc.descricao}"></td>
-        <td th:text="${lanc.contato != null ? lanc.contato.nome : '-'}"></td>
-        <td th:text="${#numbers.formatDecimal(lanc.valor, 1, 'POINT', 2, 'COMMA')}"></td>
+        <td th:text="${lanc.contato != null ? lanc.contato.nomeExibicao : '-'}"></td>
+        <td th:text="${#numbers.formatCurrency(lanc.valor)}"></td>
         <td>
             <div th:if="${!lanc.comprovantes.isEmpty()}">
                 <div th:each="comp : ${lanc.comprovantes}">

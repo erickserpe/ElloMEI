@@ -39,7 +39,7 @@ public class LancamentoService {
         comprovanteRepository.delete(comprovante);
     }
 
-    public void salvarOuAtualizarOperacao(LancamentoFormDTO form, MultipartFile comprovanteFile, Usuario usuario) {
+    public void salvarOuAtualizarOperacao(LancamentoFormDTO form, MultipartFile[] comprovanteFiles, Usuario usuario) {
         String grupoOperacao = (form.getGrupoOperacao() != null && !form.getGrupoOperacao().isBlank())
                 ? form.getGrupoOperacao()
                 : UUID.randomUUID().toString();
@@ -84,16 +84,27 @@ public class LancamentoService {
 
             Lancamento lancamentoSalvo = lancamentoRepository.save(lancamento);
 
-            // If a new file was uploaded, add it to the list of attachments
-            if (comprovanteFile != null && !comprovanteFile.isEmpty()) {
-                List<String> comprovantePaths = fileStorageService.storeFile(comprovanteFile);
-                for (String path : comprovantePaths) {
-                    Comprovante comprovante = new Comprovante();
-                    comprovante.setPathArquivo(path);
-                    comprovante.setLancamento(lancamentoSalvo);
-                    comprovanteRepository.save(comprovante);
+            // --- START: Robust multiple file processing ---
+            // If new files were uploaded, add them to the list of attachments for each created lancamento
+            if (comprovanteFiles != null && comprovanteFiles.length > 0) {
+                // Check if the array contains more than just one empty file
+                if (comprovanteFiles.length > 1 || !comprovanteFiles[0].isEmpty()) {
+                    for (MultipartFile file : comprovanteFiles) {
+                        if (file != null && !file.isEmpty()) {
+                            // The storeFile service already handles PDF page splitting
+                            List<String> comprovantePaths = fileStorageService.storeFile(file);
+                            for (String path : comprovantePaths) {
+                                Comprovante comprovante = new Comprovante();
+                                comprovante.setPathArquivo(path);
+                                // Associate with the correct lancamento being processed
+                                comprovante.setLancamento(lancamentoSalvo);
+                                comprovanteRepository.save(comprovante);
+                            }
+                        }
+                    }
                 }
             }
+            // --- END: Robust multiple file processing ---
 
             if (lancamentoSalvo.getStatus() == StatusLancamento.PAGO) {
                 aplicarLancamentoNaConta(lancamentoSalvo);

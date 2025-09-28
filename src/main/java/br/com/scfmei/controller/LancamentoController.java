@@ -121,8 +121,8 @@ public class LancamentoController {
 
     @PostMapping
     public String salvarLancamento(@ModelAttribute("lancamentoForm") LancamentoFormDTO lancamentoForm,
-                                   @RequestParam(value = "comprovanteFile", required = false) MultipartFile comprovanteFile, Principal principal) {
-        lancamentoService.salvarOuAtualizarOperacao(lancamentoForm, comprovanteFile, getUsuarioLogado(principal));
+                                   @RequestParam(value = "comprovanteFiles", required = false) MultipartFile[] comprovanteFiles, Principal principal) {
+        lancamentoService.salvarOuAtualizarOperacao(lancamentoForm, comprovanteFiles, getUsuarioLogado(principal));
         return "redirect:/lancamentos";
     }
 
