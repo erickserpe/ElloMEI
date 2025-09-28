@@ -53,32 +53,16 @@ public class CategoriaDespesaController {
     }
 
     @GetMapping("/editar/{id}")
-    public String mostrarFormularioDeEdicao(@PathVariable Long id, Model model, Principal principal) {
-        Usuario usuarioLogado = getUsuarioLogado(principal);
-        Optional<CategoriaDespesa> categoriaOpt = categoriaService.buscarPorId(id);
-
-        if (categoriaOpt.isPresent()) {
-            CategoriaDespesa categoria = categoriaOpt.get();
-            if (!categoria.getUsuario().getId().equals(usuarioLogado.getId())) {
-                throw new AccessDeniedException("Acesso negado.");
-            }
-            model.addAttribute("categoria", categoria);
-            return "form-categoria";
-        }
-        return "redirect:/categorias";
+    public String mostrarFormularioDeEdicao(@PathVariable Long id, Model model) {
+        CategoriaDespesa categoria = categoriaService.buscarPorId(id)
+                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+        model.addAttribute("categoria", categoria);
+        return "form-categoria";
     }
 
     @GetMapping("/excluir/{id}")
-    public String excluirCategoria(@PathVariable Long id, Principal principal) {
-        Usuario usuarioLogado = getUsuarioLogado(principal);
-        Optional<CategoriaDespesa> categoriaOpt = categoriaService.buscarPorId(id);
-
-
-        if (categoriaOpt.isPresent() && categoriaOpt.get().getUsuario().getId().equals(usuarioLogado.getId())) {
-            categoriaService.excluirPorId(id);
-        } else {
-            throw new AccessDeniedException("Acesso negado.");
-        }
+    public String excluirCategoria(@PathVariable Long id) {
+        categoriaService.excluirPorId(id);
         return "redirect:/categorias";
     }
 }

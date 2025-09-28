@@ -4,6 +4,7 @@ import br.com.scfmei.domain.Conta;
 import br.com.scfmei.domain.Usuario;
 import br.com.scfmei.repository.ContaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,11 +33,13 @@ public class ContaService {
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("@customSecurityService.isContaOwner(#id)")
     public Optional<Conta> buscarPorId(Long id) {
         return contaRepository.findById(id);
     }
 
     @Transactional
+    @PreAuthorize("@customSecurityService.isContaOwner(#id)")
     public void excluirPorId(Long id) {
         contaRepository.deleteById(id);
     }

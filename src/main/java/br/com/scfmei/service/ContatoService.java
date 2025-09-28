@@ -5,6 +5,7 @@ import br.com.scfmei.domain.Contato;
 import br.com.scfmei.domain.Usuario; // Importe Usuario
 import br.com.scfmei.repository.ContatoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,11 +30,13 @@ public class ContatoService {
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("@customSecurityService.isContatoOwner(#id)")
     public Optional<Contato> buscarPorId(Long id) {
         return contatoRepository.findById(id);
     }
 
     @Transactional
+    @PreAuthorize("@customSecurityService.isContatoOwner(#id)")
     public void excluirPorId(Long id) {
         contatoRepository.deleteById(id);
     }

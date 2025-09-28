@@ -55,33 +55,16 @@ public class ContaController {
     }
 
     @GetMapping("/editar/{id}")
-    public String mostrarFormularioDeEdicao(@PathVariable Long id, Model model, Principal principal) {
-        Usuario usuarioLogado = getUsuarioLogado(principal);
-        Optional<Conta> contaOptional = contaService.buscarPorId(id);
-
-        if (contaOptional.isPresent()) {
-            Conta conta = contaOptional.get();
-            // VERIFICAÇÃO DE SEGURANÇA: Garante que o usuário só pode editar suas próprias contas
-            if (!conta.getUsuario().getId().equals(usuarioLogado.getId())) {
-                throw new AccessDeniedException("Acesso negado.");
-            }
-            model.addAttribute("conta", conta);
-            return "form-conta";
-        }
-        return "redirect:/contas";
+    public String mostrarFormularioDeEdicao(@PathVariable Long id, Model model) {
+        Conta conta = contaService.buscarPorId(id)
+                .orElseThrow(() -> new RuntimeException("Conta não encontrada"));
+        model.addAttribute("conta", conta);
+        return "form-conta";
     }
 
     @GetMapping("/excluir/{id}")
-    public String excluirConta(@PathVariable Long id, Principal principal) {
-        Usuario usuarioLogado = getUsuarioLogado(principal);
-        Optional<Conta> contaOptional = contaService.buscarPorId(id);
-
-        // VERIFICAÇÃO DE SEGURANÇA: Garante que o usuário só pode excluir suas próprias contas
-        if (contaOptional.isPresent() && contaOptional.get().getUsuario().getId().equals(usuarioLogado.getId())) {
-            contaService.excluirPorId(id);
-        } else {
-            throw new AccessDeniedException("Acesso negado.");
-        }
+    public String excluirConta(@PathVariable Long id) {
+        contaService.excluirPorId(id);
         return "redirect:/contas";
     }
 }

@@ -5,6 +5,7 @@ import br.com.scfmei.repository.ComprovanteRepository;
 import br.com.scfmei.repository.LancamentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,17 +25,14 @@ public class LancamentoService {
     @Autowired private FileStorageService fileStorageService;
 
     @Transactional(readOnly = true)
+    @PreAuthorize("@customSecurityService.isLancamentoOwner(#id)")
     public Optional<Lancamento> buscarPorId(Long id) { return lancamentoRepository.findById(id); }
 
     @Transactional
+    @PreAuthorize("@customSecurityService.isComprovanteOwner(#comprovanteId)")
     public void excluirComprovante(Long comprovanteId, Usuario usuario) {
         Comprovante comprovante = comprovanteRepository.findById(comprovanteId)
                 .orElseThrow(() -> new RuntimeException("Comprovante não encontrado!"));
-
-        // Security Check: Ensure the user owns the transaction associated with the attachment
-        if (!comprovante.getLancamento().getUsuario().getId().equals(usuario.getId())) {
-            throw new AccessDeniedException("Acesso negado para excluir este comprovante.");
-        }
 
         // The @OneToMany(orphanRemoval=true) on Lancamento entity will handle the deletion
         comprovante.getLancamento().getComprovantes().remove(comprovante);
@@ -134,11 +132,9 @@ public class LancamentoService {
         return form;
     }
 
+    @PreAuthorize("@customSecurityService.isLancamentoOwner(#lancamentoId)")
     public void excluirOperacao(Long lancamentoId, Usuario usuario) {
         Lancamento umLancamentoDoGrupo = buscarPorId(lancamentoId).orElseThrow(() -> new RuntimeException("Lançamento não encontrado!"));
-        if (!umLancamentoDoGrupo.getUsuario().getId().equals(usuario.getId())) {
-            throw new AccessDeniedException("Acesso negado.");
-        }
 
         String grupoOperacao = umLancamentoDoGrupo.getGrupoOperacao();
         if (grupoOperacao == null || grupoOperacao.isBlank()) {
@@ -230,11 +226,9 @@ public class LancamentoService {
         return lancamentoRepository.findByStatusAndUsuarioOrderByDataAsc(StatusLancamento.A_PAGAR, usuario);
     }
 
+    @PreAuthorize("@customSecurityService.isLancamentoOwner(#lancamentoId)")
     public void pagarConta(Long lancamentoId, Usuario usuario) {
         Lancamento lancamento = buscarPorId(lancamentoId).orElseThrow(() -> new RuntimeException("Lançamento não encontrado!"));
-        if (!lancamento.getUsuario().getId().equals(usuario.getId())) {
-            throw new AccessDeniedException("Acesso negado.");
-        }
 
         if (lancamento.getStatus() == StatusLancamento.A_PAGAR) {
             lancamento.setStatus(StatusLancamento.PAGO);

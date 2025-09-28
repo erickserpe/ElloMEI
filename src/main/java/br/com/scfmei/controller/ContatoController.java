@@ -54,33 +54,16 @@ public class ContatoController {
     }
 
     @GetMapping("/editar/{id}")
-    public String mostrarFormularioDeEdicao(@PathVariable Long id, Model model, Principal principal) {
-        Usuario usuarioLogado = getUsuarioLogado(principal);
-        Optional<Contato> contatoOpt = contatoService.buscarPorId(id);
-
-        if (contatoOpt.isPresent()) {
-            Contato contato = contatoOpt.get();
-            // VERIFICAÇÃO DE SEGURANÇA
-            if (!contato.getUsuario().getId().equals(usuarioLogado.getId())) {
-                throw new AccessDeniedException("Acesso negado.");
-            }
-            model.addAttribute("contato", contato);
-            return "form-contato";
-        }
-        return "redirect:/contatoes";
+    public String mostrarFormularioDeEdicao(@PathVariable Long id, Model model) {
+        Contato contato = contatoService.buscarPorId(id)
+                .orElseThrow(() -> new RuntimeException("Contato não encontrado"));
+        model.addAttribute("contato", contato);
+        return "form-contato";
     }
 
     @GetMapping("/excluir/{id}")
-    public String excluirContato(@PathVariable Long id, Principal principal) {
-        Usuario usuarioLogado = getUsuarioLogado(principal);
-        Optional<Contato> contatoOpt = contatoService.buscarPorId(id);
-
-        // VERIFICAÇÃO DE SEGURANÇA
-        if (contatoOpt.isPresent() && contatoOpt.get().getUsuario().getId().equals(usuarioLogado.getId())) {
-            contatoService.excluirPorId(id);
-        } else {
-            throw new AccessDeniedException("Acesso negado.");
-        }
+    public String excluirContato(@PathVariable Long id) {
+        contatoService.excluirPorId(id);
         return "redirect:/contatoes";
     }
 }

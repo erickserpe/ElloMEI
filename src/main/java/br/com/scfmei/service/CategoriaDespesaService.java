@@ -4,6 +4,7 @@ import br.com.scfmei.domain.CategoriaDespesa;
 import br.com.scfmei.domain.Usuario;
 import br.com.scfmei.repository.CategoriaDespesaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
@@ -27,11 +28,13 @@ public class CategoriaDespesaService {
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("@customSecurityService.isCategoriaOwner(#id)")
     public Optional<CategoriaDespesa> buscarPorId(Long id) {
         return categoriaDespesaRepository.findById(id);
     }
 
     @Transactional
+    @PreAuthorize("@customSecurityService.isCategoriaOwner(#id)")
     public void excluirPorId(Long id) {
         categoriaDespesaRepository.deleteById(id);
     }

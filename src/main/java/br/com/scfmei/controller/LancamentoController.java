@@ -114,10 +114,6 @@ public class LancamentoController {
         Usuario usuario = getUsuarioLogado(principal);
         Lancamento lancamento = lancamentoService.buscarPorId(id).orElseThrow(() -> new RuntimeException("Lançamento não encontrado"));
 
-        if(!lancamento.getUsuario().getId().equals(usuario.getId())) {
-            throw new AccessDeniedException("Acesso negado.");
-        }
-
         carregarDadosDoFormulario(model, usuario);
         LancamentoFormDTO lancamentoForm = lancamentoService.carregarOperacaoParaEdicao(id);
         model.addAttribute("lancamentoForm", lancamentoForm);
@@ -140,12 +136,6 @@ public class LancamentoController {
     @DeleteMapping("/excluir/{id}")
     public String excluirLancamento(@PathVariable Long id, Principal principal) {
         Usuario usuario = getUsuarioLogado(principal);
-        Lancamento lancamento = lancamentoService.buscarPorId(id).orElseThrow(() -> new RuntimeException("Lançamento não encontrado"));
-
-        if(!lancamento.getUsuario().getId().equals(usuario.getId())) {
-            throw new AccessDeniedException("Acesso negado.");
-        }
-
         lancamentoService.excluirOperacao(id, usuario);
         return "redirect:/lancamentos";
     }
