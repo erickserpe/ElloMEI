@@ -928,6 +928,9 @@ h1, h2, h3, h4, h5, h6 {
 .bg-warning-100 { background-color: rgba(245, 158, 11, 0.1) !important; }
 .text-warning-700 { color: var(--warning-700) !important; }
 
+.bg-info-100 { background-color: rgba(59, 130, 246, 0.1) !important; }
+.text-info-700 { color: var(--primary-700) !important; }
+
 /* Border Utilities */
 .border-primary-200 { border-color: rgba(59, 130, 246, 0.2) !important; }
 
