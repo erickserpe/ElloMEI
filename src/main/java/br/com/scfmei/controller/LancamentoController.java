@@ -72,7 +72,7 @@ public class LancamentoController {
         model.addAttribute("dataInicioSel", dataInicio);
         model.addAttribute("dataFimSel", dataFim);
         model.addAttribute("contaIdSel", contaId);
-        model.addAttribute("pessoaIdSel", contatoId); // nome mantido para compatibilidade com o HTML
+        model.addAttribute("contatoIdSel", contatoId);
         model.addAttribute("statusSel", status);
 
         return "lancamentos";
@@ -82,13 +82,6 @@ public class LancamentoController {
         model.addAttribute("listaDeContas", contaService.buscarTodasPorUsuario(usuario));
         model.addAttribute("listaDeCategorias", categoriaService.buscarTodasPorUsuario(usuario));
         model.addAttribute("listaDePessoas", contatoService.buscarTodosPorUsuario(usuario));
-    }
-
-    @GetMapping("/novo")
-    public String mostrarFormularioDeNovoLancamento(Model model, Principal principal) {
-        carregarDadosDoFormulario(model, getUsuarioLogado(principal));
-        model.addAttribute("lancamentoForm", new LancamentoFormDTO());
-        return "form-lancamento"; // <-- CORRIGIDO
     }
 
     @GetMapping("/novo/entrada")

@@ -35,13 +35,6 @@
                         Nova Saída
                     </a>
                 </li>
-                <li><hr class="dropdown-divider"></li>
-                <li>
-                    <a class="dropdown-item" th:href="@{/lancamentos/novo}">
-                        <i class="bi bi-plus-circle text-primary me-2"></i>
-                        Formulário Completo
-                    </a>
-                </li>
             </ul>
         </div>
     </div>
@@ -96,7 +89,7 @@
                             <option th:each="contato : ${listaDePessoas}"
                                     th:value="${contato.id}"
                                     th:text="${contato.nomeExibicao}"
-                                    th:selected="${contato.id == pessoaIdSel}"></option>
+                                    th:selected="${contato.id == contatoIdSel}"></option>
                         </select>
                     </div>
                     <div class="col-md-2">
@@ -235,13 +228,6 @@
                                             <a class="dropdown-item" th:href="@{/lancamentos/novo/saida}">
                                                 <i class="bi bi-arrow-up-circle text-danger me-2"></i>
                                                 Nova Saída
-                                            </a>
-                                        </li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <a class="dropdown-item" th:href="@{/lancamentos/novo}">
-                                                <i class="bi bi-plus-circle text-primary me-2"></i>
-                                                Formulário Completo
                                             </a>
                                         </li>
                                     </ul>
