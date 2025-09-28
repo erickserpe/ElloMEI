@@ -4,6 +4,7 @@ import br.com.scfmei.domain.*;
 import br.com.scfmei.repository.UsuarioRepository;
 import br.com.scfmei.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -131,12 +132,12 @@ public class LancamentoController {
 
     @PostMapping
     public String salvarLancamento(@ModelAttribute("lancamentoForm") LancamentoFormDTO lancamentoForm,
-                                   @RequestParam("comprovanteFile") MultipartFile comprovanteFile, Principal principal) {
+                                   @RequestParam(value = "comprovanteFile", required = false) MultipartFile comprovanteFile, Principal principal) {
         lancamentoService.salvarOuAtualizarOperacao(lancamentoForm, comprovanteFile, getUsuarioLogado(principal));
         return "redirect:/lancamentos";
     }
 
-    @GetMapping("/excluir/{id}")
+    @DeleteMapping("/excluir/{id}")
     public String excluirLancamento(@PathVariable Long id, Principal principal) {
         Usuario usuario = getUsuarioLogado(principal);
         Lancamento lancamento = lancamentoService.buscarPorId(id).orElseThrow(() -> new RuntimeException("Lançamento não encontrado"));
@@ -147,5 +148,12 @@ public class LancamentoController {
 
         lancamentoService.excluirOperacao(id, usuario);
         return "redirect:/lancamentos";
+    }
+
+    @DeleteMapping("/comprovante/{comprovanteId}")
+    public ResponseEntity<Void> excluirComprovante(@PathVariable Long comprovanteId, Principal principal) {
+        Usuario usuario = getUsuarioLogado(principal);
+        lancamentoService.excluirComprovante(comprovanteId, usuario);
+        return ResponseEntity.ok().build();
     }
 }

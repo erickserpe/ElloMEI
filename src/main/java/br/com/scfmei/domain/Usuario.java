@@ -1,5 +1,7 @@
 package br.com.scfmei.domain;
 
+import br.com.scfmei.validation.anotations.CPF;
+import br.com.scfmei.validation.anotations.CNPJ;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -18,11 +20,13 @@ public class Usuario {
 
     // Dados Pessoais
     private String nomeCompleto;
+    @CPF
     private String cpf;
 
     // Dados da Empresa (MEI)
     private String razaoSocial;
     private String nomeFantasia;
+    @CNPJ
     private String cnpj;
 
     private String roles; // Papéis/Permissões do usuário

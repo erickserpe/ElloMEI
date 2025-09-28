@@ -26,22 +26,38 @@ public class LancamentoService {
     @Transactional(readOnly = true)
     public Optional<Lancamento> buscarPorId(Long id) { return lancamentoRepository.findById(id); }
 
-    public void salvarOuAtualizarOperacao(LancamentoFormDTO form, MultipartFile comprovanteFile, Usuario usuario) {
-        if (form.getGrupoOperacao() != null && !form.getGrupoOperacao().isBlank()) {
-            excluirOperacaoPorGrupo(form.getGrupoOperacao(), usuario);
+    @Transactional
+    public void excluirComprovante(Long comprovanteId, Usuario usuario) {
+        Comprovante comprovante = comprovanteRepository.findById(comprovanteId)
+                .orElseThrow(() -> new RuntimeException("Comprovante não encontrado!"));
+
+        // Security Check: Ensure the user owns the transaction associated with the attachment
+        if (!comprovante.getLancamento().getUsuario().getId().equals(usuario.getId())) {
+            throw new AccessDeniedException("Acesso negado para excluir este comprovante.");
         }
-        salvarNovaOperacao(form, comprovanteFile, usuario);
+
+        // The @OneToMany(orphanRemoval=true) on Lancamento entity will handle the deletion
+        comprovante.getLancamento().getComprovantes().remove(comprovante);
+        comprovanteRepository.delete(comprovante);
     }
 
-    private void salvarNovaOperacao(LancamentoFormDTO form, MultipartFile comprovanteFile, Usuario usuario) {
-        String grupoOperacao = UUID.randomUUID().toString();
-        List<String> comprovantePaths = new ArrayList<>();
-        if (comprovanteFile != null && !comprovanteFile.isEmpty()) {
-            comprovantePaths = fileStorageService.storeFile(comprovanteFile);
-        } else if (form.getGrupoOperacao() != null && form.getComprovantes() != null && !form.getComprovantes().isEmpty()) {
-            comprovantePaths = form.getComprovantes().stream().map(Comprovante::getPathArquivo).collect(Collectors.toList());
+    public void salvarOuAtualizarOperacao(LancamentoFormDTO form, MultipartFile comprovanteFile, Usuario usuario) {
+        String grupoOperacao = (form.getGrupoOperacao() != null && !form.getGrupoOperacao().isBlank())
+                ? form.getGrupoOperacao()
+                : UUID.randomUUID().toString();
+
+        // If it's an existing operation, we need to delete the old lancamentos before recreating them
+        if (form.getGrupoOperacao() != null && !form.getGrupoOperacao().isBlank()) {
+            List<Lancamento> lancamentosAntigos = lancamentoRepository.findByGrupoOperacaoAndUsuario(form.getGrupoOperacao(), usuario);
+            for (Lancamento lancamento : lancamentosAntigos) {
+                if (lancamento.getStatus() == StatusLancamento.PAGO) {
+                    reverterLancamentoNaConta(lancamento);
+                }
+            }
+            lancamentoRepository.deleteAll(lancamentosAntigos);
         }
 
+        // Save the new or updated lancamentos
         for (PagamentoDTO pagamento : form.getPagamentos()) {
             if (pagamento.getValor() == null || pagamento.getConta() == null) continue;
 
@@ -60,9 +76,19 @@ public class LancamentoService {
             lancamento.setConta(conta);
             lancamento.setValor(pagamento.getValor());
 
+            // Get existing attachments for this group operation before saving
+            if (form.getGrupoOperacao() != null && form.getComprovantes() != null) {
+                form.getComprovantes().forEach(comp -> {
+                    comp.setLancamento(lancamento);
+                    lancamento.getComprovantes().add(comp);
+                });
+            }
+
             Lancamento lancamentoSalvo = lancamentoRepository.save(lancamento);
 
-            if (!comprovantePaths.isEmpty()) {
+            // If a new file was uploaded, add it to the list of attachments
+            if (comprovanteFile != null && !comprovanteFile.isEmpty()) {
+                List<String> comprovantePaths = fileStorageService.storeFile(comprovanteFile);
                 for (String path : comprovantePaths) {
                     Comprovante comprovante = new Comprovante();
                     comprovante.setPathArquivo(path);
@@ -76,6 +102,8 @@ public class LancamentoService {
             }
         }
     }
+
+
 
     @Transactional(readOnly = true)
     public LancamentoFormDTO carregarOperacaoParaEdicao(Long lancamentoId) {

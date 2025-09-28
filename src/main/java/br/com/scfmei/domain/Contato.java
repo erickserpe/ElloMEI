@@ -1,6 +1,8 @@
 // src/main/java/br/com/scfmei/domain/Contato.java
 package br.com.scfmei.domain;
 
+import br.com.scfmei.validation.anotations.CPF;
+import br.com.scfmei.validation.anotations.CNPJ;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -17,11 +19,13 @@ public class Contato {
 
     // Campos para Pessoa Física
     private String nomeCompleto;
+    @CPF
     private String cpf;
 
     // Campos para Pessoa Jurídica
     private String razaoSocial;
     private String nomeFantasia;
+    @CNPJ
     private String cnpj;
 
     // --- NOVA ADIÇÃO ---

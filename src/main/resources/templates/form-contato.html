@@ -57,6 +57,7 @@
                                     </label>
                                     <input type="text" class="form-control" id="cpf" th:field="*{cpf}"
                                            placeholder="000.000.000-00">
+                                    <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('cpf')}" th:errors="*{cpf}"></div>
                                 </div>
                             </div>
                         </div>
@@ -86,6 +87,7 @@
                                     </label>
                                     <input type="text" class="form-control" id="cnpj" th:field="*{cnpj}"
                                            placeholder="00.000.000/0000-00">
+                                    <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('cnpj')}" th:errors="*{cnpj}"></div>
                                 </div>
                             </div>
                         </div>

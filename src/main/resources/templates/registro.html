@@ -338,17 +338,19 @@
                                     <i class="bi bi-card-text"></i>
                                     CPF
                                 </label>
-                                <input type="text" class="glass-input" id="cpf" th:field="*{cpf}" 
+                                <input type="text" class="glass-input" id="cpf" th:field="*{cpf}"
                                        placeholder="000.000.000-00" maxlength="14">
+                                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('cpf')}" th:errors="*{cpf}"></div>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="cnpj" class="form-label">
                                     <i class="bi bi-building-check"></i>
                                     CNPJ
                                 </label>
-                                <input type="text" class="glass-input" id="cnpj" th:field="*{cnpj}" 
+                                <input type="text" class="glass-input" id="cnpj" th:field="*{cnpj}"
                                        placeholder="00.000.000/0000-00" maxlength="18">
+                                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('cnpj')}" th:errors="*{cnpj}"></div>
                             </div>
                         </div>
                         
