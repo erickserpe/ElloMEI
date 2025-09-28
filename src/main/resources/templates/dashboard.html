@@ -12,11 +12,35 @@
             <h1 class="h2 fw-bold text-gray-900 mb-1">Dashboard</h1>
             <p class="text-muted mb-0">Visão geral do seu negócio</p>
         </div>
-        <a th:href="@{/lancamentos/novo}" class="btn btn-primary d-flex align-items-center">
-            <i class="bi bi-plus-circle me-2"></i>
-            <span class="d-none d-sm-inline">Novo Lançamento</span>
-            <span class="d-sm-none">Novo</span>
-        </a>
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle d-flex align-items-center" type="button"
+                    id="dropdownNovoLancamento" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-plus-circle me-2"></i>
+                <span class="d-none d-sm-inline">Novo Lançamento</span>
+                <span class="d-sm-none">Novo</span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownNovoLancamento">
+                <li>
+                    <a class="dropdown-item" th:href="@{/lancamentos/novo/entrada}">
+                        <i class="bi bi-arrow-down-circle text-success me-2"></i>
+                        Nova Entrada
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" th:href="@{/lancamentos/novo/saida}">
+                        <i class="bi bi-arrow-up-circle text-danger me-2"></i>
+                        Nova Saída
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item" th:href="@{/lancamentos/novo}">
+                        <i class="bi bi-plus-circle text-primary me-2"></i>
+                        Formulário Completo
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
 
     <!-- KPI Cards - Gradient Backgrounds Preserved -->

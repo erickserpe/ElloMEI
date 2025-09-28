@@ -90,6 +90,24 @@ public class LancamentoController {
         return "form-lancamento"; // <-- CORRIGIDO
     }
 
+    @GetMapping("/novo/entrada")
+    public String mostrarFormularioDeNovaEntrada(Model model, Principal principal) {
+        carregarDadosDoFormulario(model, getUsuarioLogado(principal));
+        LancamentoFormDTO lancamentoForm = new LancamentoFormDTO();
+        lancamentoForm.setTipo(TipoLancamento.ENTRADA);
+        model.addAttribute("lancamentoForm", lancamentoForm);
+        return "form-lancamento-entrada";
+    }
+
+    @GetMapping("/novo/saida")
+    public String mostrarFormularioDeNovaSaida(Model model, Principal principal) {
+        carregarDadosDoFormulario(model, getUsuarioLogado(principal));
+        LancamentoFormDTO lancamentoForm = new LancamentoFormDTO();
+        lancamentoForm.setTipo(TipoLancamento.SAIDA);
+        model.addAttribute("lancamentoForm", lancamentoForm);
+        return "form-lancamento-saida";
+    }
+
     @GetMapping("/editar/{id}")
     public String mostrarFormularioDeEdicao(@PathVariable Long id, Model model, Principal principal) {
         Usuario usuario = getUsuarioLogado(principal);
@@ -100,8 +118,15 @@ public class LancamentoController {
         }
 
         carregarDadosDoFormulario(model, usuario);
-        model.addAttribute("lancamentoForm", lancamentoService.carregarOperacaoParaEdicao(id));
-        return "form-lancamento";
+        LancamentoFormDTO lancamentoForm = lancamentoService.carregarOperacaoParaEdicao(id);
+        model.addAttribute("lancamentoForm", lancamentoForm);
+
+        // Route to the appropriate form based on transaction type
+        if (lancamento.getTipo() == TipoLancamento.ENTRADA) {
+            return "form-lancamento-entrada";
+        } else {
+            return "form-lancamento-saida";
+        }
     }
 
     @PostMapping

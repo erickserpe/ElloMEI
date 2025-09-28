@@ -15,11 +15,35 @@
             </h1>
             <p class="text-muted mb-0">Gerencie todas as suas transações financeiras</p>
         </div>
-        <a th:href="@{/lancamentos/novo}" class="btn btn-primary d-flex align-items-center">
-            <i class="bi bi-plus-circle me-2"></i>
-            <span class="d-none d-sm-inline">Novo Lançamento</span>
-            <span class="d-sm-none">Novo</span>
-        </a>
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle d-flex align-items-center" type="button"
+                    id="dropdownNovoLancamento" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-plus-circle me-2"></i>
+                <span class="d-none d-sm-inline">Novo Lançamento</span>
+                <span class="d-sm-none">Novo</span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownNovoLancamento">
+                <li>
+                    <a class="dropdown-item" th:href="@{/lancamentos/novo/entrada}">
+                        <i class="bi bi-arrow-down-circle text-success me-2"></i>
+                        Nova Entrada
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" th:href="@{/lancamentos/novo/saida}">
+                        <i class="bi bi-arrow-up-circle text-danger me-2"></i>
+                        Nova Saída
+                    </a>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item" th:href="@{/lancamentos/novo}">
+                        <i class="bi bi-plus-circle text-primary me-2"></i>
+                        Formulário Completo
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
 
     <!-- Filters Card -->
@@ -194,10 +218,34 @@
                                 <i class="bi bi-inbox display-1 text-muted mb-3"></i>
                                 <h5 class="text-muted mb-2">Nenhum lançamento encontrado</h5>
                                 <p class="text-muted mb-4">Comece criando seu primeiro lançamento financeiro</p>
-                                <a th:href="@{/lancamentos/novo}" class="btn btn-primary">
-                                    <i class="bi bi-plus-circle me-2"></i>
-                                    Criar Primeiro Lançamento
-                                </a>
+                                <div class="dropdown">
+                                    <button class="btn btn-primary dropdown-toggle" type="button"
+                                            id="dropdownEmptyState" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-plus-circle me-2"></i>
+                                        Criar Primeiro Lançamento
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownEmptyState">
+                                        <li>
+                                            <a class="dropdown-item" th:href="@{/lancamentos/novo/entrada}">
+                                                <i class="bi bi-arrow-down-circle text-success me-2"></i>
+                                                Nova Entrada
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" th:href="@{/lancamentos/novo/saida}">
+                                                <i class="bi bi-arrow-up-circle text-danger me-2"></i>
+                                                Nova Saída
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" th:href="@{/lancamentos/novo}">
+                                                <i class="bi bi-plus-circle text-primary me-2"></i>
+                                                Formulário Completo
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -238,5 +286,23 @@
         </div>
     </div>
 </div>
+
+<!-- Bootstrap Dropdown Initialization Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Ensure Bootstrap dropdowns are properly initialized
+    const dropdownElements = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+    dropdownElements.forEach(function(element) {
+        if (typeof bootstrap !== 'undefined' && bootstrap.Dropdown) {
+            new bootstrap.Dropdown(element);
+        }
+    });
+
+    // Debug logging
+    console.log('Bootstrap dropdowns initialized:', dropdownElements.length);
+    console.log('Bootstrap object available:', typeof bootstrap !== 'undefined');
+});
+</script>
+
 </body>
 </html>
