@@ -7,336 +7,121 @@
 <body>
 
 <div id="conteudo-principal">
-    <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-5">
-        <div>
-            <h1 class="h2 fw-bold text-gray-900 mb-1" th:if="*{grupoOperacao == null}">
-                <i class="bi bi-plus-circle text-primary me-2"></i>
-                Novo Lançamento
-            </h1>
-            <h1 class="h2 fw-bold text-gray-900 mb-1" th:unless="*{grupoOperacao == null}">
-                <i class="bi bi-pencil-square text-primary me-2"></i>
-                Editar Lançamento
-            </h1>
-            <p class="text-muted mb-0">Preencha os dados da transação financeira</p>
-        </div>
-        <a th:href="@{/lancamentos}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-2"></i>
-            <span class="d-none d-sm-inline">Voltar para Lista</span>
-            <span class="d-sm-none">Voltar</span>
-        </a>
-    </div>
-
     <form th:action="@{/lancamentos}" method="post" th:object="${lancamentoForm}" enctype="multipart/form-data">
+        <h1 th:if="*{grupoOperacao == null}">Novo Lançamento</h1>
+        <h1 th:unless="*{grupoOperacao == null}">Editar Lançamento</h1>
+
         <input type="hidden" th:field="*{grupoOperacao}" />
 
-        <div class="form-section-card mb-4">
-            <div class="form-section-header">
-                <h5>
-                    <i class="bi bi-info-circle text-primary"></i>
-                    Dados Gerais
-                </h5>
-            </div>
-            <div class="form-section-body">
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <label for="descricao" class="form-label">
-                            <i class="bi bi-card-text me-1"></i>
-                            Descrição *
-                        </label>
-                        <input type="text" class="form-control" id="descricao" th:field="*{descricao}"
-                               placeholder="Ex: Compra de material, Venda de produto..." required>
+        <div class="card mb-4">
+            <div class="card-header">Dados Gerais</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="descricao" class="form-label">Descrição</label>
+                        <input type="text" class="form-control" id="descricao" th:field="*{descricao}" required>
                     </div>
-                    <div class="col-md-3">
-                        <label for="data" class="form-label">
-                            <i class="bi bi-calendar3 me-1"></i>
-                            Data *
-                        </label>
+                    <div class="col-md-3 mb-3">
+                        <label for="data" class="form-label">Data</label>
                         <input type="date" class="form-control" id="data" th:field="*{data}" required>
                     </div>
-                    <div class="col-md-3">
-                        <label for="tipo" class="form-label">
-                            <i class="bi bi-arrow-up-down me-1"></i>
-                            Tipo *
-                        </label>
+                    <div class="col-md-3 mb-3">
+                        <label for="tipo" class="form-label">Tipo</label>
                         <select class="form-select" id="tipo" th:field="*{tipo}" required>
-                            <option value="">Selecione o tipo</option>
                             <option th:each="tipoOpt : ${T(br.com.scfmei.domain.TipoLancamento).values()}"
                                     th:value="${tipoOpt}" th:text="${tipoOpt}"></option>
                         </select>
                     </div>
                 </div>
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <label for="categoria" class="form-label">
-                            <i class="bi bi-tag me-1"></i>
-                            Categoria
-                        </label>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="categoria" class="form-label">Categoria</label>
                         <select class="form-select" id="categoria" th:field="*{categoriaDespesa}">
-                            <option value="">Selecione uma categoria</option>
+                            <option value="">Nenhuma</option>
                             <option th:each="cat : ${listaDeCategorias}" th:value="${cat.id}" th:text="${cat.nome}"></option>
                         </select>
-                        <div class="form-text">Opcional - para classificar despesas</div>
                     </div>
-                    <div class="col-md-6">
-                        <label for="contato" class="form-label">
-                            <i class="bi bi-person me-1"></i>
-                            Pessoa/Fornecedor
-                        </label>
+                    <div class="col-md-6 mb-3">
+                        <label for="contato" class="form-label">Pessoa/Fornecedor</label>
                         <select class="form-select" id="contato" th:field="*{contato}">
-                            <option value="">Selecione um contato</option>
+                            <option value="">Nenhuma</option>
                             <option th:each="p : ${listaDePessoas}" th:value="${p.id}" th:text="${p.getNomeExibicao()}"></option>
                         </select>
-                        <div class="form-text">Opcional - pessoa ou empresa relacionada</div>
                     </div>
                 </div>
-                <div class="row g-4">
-                    <div class="col-md-4">
-                        <label for="status" class="form-label">
-                            <i class="bi bi-check-circle me-1"></i>
-                            Status *
-                        </label>
-                        <select class="form-select" id="status" th:field="*{status}" required>
-                            <option value="">Selecione o status</option>
-                            <option th:each="statusOpt : ${T(br.com.scfmei.domain.StatusLancamento).values()}"
-                                    th:value="${statusOpt}" th:text="${statusOpt.descricao}"></option>
-                        </select>
-                    </div>
-                    <div class="col-md-8">
-                        <label class="form-label d-block">
-                            <i class="bi bi-receipt me-1"></i>
-                            Documentação Fiscal
-                        </label>
-                        <div class="form-check mt-2">
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="comNotaFiscal" th:field="*{comNotaFiscal}">
-                            <label class="form-check-label fw-medium" for="comNotaFiscal">
-                                Esta transação possui Nota Fiscal
-                            </label>
+                            <label class="form-check-label" for="comNotaFiscal">Esta transação teve Nota Fiscal?</label>
                         </div>
-                        <div class="form-text">Marque se houver documento fiscal relacionado</div>
                     </div>
                 </div>
-                <div class="row g-4">
-                    <div class="col-12">
-                        <div th:if="${!lancamentoForm.comprovantes.isEmpty()}" class="alert alert-info border-0 bg-primary-50 mb-4">
-                            <div class="d-flex align-items-start">
-                                <i class="bi bi-info-circle text-primary me-2 mt-1"></i>
-                                <div>
-                                    <strong class="text-primary">Comprovantes atuais:</strong>
-                                    <ul class="mb-0 mt-2">
-                                        <li th:each="comp : ${lancamentoForm.comprovantes}" class="mb-1">
-                                            <a th:href="@{/uploads/{filename}(filename=${comp.pathArquivo})}"
-                                               target="_blank" class="text-decoration-none text-primary fw-medium">
-                                                <i class="bi bi-file-earmark-text me-1"></i>
-                                                <span th:text="${#strings.substringAfter(comp.pathArquivo, '_')}">Arquivo</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <div th:if="${!lancamentoForm.comprovantes.isEmpty()}" class="alert alert-info p-2">
+                            <strong>Comprovante(s) atual(is):</strong>
+                            <ul>
+                                <li th:each="comp : ${lancamentoForm.comprovantes}">
+                                    <a th:href="@{/uploads/{filename}(filename=${comp.pathArquivo})}"
+                                       th:text="${#strings.substringAfter(comp.pathArquivo, '_')}"
+                                       target="_blank"></a>
+                                </li>
+                            </ul>
                         </div>
-                        <label for="comprovanteFile" class="form-label">
-                            <i class="bi bi-paperclip me-1"></i>
-                            Anexar Comprovantes
-                        </label>
-                        <input class="form-control" type="file" id="comprovanteFile" name="comprovanteFile" accept="image/*,.pdf">
-                        <div class="form-text">
-                            <i class="bi bi-info-circle me-1"></i>
-                            Formatos aceitos: PDF, JPG, PNG. Tamanho máximo: 10MB
-                        </div>
+                        <label for="comprovanteFile" class="form-label">Anexar Novo(s) Comprovante(s) (Substitui o antigo)</label>
+                        <input class="form-control" type="file" id="comprovanteFile" name="comprovanteFile">
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="form-section-card">
-            <div class="form-section-header d-flex justify-content-between align-items-center">
-                <h5>
-                    <i class="bi bi-credit-card text-primary"></i>
-                    Formas de Pagamento
-                </h5>
-                <button type="button" id="adicionar-pagamento" class="btn btn-primary btn-sm">
-                    <i class="bi bi-plus-circle me-2"></i>
-                    <span class="d-none d-sm-inline">Adicionar Pagamento</span>
-                    <span class="d-sm-none">Adicionar</span>
-                </button>
-            </div>
-            <div class="card-body p-4">
+        <div class="card">
+            <div class="card-header">Pagamentos</div>
+            <div class="card-body">
                 <div id="pagamentos-container">
-                    <div class="row pagamento-item mb-4 p-3 bg-gray-50 rounded-lg align-items-end" th:each="pag, stat : *{pagamentos}">
-                        <div class="col-md-5">
-                            <label class="form-label fw-medium">
-                                <i class="bi bi-wallet2 me-1"></i>
-                                Conta *
-                            </label>
+                    <div class="row pagamento-item mb-3" th:each="pag, stat : *{pagamentos}">
+                        <div class="col-md-6">
+                            <label class="form-label">Conta</label>
                             <select class="form-select" th:field="*{pagamentos[__${stat.index}__].conta}" required>
-                                <option value="">Selecione uma conta</option>
                                 <option th:each="c : ${listaDeContas}" th:value="${c.id}" th:text="${c.nomeConta}"></option>
                             </select>
                         </div>
                         <div class="col-md-5">
-                            <label class="form-label fw-medium">
-                                <i class="bi bi-currency-dollar me-1"></i>
-                                Valor *
-                            </label>
-                            <div class="input-group">
-                                <span class="input-group-text">R$</span>
-                                <input type="number" step="0.01" min="0.01" class="form-control valor-pagamento"
-                                       th:field="*{pagamentos[__${stat.index}__].valor}" placeholder="0,00" required>
+                            <label class="form-label">Valor</label>
+                            <input type="number" step="0.01" class="form-control valor-pagamento" th:field="*{pagamentos[__${stat.index}__].valor}" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select" id="status" th:field="*{status}" required>
+                                    <option th:each="statusOpt : ${T(br.com.scfmei.domain.StatusLancamento).values()}"
+                                            th:value="${statusOpt}" th:text="${statusOpt.descricao}"></option>
+                                </select>
                             </div>
                         </div>
-                        <div class="col-md-2 d-flex justify-content-center">
-                            <button type="button" class="btn btn-outline-danger btn-sm remover-pagamento"
-                                    th:style="${stat.index == 0} ? 'display: none;' : ''" title="Remover pagamento">
-                                <i class="bi bi-trash"></i>
-                            </button>
+                        <div class="col-md-1 d-flex align-items-end">
+                            <button type="button" class="btn btn-danger btn-sm remover-pagamento" style="display: none;">X</button>
                         </div>
                     </div>
                 </div>
-                <div class="mt-4 p-4 bg-primary-50 border border-primary-200 rounded-lg">
-                    <div class="row align-items-center">
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-calculator text-primary me-2"></i>
-                                <span class="fw-semibold text-gray-700">Total de Pagamentos:</span>
-                                <span id="total-adicionado" class="fw-bold text-primary ms-2 fs-5">R$ 0,00</span>
-                            </div>
-                        </div>
-                        <div class="col-md-6 text-end">
-                            <small class="text-muted">
-                                <i class="bi bi-info-circle me-1"></i>
-                                Os valores serão aplicados nas contas quando o status for "Pago"
-                            </small>
-                        </div>
-                    </div>
+                <button type="button" id="adicionar-pagamento" class="btn btn-outline-primary btn-sm mt-2">Adicionar Pagamento</button>
+                <div class="mt-3">
+                    <strong>Total Adicionado: </strong>
+                    <span id="total-adicionado" class="fw-bold">R$ 0,00</span>
                 </div>
             </div>
         </div>
 
-        <div class="mt-5 d-flex justify-content-between align-items-center">
-            <div class="text-muted small">
-                <i class="bi bi-info-circle me-1"></i>
-                Campos marcados com * são obrigatórios
-            </div>
-            <div class="d-flex gap-3">
-                <a th:href="@{/lancamentos}" class="btn btn-outline-secondary">
-                    <i class="bi bi-x-circle me-2"></i>
-                    Cancelar
-                </a>
-                <button type="submit" class="btn btn-primary px-4">
-                    <i class="bi bi-check-circle me-2"></i>
-                    <span th:if="*{grupoOperacao == null}">Criar Lançamento</span>
-                    <span th:unless="*{grupoOperacao == null}">Salvar Alterações</span>
-                </button>
-            </div>
+        <div class="mt-4">
+            <button type="submit" class="btn btn-success">Salvar</button>
+            <a th:href="@{/lancamentos}" class="btn btn-secondary">Cancelar</a>
         </div>
     </form>
 
-    <!-- Template para novos pagamentos -->
-    <div id="pagamento-template" style="display: none;">
-        <div class="row pagamento-item mb-4 p-3 bg-gray-50 rounded-lg align-items-end">
-            <div class="col-md-5">
-                <label class="form-label fw-medium">
-                    <i class="bi bi-wallet2 me-1"></i>
-                    Conta *
-                </label>
-                <select class="form-select" name="pagamentos[INDEX].conta" required>
-                    <option value="">Selecione uma conta</option>
-                    <option th:each="c : ${listaDeContas}" th:value="${c.id}" th:text="${c.nomeConta}"></option>
-                </select>
-            </div>
-            <div class="col-md-5">
-                <label class="form-label fw-medium">
-                    <i class="bi bi-currency-dollar me-1"></i>
-                    Valor *
-                </label>
-                <div class="input-group">
-                    <span class="input-group-text">R$</span>
-                    <input type="number" step="0.01" min="0.01" class="form-control valor-pagamento"
-                           name="pagamentos[INDEX].valor" placeholder="0,00" required>
-                </div>
-            </div>
-            <div class="col-md-2 d-flex justify-content-center">
-                <button type="button" class="btn btn-outline-danger btn-sm remover-pagamento" title="Remover pagamento">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </div>
-        </div>
-    </div>
+    <div id="pagamento-template" style="display: none;"> ... </div>
+    <script> ... </script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let pagamentoIndex = /*[[${#lists.size(lancamentoForm.pagamentos)}]]*/ 1;
-
-            // Função para calcular o total
-            function calcularTotal() {
-                let total = 0;
-                document.querySelectorAll('.valor-pagamento').forEach(input => {
-                    const valor = parseFloat(input.value) || 0;
-                    total += valor;
-                });
-                document.getElementById('total-adicionado').textContent =
-                    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(total);
-            }
-
-            // Função para atualizar índices dos campos
-            function atualizarIndices() {
-                const pagamentos = document.querySelectorAll('.pagamento-item');
-                pagamentos.forEach((item, index) => {
-                    const select = item.querySelector('select');
-                    const input = item.querySelector('input');
-
-                    if (select) select.name = `pagamentos[${index}].conta`;
-                    if (input) input.name = `pagamentos[${index}].valor`;
-                });
-                pagamentoIndex = pagamentos.length;
-            }
-
-            // Função para mostrar/ocultar botões de remover
-            function atualizarBotoesRemover() {
-                const botoes = document.querySelectorAll('.remover-pagamento');
-                botoes.forEach((botao, index) => {
-                    botao.style.display = index === 0 && botoes.length === 1 ? 'none' : 'inline-block';
-                });
-            }
-
-            // Adicionar novo pagamento
-            document.getElementById('adicionar-pagamento').addEventListener('click', function() {
-                const template = document.getElementById('pagamento-template');
-                const container = document.getElementById('pagamentos-container');
-
-                const novoPagamento = template.innerHTML.replace(/INDEX/g, pagamentoIndex);
-                container.insertAdjacentHTML('beforeend', novoPagamento);
-
-                pagamentoIndex++;
-                atualizarIndices();
-                atualizarBotoesRemover();
-                calcularTotal();
-            });
-
-            // Remover pagamento
-            document.addEventListener('click', function(e) {
-                if (e.target.closest('.remover-pagamento')) {
-                    const item = e.target.closest('.pagamento-item');
-                    item.remove();
-                    atualizarIndices();
-                    atualizarBotoesRemover();
-                    calcularTotal();
-                }
-            });
-
-            // Calcular total quando valores mudarem
-            document.addEventListener('input', function(e) {
-                if (e.target.classList.contains('valor-pagamento')) {
-                    calcularTotal();
-                }
-            });
-
-            // Calcular total inicial
-            calcularTotal();
-            atualizarBotoesRemover();
-        });
-    </script>
 </div>
 </body>
 </html>
