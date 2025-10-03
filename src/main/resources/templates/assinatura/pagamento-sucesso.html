@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento Aprovado! - SCF-MEI</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css}">
+    <style>
+        .success-animation {
+            animation: scaleIn 0.5s ease-in-out;
+        }
+        @keyframes scaleIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f0f;
+            position: absolute;
+            animation: confetti-fall 3s linear infinite;
+        }
+        @keyframes confetti-fall {
+            to { transform: translateY(100vh) rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-md-8 col-lg-6">
+                <div class="card shadow-lg border-0">
+                    <div class="card-body text-center p-5">
+                        <!-- Ícone de Sucesso -->
+                        <div class="success-animation mb-4">
+                            <i class="bi bi-check-circle-fill text-success" style="font-size: 6rem;"></i>
+                        </div>
+                        
+                        <!-- Título -->
+                        <h1 class="display-4 text-success mb-3">Pagamento Aprovado!</h1>
+                        <p class="lead text-muted mb-4">
+                            Parabéns! Seu upgrade para o plano PRO foi confirmado.
+                        </p>
+                        
+                        <!-- Informações -->
+                        <div class="alert alert-success" role="alert">
+                            <h5 class="alert-heading">
+                                <i class="bi bi-star-fill"></i>
+                                Bem-vindo ao Plano PRO!
+                            </h5>
+                            <hr>
+                            <p class="mb-0">
+                                Agora você tem acesso a todos os recursos premium do SCF-MEI:
+                            </p>
+                        </div>
+                        
+                        <!-- Benefícios -->
+                        <div class="row text-start mb-4">
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-infinity text-primary me-2" style="font-size: 2rem;"></i>
+                                    <div>
+                                        <strong>Lançamentos Ilimitados</strong>
+                                        <br>
+                                        <small class="text-muted">Sem limites mensais</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-file-earmark-pdf text-primary me-2" style="font-size: 2rem;"></i>
+                                    <div>
+                                        <strong>Relatórios em PDF</strong>
+                                        <br>
+                                        <small class="text-muted">Profissionais e completos</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-graph-up text-primary me-2" style="font-size: 2rem;"></i>
+                                    <div>
+                                        <strong>Dashboard Avançado</strong>
+                                        <br>
+                                        <small class="text-muted">Análises detalhadas</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-headset text-primary me-2" style="font-size: 2rem;"></i>
+                                    <div>
+                                        <strong>Suporte Prioritário</strong>
+                                        <br>
+                                        <small class="text-muted">Atendimento VIP</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Próximos Passos -->
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <h6 class="card-title">
+                                    <i class="bi bi-info-circle"></i>
+                                    Próximos Passos
+                                </h6>
+                                <ul class="list-unstyled text-start mb-0">
+                                    <li class="mb-2">
+                                        <i class="bi bi-check2 text-success"></i>
+                                        Você receberá um e-mail de confirmação
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bi bi-check2 text-success"></i>
+                                        Sua próxima cobrança será em 30 dias
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bi bi-check2 text-success"></i>
+                                        Você pode cancelar a qualquer momento
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Botões de Ação -->
+                        <div class="d-grid gap-2">
+                            <a th:href="@{/dashboard}" class="btn btn-primary btn-lg">
+                                <i class="bi bi-house-door"></i>
+                                Ir para o Dashboard
+                            </a>
+                            <a th:href="@{/assinatura}" class="btn btn-outline-secondary">
+                                <i class="bi bi-credit-card"></i>
+                                Gerenciar Assinatura
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mensagem Extra -->
+                <div class="text-center mt-4">
+                    <p class="text-muted">
+                        <i class="bi bi-shield-check"></i>
+                        Pagamento processado com segurança pelo Mercado Pago
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+    
+    <!-- Confetti Animation -->
+    <script>
+        // Criar confetti
+        for (let i = 0; i < 50; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + '%';
+            confetti.style.animationDelay = Math.random() * 3 + 's';
+            confetti.style.backgroundColor = ['#ff0', '#f0f', '#0ff', '#0f0', '#f00'][Math.floor(Math.random() * 5)];
+            document.body.appendChild(confetti);
+            
+            // Remover após animação
+            setTimeout(() => confetti.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
+

@@ -1,6 +1,7 @@
 package br.com.scfmei.controller;
 
 import br.com.scfmei.domain.*;
+import br.com.scfmei.repository.HistoricoPagamentoRepository;
 import br.com.scfmei.repository.UsuarioRepository;
 import br.com.scfmei.service.AssinaturaService;
 import br.com.scfmei.service.MercadoPagoService;
@@ -48,7 +49,10 @@ public class AssinaturaController {
     
     @Autowired
     private UsuarioRepository usuarioRepository;
-    
+
+    @Autowired
+    private HistoricoPagamentoRepository historicoPagamentoRepository;
+
     /**
      * Obtém o usuário logado.
      */
@@ -161,68 +165,60 @@ public class AssinaturaController {
     public String pagamentoSucesso(@RequestParam(required = false) String payment_id,
                                   @RequestParam(required = false) String external_reference,
                                   Principal principal,
-                                  RedirectAttributes redirectAttributes) {
-        
-        logger.info("Pagamento aprovado - Payment ID: {} - External Ref: {}", 
+                                  Model model) {
+
+        logger.info("Pagamento aprovado - Payment ID: {} - External Ref: {}",
                    payment_id, external_reference);
-        
+
         try {
             if (payment_id != null) {
                 // Buscar pagamento no Mercado Pago
                 Payment payment = mercadoPagoService.buscarPagamento(Long.parseLong(payment_id));
-                
+
                 if ("approved".equals(payment.getStatus())) {
                     Usuario usuario = getUsuarioLogado(principal);
-                    
+
                     // Processar upgrade
                     assinaturaService.processarUpgrade(
-                        usuario, 
-                        PlanoAssinatura.PRO, 
-                        payment, 
+                        usuario,
+                        PlanoAssinatura.PRO,
+                        payment,
                         FormaPagamento.CARTAO_CREDITO
                     );
-                    
-                    redirectAttributes.addFlashAttribute("sucesso", 
-                        "Pagamento aprovado! Seu plano foi atualizado para PRO.");
+
+                    // Página de sucesso
+                    return "assinatura/pagamento-sucesso";
                 } else {
-                    redirectAttributes.addFlashAttribute("aviso", 
-                        "Pagamento pendente. Aguarde a confirmação.");
+                    // Página de pendente
+                    return "assinatura/pagamento-pendente";
                 }
             }
-            
+
         } catch (Exception e) {
             logger.error("Erro ao processar callback de sucesso: {}", e.getMessage());
-            redirectAttributes.addFlashAttribute("erro", 
-                "Erro ao processar pagamento. Entre em contato com o suporte.");
+            model.addAttribute("erro", "Erro ao processar pagamento. Entre em contato com o suporte.");
+            return "assinatura/pagamento-falha";
         }
-        
-        return "redirect:/assinatura";
+
+        return "assinatura/pagamento-pendente";
     }
     
     /**
      * Callback de falha do pagamento.
      */
     @GetMapping("/pagamento/falha")
-    public String pagamentoFalha(RedirectAttributes redirectAttributes) {
+    public String pagamentoFalha() {
         logger.warn("Pagamento falhou ou foi cancelado pelo usuário");
-        
-        redirectAttributes.addFlashAttribute("erro", 
-            "Pagamento não foi concluído. Tente novamente.");
-        
-        return "redirect:/assinatura/upgrade";
+        return "assinatura/pagamento-falha";
     }
-    
+
     /**
      * Callback de pagamento pendente.
      */
     @GetMapping("/pagamento/pendente")
-    public String pagamentoPendente(RedirectAttributes redirectAttributes) {
+    public String pagamentoPendente() {
         logger.info("Pagamento pendente de confirmação");
-        
-        redirectAttributes.addFlashAttribute("aviso", 
-            "Pagamento pendente. Você receberá um e-mail quando for confirmado.");
-        
-        return "redirect:/assinatura";
+        return "assinatura/pagamento-pendente";
     }
     
     /**
@@ -247,6 +243,22 @@ public class AssinaturaController {
         }
         
         return "redirect:/assinatura";
+    }
+
+    /**
+     * Exibe o histórico de pagamentos do usuário.
+     */
+    @GetMapping("/historico")
+    public String historicoPagamentos(Principal principal, Model model) {
+        Usuario usuario = getUsuarioLogado(principal);
+
+        List<HistoricoPagamento> historico =
+            historicoPagamentoRepository.findByUsuarioOrderByDataPagamentoDesc(usuario);
+
+        model.addAttribute("historico", historico);
+        model.addAttribute("usuario", usuario);
+
+        return "assinatura/historico";
     }
 }
 

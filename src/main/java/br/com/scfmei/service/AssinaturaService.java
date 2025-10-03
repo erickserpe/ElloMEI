@@ -4,6 +4,7 @@ import br.com.scfmei.domain.*;
 import br.com.scfmei.event.PlanUpgradedEvent;
 import br.com.scfmei.event.SubscriptionCancelledEvent;
 import br.com.scfmei.repository.AssinaturaRepository;
+import br.com.scfmei.repository.HistoricoPagamentoRepository;
 import br.com.scfmei.repository.UsuarioRepository;
 import com.mercadopago.resources.payment.Payment;
 import org.slf4j.Logger;
@@ -40,10 +41,13 @@ public class AssinaturaService {
     
     @Autowired
     private AssinaturaRepository assinaturaRepository;
-    
+
     @Autowired
     private UsuarioRepository usuarioRepository;
-    
+
+    @Autowired
+    private HistoricoPagamentoRepository historicoPagamentoRepository;
+
     @Autowired
     private ApplicationEventPublisher eventPublisher;
     
@@ -128,18 +132,22 @@ public class AssinaturaService {
         novaAssinatura.setTrial(false);
         
         novaAssinatura = assinaturaRepository.save(novaAssinatura);
-        
+
+        // Registrar no histórico de pagamentos
+        registrarPagamentoNoHistorico(usuario, novaAssinatura, payment, "approved",
+            "Upgrade para plano " + planoNovo, valorMensal, formaPagamento);
+
         // Atualizar plano do usuário
         usuario.setPlano(planoNovo);
         usuarioRepository.save(usuario);
-        
+
         // Publicar evento de upgrade
         eventPublisher.publishEvent(
             new PlanUpgradedEvent(this, usuario, planoAnterior, planoNovo, novaAssinatura)
         );
-        
+
         logger.info("Upgrade processado com sucesso. Assinatura ID: {}", novaAssinatura.getId());
-        
+
         return novaAssinatura;
     }
     
@@ -279,8 +287,37 @@ public class AssinaturaService {
             usuario.setPlano(PlanoAssinatura.FREE);
             usuarioRepository.save(usuario);
             
-            logger.info("Trial expirado: {} - Usuário: {}", 
+            logger.info("Trial expirado: {} - Usuário: {}",
                        trial.getId(), usuario.getUsername());
+        }
+    }
+
+    /**
+     * Registra um pagamento no histórico.
+     */
+    private void registrarPagamentoNoHistorico(Usuario usuario, Assinatura assinatura,
+                                              Payment payment, String status, String descricao,
+                                              BigDecimal valor, FormaPagamento formaPagamento) {
+        try {
+            HistoricoPagamento historico = new HistoricoPagamento();
+            historico.setUsuario(usuario);
+            historico.setAssinatura(assinatura);
+            historico.setStatus(status);
+            historico.setDescricao(descricao);
+            historico.setValor(valor);
+            historico.setFormaPagamento(formaPagamento);
+            historico.setDataPagamento(LocalDateTime.now());
+
+            if (payment != null && payment.getId() != null) {
+                historico.setIdPagamentoExterno(payment.getId().toString());
+            }
+
+            historicoPagamentoRepository.save(historico);
+            logger.info("Pagamento registrado no histórico: {} - Valor: {}", status, valor);
+
+        } catch (Exception e) {
+            logger.error("Erro ao registrar pagamento no histórico: {}", e.getMessage());
+            // Não propagar exceção para não afetar o fluxo principal
         }
     }
 }

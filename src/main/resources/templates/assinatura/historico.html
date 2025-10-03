@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Histórico de Pagamentos - SCF-MEI</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container-fluid">
+            <!-- Cabeçalho -->
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2>
+                                <i class="bi bi-clock-history"></i>
+                                Histórico de Pagamentos
+                            </h2>
+                            <p class="text-muted">Todos os seus pagamentos e transações</p>
+                        </div>
+                        <div>
+                            <a th:href="@{/assinatura}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i>
+                                Voltar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Estatísticas -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0">
+                                    <i class="bi bi-check-circle-fill text-success" style="font-size: 2.5rem;"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="text-muted mb-1">Pagamentos Aprovados</h6>
+                                    <h3 class="mb-0" th:text="${#lists.size(#lists.filter(historico, h -> h.aprovado))}">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0">
+                                    <i class="bi bi-currency-dollar text-primary" style="font-size: 2.5rem;"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="text-muted mb-1">Total Gasto</h6>
+                                    <h3 class="mb-0">
+                                        R$ <span th:text="${#numbers.formatDecimal(#aggregates.sum(#lists.filter(historico, h -> h.aprovado).![valor]), 1, 'POINT', 2, 'COMMA')}">0,00</span>
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0">
+                                    <i class="bi bi-receipt text-info" style="font-size: 2.5rem;"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="text-muted mb-1">Total de Transações</h6>
+                                    <h3 class="mb-0" th:text="${#lists.size(historico)}">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tabela de Histórico -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="bi bi-list-ul"></i>
+                                Transações
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Mensagem se não houver histórico -->
+                            <div th:if="${#lists.isEmpty(historico)}" class="text-center py-5">
+                                <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+                                <p class="text-muted mt-3">Nenhum pagamento registrado ainda.</p>
+                                <a th:href="@{/assinatura/upgrade}" class="btn btn-primary">
+                                    <i class="bi bi-rocket"></i>
+                                    Fazer Upgrade para PRO
+                                </a>
+                            </div>
+                            
+                            <!-- Tabela de Histórico -->
+                            <div th:if="${!#lists.isEmpty(historico)}" class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Data</th>
+                                            <th>Descrição</th>
+                                            <th>Forma de Pagamento</th>
+                                            <th>Valor</th>
+                                            <th>Status</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="pagamento : ${historico}">
+                                            <!-- Data -->
+                                            <td>
+                                                <small class="text-muted">
+                                                    <i class="bi bi-calendar3"></i>
+                                                    <span th:text="${#temporals.format(pagamento.dataPagamento, 'dd/MM/yyyy')}"></span>
+                                                    <br>
+                                                    <i class="bi bi-clock"></i>
+                                                    <span th:text="${#temporals.format(pagamento.dataPagamento, 'HH:mm')}"></span>
+                                                </small>
+                                            </td>
+                                            
+                                            <!-- Descrição -->
+                                            <td>
+                                                <strong th:text="${pagamento.descricao}">Descrição</strong>
+                                                <br>
+                                                <small class="text-muted" th:if="${pagamento.idPagamentoExterno}">
+                                                    ID: <span th:text="${pagamento.idPagamentoExterno}"></span>
+                                                </small>
+                                            </td>
+                                            
+                                            <!-- Forma de Pagamento -->
+                                            <td>
+                                                <span th:if="${pagamento.formaPagamento == T(br.com.scfmei.domain.FormaPagamento).CARTAO_CREDITO}">
+                                                    <i class="bi bi-credit-card text-primary"></i>
+                                                    Cartão de Crédito
+                                                </span>
+                                                <span th:if="${pagamento.formaPagamento == T(br.com.scfmei.domain.FormaPagamento).PIX}">
+                                                    <i class="bi bi-qr-code text-success"></i>
+                                                    PIX
+                                                </span>
+                                                <span th:if="${pagamento.formaPagamento == T(br.com.scfmei.domain.FormaPagamento).BOLETO}">
+                                                    <i class="bi bi-file-earmark-text text-warning"></i>
+                                                    Boleto
+                                                </span>
+                                            </td>
+                                            
+                                            <!-- Valor -->
+                                            <td>
+                                                <strong class="text-primary">
+                                                    R$ <span th:text="${#numbers.formatDecimal(pagamento.valor, 1, 'POINT', 2, 'COMMA')}">0,00</span>
+                                                </strong>
+                                            </td>
+                                            
+                                            <!-- Status -->
+                                            <td>
+                                                <span class="badge" 
+                                                      th:classappend="${'bg-' + pagamento.corBadge}">
+                                                    <i th:class="${pagamento.icone}"></i>
+                                                    <span th:text="${pagamento.statusTraduzido}">Status</span>
+                                                </span>
+                                                <br>
+                                                <small class="text-danger" th:if="${pagamento.motivoRecusa}" th:text="${pagamento.motivoRecusa}"></small>
+                                            </td>
+                                            
+                                            <!-- Ações -->
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary" 
+                                                        data-bs-toggle="modal" 
+                                                        th:data-bs-target="${'#detalhes-' + pagamento.id}">
+                                                    <i class="bi bi-eye"></i>
+                                                    Detalhes
+                                                </button>
+                                                
+                                                <!-- Modal de Detalhes -->
+                                                <div class="modal fade" th:id="${'detalhes-' + pagamento.id}" tabindex="-1">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">Detalhes do Pagamento</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <dl class="row">
+                                                                    <dt class="col-sm-4">ID Pagamento:</dt>
+                                                                    <dd class="col-sm-8" th:text="${pagamento.idPagamentoExterno ?: 'N/A'}"></dd>
+                                                                    
+                                                                    <dt class="col-sm-4">Data:</dt>
+                                                                    <dd class="col-sm-8" th:text="${#temporals.format(pagamento.dataPagamento, 'dd/MM/yyyy HH:mm:ss')}"></dd>
+                                                                    
+                                                                    <dt class="col-sm-4">Descrição:</dt>
+                                                                    <dd class="col-sm-8" th:text="${pagamento.descricao}"></dd>
+                                                                    
+                                                                    <dt class="col-sm-4">Valor:</dt>
+                                                                    <dd class="col-sm-8">
+                                                                        R$ <span th:text="${#numbers.formatDecimal(pagamento.valor, 1, 'POINT', 2, 'COMMA')}"></span>
+                                                                    </dd>
+                                                                    
+                                                                    <dt class="col-sm-4">Forma de Pagamento:</dt>
+                                                                    <dd class="col-sm-8" th:text="${pagamento.formaPagamento}"></dd>
+                                                                    
+                                                                    <dt class="col-sm-4">Status:</dt>
+                                                                    <dd class="col-sm-8">
+                                                                        <span class="badge" th:classappend="${'bg-' + pagamento.corBadge}" th:text="${pagamento.statusTraduzido}"></span>
+                                                                    </dd>
+                                                                    
+                                                                    <dt class="col-sm-4" th:if="${pagamento.motivoRecusa}">Motivo da Recusa:</dt>
+                                                                    <dd class="col-sm-8 text-danger" th:if="${pagamento.motivoRecusa}" th:text="${pagamento.motivoRecusa}"></dd>
+                                                                </dl>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

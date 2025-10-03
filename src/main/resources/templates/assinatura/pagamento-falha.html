@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento Recusado - SCF-MEI</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css}">
+    <style>
+        .error-animation {
+            animation: shake 0.5s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-md-8 col-lg-6">
+                <div class="card shadow-lg border-0">
+                    <div class="card-body text-center p-5">
+                        <!-- Ícone de Erro -->
+                        <div class="error-animation mb-4">
+                            <i class="bi bi-x-circle-fill text-danger" style="font-size: 6rem;"></i>
+                        </div>
+                        
+                        <!-- Título -->
+                        <h1 class="display-4 text-danger mb-3">Pagamento Recusado</h1>
+                        <p class="lead text-muted mb-4">
+                            Infelizmente, não conseguimos processar seu pagamento.
+                        </p>
+                        
+                        <!-- Motivos Comuns -->
+                        <div class="alert alert-warning" role="alert">
+                            <h5 class="alert-heading">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                Motivos Comuns
+                            </h5>
+                            <hr>
+                            <ul class="list-unstyled text-start mb-0">
+                                <li class="mb-2">
+                                    <i class="bi bi-dash"></i>
+                                    Dados do cartão incorretos
+                                </li>
+                                <li class="mb-2">
+                                    <i class="bi bi-dash"></i>
+                                    Saldo insuficiente
+                                </li>
+                                <li class="mb-2">
+                                    <i class="bi bi-dash"></i>
+                                    Cartão vencido ou bloqueado
+                                </li>
+                                <li class="mb-2">
+                                    <i class="bi bi-dash"></i>
+                                    Limite de crédito excedido
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- O que fazer -->
+                        <div class="card bg-light mb-4">
+                            <div class="card-body">
+                                <h6 class="card-title">
+                                    <i class="bi bi-lightbulb"></i>
+                                    O que você pode fazer
+                                </h6>
+                                <ul class="list-unstyled text-start mb-0">
+                                    <li class="mb-2">
+                                        <i class="bi bi-1-circle text-primary"></i>
+                                        Verifique os dados do seu cartão
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bi bi-2-circle text-primary"></i>
+                                        Entre em contato com seu banco
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bi bi-3-circle text-primary"></i>
+                                        Tente outro cartão ou forma de pagamento
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="bi bi-4-circle text-primary"></i>
+                                        Use PIX para pagamento instantâneo
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Formas de Pagamento Alternativas -->
+                        <div class="card border-primary mb-4">
+                            <div class="card-body">
+                                <h6 class="card-title text-primary">
+                                    <i class="bi bi-credit-card-2-front"></i>
+                                    Formas de Pagamento Disponíveis
+                                </h6>
+                                <div class="row text-center">
+                                    <div class="col-4">
+                                        <i class="bi bi-credit-card display-6 text-primary"></i>
+                                        <p class="small mb-0">Cartão</p>
+                                    </div>
+                                    <div class="col-4">
+                                        <i class="bi bi-qr-code display-6 text-primary"></i>
+                                        <p class="small mb-0">PIX</p>
+                                    </div>
+                                    <div class="col-4">
+                                        <i class="bi bi-file-earmark-text display-6 text-primary"></i>
+                                        <p class="small mb-0">Boleto</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Botões de Ação -->
+                        <div class="d-grid gap-2">
+                            <a th:href="@{/assinatura/upgrade}" class="btn btn-primary btn-lg">
+                                <i class="bi bi-arrow-repeat"></i>
+                                Tentar Novamente
+                            </a>
+                            <a th:href="@{/dashboard}" class="btn btn-outline-secondary">
+                                <i class="bi bi-house-door"></i>
+                                Voltar para o Dashboard
+                            </a>
+                        </div>
+                        
+                        <!-- Suporte -->
+                        <div class="mt-4">
+                            <p class="text-muted small">
+                                <i class="bi bi-headset"></i>
+                                Precisa de ajuda? Entre em contato com nosso suporte
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mensagem Extra -->
+                <div class="text-center mt-4">
+                    <p class="text-muted">
+                        <i class="bi bi-shield-check"></i>
+                        Seus dados estão seguros. Nenhuma cobrança foi realizada.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>
+

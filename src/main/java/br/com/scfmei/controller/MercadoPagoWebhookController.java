@@ -12,10 +12,17 @@ import com.mercadopago.resources.payment.Payment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
 import java.util.Map;
 import java.util.Optional;
 
@@ -39,35 +46,53 @@ import java.util.Optional;
 public class MercadoPagoWebhookController {
     
     private static final Logger logger = LoggerFactory.getLogger(MercadoPagoWebhookController.class);
-    
+
+    @Value("${mercadopago.webhook.secret:}")
+    private String webhookSecret;
+
     @Autowired
     private MercadoPagoService mercadoPagoService;
-    
+
     @Autowired
     private AssinaturaService assinaturaService;
-    
+
     @Autowired
     private AssinaturaRepository assinaturaRepository;
-    
+
     @Autowired
     private UsuarioRepository usuarioRepository;
     
     /**
      * Endpoint que recebe notificações do Mercado Pago.
-     * 
+     *
      * Tipos de notificação:
      * - payment: Notificação de pagamento
      * - plan: Notificação de plano de assinatura
      * - subscription: Notificação de assinatura
      * - invoice: Notificação de fatura
-     * 
+     *
      * @param body Corpo da notificação
+     * @param xSignature Header x-signature para validação
+     * @param xRequestId Header x-request-id
      * @return Status HTTP 200 (OK) ou 500 (Error)
      */
     @PostMapping
-    public ResponseEntity<String> processarWebhook(@RequestBody Map<String, Object> body) {
-        
+    public ResponseEntity<String> processarWebhook(
+            @RequestBody Map<String, Object> body,
+            @RequestHeader(value = "x-signature", required = false) String xSignature,
+            @RequestHeader(value = "x-request-id", required = false) String xRequestId) {
+
         logger.info("Webhook recebido do Mercado Pago: {}", body);
+        logger.info("X-Signature: {}", xSignature);
+        logger.info("X-Request-Id: {}", xRequestId);
+
+        // Validar assinatura do webhook (se configurado)
+        if (webhookSecret != null && !webhookSecret.isEmpty()) {
+            if (!validarAssinaturaWebhook(body, xSignature, xRequestId)) {
+                logger.error("Assinatura do webhook inválida! Possível tentativa de fraude.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid signature");
+            }
+        }
         
         try {
             String type = (String) body.get("type");
@@ -203,9 +228,84 @@ public class MercadoPagoWebhookController {
      */
     private void processarNotificacaoAssinatura(Map<String, Object> body) {
         logger.info("Processando notificação de assinatura: {}", body);
-        
+
         // TODO: Implementar lógica de assinaturas recorrentes
         // Quando o Mercado Pago cobrar automaticamente a renovação mensal
+    }
+
+    /**
+     * Valida a assinatura do webhook do Mercado Pago.
+     *
+     * Documentação:
+     * https://www.mercadopago.com.br/developers/pt/docs/your-integrations/notifications/webhooks#editor_3
+     *
+     * @param body Corpo da notificação
+     * @param xSignature Header x-signature
+     * @param xRequestId Header x-request-id
+     * @return true se a assinatura é válida, false caso contrário
+     */
+    private boolean validarAssinaturaWebhook(Map<String, Object> body, String xSignature, String xRequestId) {
+        if (xSignature == null || xRequestId == null) {
+            logger.warn("Headers de assinatura ausentes");
+            return false;
+        }
+
+        try {
+            // Extrair partes da assinatura
+            // Formato: ts=timestamp,v1=hash
+            String[] parts = xSignature.split(",");
+            String timestamp = null;
+            String hash = null;
+
+            for (String part : parts) {
+                String[] keyValue = part.split("=");
+                if (keyValue.length == 2) {
+                    if ("ts".equals(keyValue[0])) {
+                        timestamp = keyValue[1];
+                    } else if ("v1".equals(keyValue[0])) {
+                        hash = keyValue[1];
+                    }
+                }
+            }
+
+            if (timestamp == null || hash == null) {
+                logger.warn("Formato de assinatura inválido");
+                return false;
+            }
+
+            // Construir string para validação
+            // Formato: id:request-id:ts:timestamp
+            Map<String, Object> data = (Map<String, Object>) body.get("data");
+            String id = data != null ? String.valueOf(data.get("id")) : "";
+            String manifest = "id:" + id + ";request-id:" + xRequestId + ";ts:" + timestamp;
+
+            // Calcular HMAC SHA256
+            String calculatedHash = calcularHMAC(manifest, webhookSecret);
+
+            // Comparar hashes
+            boolean valid = calculatedHash.equals(hash);
+
+            if (!valid) {
+                logger.error("Hash inválido! Esperado: {}, Recebido: {}", calculatedHash, hash);
+            }
+
+            return valid;
+
+        } catch (Exception e) {
+            logger.error("Erro ao validar assinatura do webhook: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Calcula HMAC SHA256.
+     */
+    private String calcularHMAC(String data, String secret) throws NoSuchAlgorithmException, InvalidKeyException {
+        Mac sha256HMAC = Mac.getInstance("HmacSHA256");
+        SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+        sha256HMAC.init(secretKey);
+        byte[] hash = sha256HMAC.doFinal(data.getBytes(StandardCharsets.UTF_8));
+        return HexFormat.of().formatHex(hash);
     }
 }
 
