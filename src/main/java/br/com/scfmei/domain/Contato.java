@@ -5,8 +5,10 @@ import br.com.scfmei.validation.anotations.CPF;
 import br.com.scfmei.validation.anotations.CNPJ;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.annotations.Filter;
 
 @Entity
+@Filter(name = "tenantFilter", condition = "usuario_id = :tenantId")
 public class Contato {
 
     @Id

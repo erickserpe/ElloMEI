@@ -1,39 +1,52 @@
 package br.com.scfmei.controller;
 
 import br.com.scfmei.domain.*;
+import br.com.scfmei.event.ReportGenerationRequestedEvent;
 import br.com.scfmei.repository.UsuarioRepository;
-import br.com.scfmei.service.DashboardService;
-import br.com.scfmei.service.LancamentoService;
-import br.com.scfmei.service.PdfService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
+/**
+ * Controller responsável por gerenciar solicitações de relatórios.
+ *
+ * Este controller implementa o padrão de Eventos de Domínio para desacoplar
+ * completamente a solicitação de relatórios da geração efetiva dos PDFs.
+ *
+ * Fluxo:
+ * 1. Recebe requisição HTTP para gerar relatório
+ * 2. Publica evento ReportGenerationRequestedEvent
+ * 3. Retorna HTTP 202 (Accepted) imediatamente
+ * 4. Listener processa o evento em background
+ *
+ * Benefícios:
+ * - Resposta HTTP rápida (não espera geração do PDF)
+ * - Escalabilidade (geração em background)
+ * - Resiliência (falhas não afetam resposta HTTP)
+ * - Flexibilidade (múltiplos listeners podem reagir)
+ *
+ * @author SCF-MEI Team
+ * @since 1.0.0
+ */
 @Controller
 @RequestMapping("/relatorios")
 public class RelatorioController {
 
-    @Autowired private LancamentoService lancamentoService;
-    @Autowired private PdfService pdfService;
-    @Autowired private DashboardService dashboardService;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
-
-    @Autowired private UsuarioRepository usuarioRepository;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     private Usuario getUsuarioLogado(Principal principal) {
         return usuarioRepository.findByUsername(principal.getName())
@@ -41,8 +54,16 @@ public class RelatorioController {
     }
 
 
+    /**
+     * Solicita geração de relatório de faturamento dinâmico.
+     *
+     * Este endpoint publica um evento e retorna imediatamente com HTTP 202 (Accepted).
+     * O PDF será gerado em background e o usuário será notificado quando estiver pronto.
+     *
+     * @return ResponseEntity com status 202 e mensagem informativa
+     */
     @GetMapping("/faturamento/dinamico/pdf")
-    public ResponseEntity<byte[]> gerarRelatorioFaturamentoDinamico(
+    public ResponseEntity<Map<String, String>> gerarRelatorioFaturamentoDinamico(
             @RequestParam String tipoVisao,
             @RequestParam(required = false) LocalDate dataInicio,
             @RequestParam(required = false) LocalDate dataFim,
@@ -53,75 +74,49 @@ public class RelatorioController {
             @RequestParam(required = false) Boolean comNotaFiscal,
             @RequestParam(required = false) String descricao,
             @RequestParam(required = false) StatusLancamento status,
-            Principal principal) throws Exception { // Added throws Exception for async handling
+            Principal principal) {
 
         Usuario usuario = getUsuarioLogado(principal);
-        Map<String, Object> variaveis = new HashMap<>();
-        String templateNome;
-        List<Lancamento> lancamentos;
 
-        if ("OFICIAL".equals(tipoVisao) || "BANCARIO".equals(tipoVisao) || "ESTIMADO_CUSTOS".equals(tipoVisao)) {
+        // Publica evento para geração assíncrona do relatório
+        ReportGenerationRequestedEvent event = ReportGenerationRequestedEvent.builder()
+                .source(this)
+                .tipoRelatorio("FATURAMENTO_DINAMICO")
+                .tipoVisao(tipoVisao)
+                .dataInicio(dataInicio)
+                .dataFim(dataFim)
+                .contaId(contaId)
+                .contatoId(contatoId)
+                .tipo(tipo)
+                .categoriaId(categoriaId)
+                .comNotaFiscal(comNotaFiscal)
+                .descricao(descricao)
+                .status(status)
+                .usuario(usuario)
+                .build();
 
-            templateNome = "relatorio_faturamento_mei";
-            int anoAtual = (dataFim != null) ? dataFim.getYear() : LocalDate.now().getYear();
-            String tituloVisao = "";
+        eventPublisher.publishEvent(event);
 
-            if ("ESTIMADO_CUSTOS".equals(tipoVisao)) {
-                tituloVisao = "Meta (Baseado em Compras)";
+        // Retorna resposta imediata
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Seu relatório está sendo processado. Você será notificado quando estiver pronto.");
+        response.put("status", "PROCESSING");
+        response.put("tipoRelatorio", "FATURAMENTO_DINAMICO");
+        response.put("tipoVisao", tipoVisao);
 
-                BigDecimal faturamentoAnual = dashboardService.getMetaFaturamentoBaseadoEmCustos(anoAtual, usuario);
-                lancamentos = lancamentoService.buscarComFiltros(dataInicio, dataFim, contaId, contatoId, TipoLancamento.SAIDA, categoriaId, true, descricao, status, usuario);
-                variaveis.put("faturamentoAnual", faturamentoAnual);
-
-            } else {
-                tituloVisao = "OFICIAL".equals(tipoVisao) ? "Faturamento Oficial" : "Faturamento Bancário";
-
-                BigDecimal faturamentoAnual = dashboardService.getFaturamentoOficial(anoAtual, usuario);
-                lancamentos = lancamentoService.buscarComFiltros(dataInicio, dataFim, contaId, contatoId, TipoLancamento.ENTRADA, categoriaId, comNotaFiscal, descricao, status, usuario);
-                variaveis.put("faturamentoAnual", faturamentoAnual);
-            }
-
-            BigDecimal totalPeriodo = lancamentos.stream()
-                    .map(Lancamento::getValor)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            BigDecimal faturamentoAnual = (BigDecimal) variaveis.get("faturamentoAnual");
-            BigDecimal limiteAnual = new BigDecimal("81000");
-            BigDecimal limiteMensal = limiteAnual.divide(BigDecimal.valueOf(12), 2, RoundingMode.HALF_UP);
-            BigDecimal percentualAnual = faturamentoAnual.divide(limiteAnual, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
-            BigDecimal faturamentoMensal = faturamentoAnual.divide(BigDecimal.valueOf(12), 2, RoundingMode.HALF_UP);
-            BigDecimal percentualMensal = faturamentoMensal.divide(limiteMensal, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
-
-            variaveis.put("tituloVisao", tituloVisao);
-            variaveis.put("percentualAnual", percentualAnual);
-            variaveis.put("faturamentoMensal", faturamentoMensal);
-            variaveis.put("percentualMensal", percentualMensal);
-            variaveis.put("totalPeriodo", totalPeriodo);
-
-        } else {
-            templateNome = "relatorio_lancamentos";
-
-            lancamentos = lancamentoService.buscarComFiltros(dataInicio, dataFim, contaId, contatoId, tipo, categoriaId, comNotaFiscal, descricao, status, usuario);
-            BigDecimal total = lancamentos.stream().map(Lancamento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add);
-            variaveis.put("total", total);
-        }
-
-        variaveis.put("lancamentos", lancamentos);
-        variaveis.put("dataInicio", dataInicio);
-        variaveis.put("dataFim", dataFim);
-
-        CompletableFuture<byte[]> pdfFuture = pdfService.gerarPdfDeHtml(templateNome, variaveis);
-        byte[] pdfBytes = pdfFuture.get(); // .get() waits for the background task to complete
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDispositionFormData("attachment", "relatorio_" + tipoVisao.toLowerCase() + ".pdf");
-
-        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
     }
 
+    /**
+     * Solicita geração de relatório de compras com nota fiscal.
+     *
+     * Este endpoint publica um evento e retorna imediatamente com HTTP 202 (Accepted).
+     * O PDF será gerado em background e o usuário será notificado quando estiver pronto.
+     *
+     * @return ResponseEntity com status 202 e mensagem informativa
+     */
     @GetMapping("/compras-com-nota/pdf")
-    public ResponseEntity<byte[]> gerarRelatorioComprasNota(
+    public ResponseEntity<Map<String, String>> gerarRelatorioComprasNota(
             @RequestParam(required = false) LocalDate dataInicio,
             @RequestParam(required = false) LocalDate dataFim,
             @RequestParam(required = false) Long contaId,
@@ -129,37 +124,45 @@ public class RelatorioController {
             @RequestParam(required = false) Long categoriaId,
             @RequestParam(required = false) String descricao,
             @RequestParam(required = false) StatusLancamento status,
-            Principal principal) throws Exception {
+            Principal principal) {
 
         Usuario usuario = getUsuarioLogado(principal);
 
-        // Filter specifically for expenses (SAIDA) with an invoice (comNotaFiscal = true)
-        List<Lancamento> lancamentos = lancamentoService.buscarComFiltros(
-                dataInicio, dataFim, contaId, contatoId, TipoLancamento.SAIDA,
-                categoriaId, true, descricao, status, usuario);
+        // Publica evento para geração assíncrona do relatório
+        ReportGenerationRequestedEvent event = ReportGenerationRequestedEvent.builder()
+                .source(this)
+                .tipoRelatorio("COMPRAS_COM_NOTA")
+                .dataInicio(dataInicio)
+                .dataFim(dataFim)
+                .contaId(contaId)
+                .contatoId(contatoId)
+                .categoriaId(categoriaId)
+                .descricao(descricao)
+                .status(status)
+                .usuario(usuario)
+                .build();
 
-        BigDecimal total = lancamentos.stream()
-                .map(Lancamento::getValor)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        eventPublisher.publishEvent(event);
 
-        Map<String, Object> variaveis = new HashMap<>();
-        variaveis.put("lancamentos", lancamentos);
-        variaveis.put("total", total);
-        variaveis.put("dataInicio", dataInicio);
-        variaveis.put("dataFim", dataFim);
+        // Retorna resposta imediata
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Seu relatório está sendo processado. Você será notificado quando estiver pronto.");
+        response.put("status", "PROCESSING");
+        response.put("tipoRelatorio", "COMPRAS_COM_NOTA");
 
-        CompletableFuture<byte[]> pdfFuture = pdfService.gerarPdfDeHtml("relatorio_compras_com_nota", variaveis);
-        byte[] pdfBytes = pdfFuture.get(); // .get() waits for the background task to complete
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDispositionFormData("attachment", "relatorio_compras_com_nota.pdf");
-
-        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
     }
 
+    /**
+     * Solicita geração de relatório de lançamentos.
+     *
+     * Este endpoint publica um evento e retorna imediatamente com HTTP 202 (Accepted).
+     * O PDF será gerado em background e o usuário será notificado quando estiver pronto.
+     *
+     * @return ResponseEntity com status 202 e mensagem informativa
+     */
     @GetMapping("/lancamentos/pdf")
-    public ResponseEntity<byte[]> gerarRelatorioLancamentos(
+    public ResponseEntity<Map<String, String>> gerarRelatorioLancamentos(
             @RequestParam(required = false) LocalDate dataInicio,
             @RequestParam(required = false) LocalDate dataFim,
             @RequestParam(required = false) Long contaId,
@@ -169,39 +172,34 @@ public class RelatorioController {
             @RequestParam(required = false) Boolean comNotaFiscal,
             @RequestParam(required = false) String descricao,
             @RequestParam(required = false) StatusLancamento status,
-            Principal principal) throws Exception {
+            Principal principal) {
 
         Usuario usuario = getUsuarioLogado(principal);
 
-        // Fetch all transactions based on filters without forcing type or invoice status
-        List<Lancamento> lancamentos = lancamentoService.buscarComFiltros(
-                dataInicio, dataFim, contaId, contatoId, tipo,
-                categoriaId, comNotaFiscal, descricao, status, usuario);
+        // Publica evento para geração assíncrona do relatório
+        ReportGenerationRequestedEvent event = ReportGenerationRequestedEvent.builder()
+                .source(this)
+                .tipoRelatorio("LANCAMENTOS")
+                .dataInicio(dataInicio)
+                .dataFim(dataFim)
+                .contaId(contaId)
+                .contatoId(contatoId)
+                .tipo(tipo)
+                .categoriaId(categoriaId)
+                .comNotaFiscal(comNotaFiscal)
+                .descricao(descricao)
+                .status(status)
+                .usuario(usuario)
+                .build();
 
-        // Prepare variables for the PDF template
-        Map<String, Object> variaveis = new HashMap<>();
-        variaveis.put("lancamentos", lancamentos);
-        variaveis.put("dataInicio", dataInicio);
-        variaveis.put("dataFim", dataFim);
+        eventPublisher.publishEvent(event);
 
-        // Process file paths to be accessible in the PDF
-        for (Lancamento lancamento : lancamentos) {
-            for (Comprovante comprovante : lancamento.getComprovantes()) {
-                // Ensure the path starts with /uploads/ for PDF generation
-                String currentPath = comprovante.getPathArquivo();
-                if (currentPath != null && !currentPath.startsWith("/uploads/")) {
-                    comprovante.setPathArquivo("/uploads/" + currentPath);
-                }
-            }
-        }
+        // Retorna resposta imediata
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Seu relatório está sendo processado. Você será notificado quando estiver pronto.");
+        response.put("status", "PROCESSING");
+        response.put("tipoRelatorio", "LANCAMENTOS");
 
-        CompletableFuture<byte[]> pdfFuture = pdfService.gerarPdfDeHtml("relatorio_lancamentos", variaveis);
-        byte[] pdfBytes = pdfFuture.get(); // .get() waits for the background task to complete
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDispositionFormData("attachment", "relatorio_lancamentos_detalhados.pdf");
-
-        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
     }
 }

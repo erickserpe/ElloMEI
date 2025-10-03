@@ -3,6 +3,7 @@ package br.com.scfmei.domain;
 import br.com.scfmei.validation.anotations.CPF;
 import br.com.scfmei.validation.anotations.CNPJ;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
@@ -32,6 +33,11 @@ public class Usuario {
     private String roles; // Papéis/Permissões do usuário
     private LocalDate dataAberturaMei;
 
+    // Plano de Assinatura (SaaS)
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    private PlanoAssinatura plano = PlanoAssinatura.FREE;
+
     // --- CORREÇÃO: A RELAÇÃO INCORRETA FOI REMOVIDA DAQUI ---
 
     // Getters e Setters...
@@ -58,5 +64,11 @@ public class Usuario {
     }
     public void setDataAberturaMei(LocalDate dataAberturaMei) {
         this.dataAberturaMei = dataAberturaMei;
+    }
+    public PlanoAssinatura getPlano() {
+        return plano;
+    }
+    public void setPlano(PlanoAssinatura plano) {
+        this.plano = plano;
     }
 }

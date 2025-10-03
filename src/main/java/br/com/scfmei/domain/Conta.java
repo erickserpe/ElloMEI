@@ -4,9 +4,11 @@ package br.com.scfmei.domain;
 import jakarta.persistence.*; // Importe o necessário
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.annotations.Filter;
 import java.math.BigDecimal;
 
 @Entity
+@Filter(name = "tenantFilter", condition = "usuario_id = :tenantId")
 public class Conta {
 
     @Id

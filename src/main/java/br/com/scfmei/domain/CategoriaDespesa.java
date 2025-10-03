@@ -2,8 +2,10 @@
 package br.com.scfmei.domain;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Filter;
 
 @Entity
+@Filter(name = "tenantFilter", condition = "usuario_id = :tenantId")
 public class CategoriaDespesa {
 
     @Id
