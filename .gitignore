@@ -31,3 +31,25 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Docker ###
+# Não ignorar arquivos Docker essenciais
+# docker-compose.yml
+# Dockerfile
+# .dockerignore
+
+### Application ###
+# Diretórios de upload (manter uploads/ para dados)
+test-uploads/
+
+### Logs ###
+logs/
+*.log
+
+### Environment ###
+.env
+
+### Backups ###
+backups/
+*.sql
+*.sql.gz

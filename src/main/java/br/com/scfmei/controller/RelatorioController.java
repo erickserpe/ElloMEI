@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Controller
 @RequestMapping("/relatorios")
@@ -52,7 +53,7 @@ public class RelatorioController {
             @RequestParam(required = false) Boolean comNotaFiscal,
             @RequestParam(required = false) String descricao,
             @RequestParam(required = false) StatusLancamento status,
-            Principal principal) { // Adicionado Principal
+            Principal principal) throws Exception { // Added throws Exception for async handling
 
         Usuario usuario = getUsuarioLogado(principal);
         Map<String, Object> variaveis = new HashMap<>();
@@ -109,7 +110,8 @@ public class RelatorioController {
         variaveis.put("dataInicio", dataInicio);
         variaveis.put("dataFim", dataFim);
 
-        byte[] pdfBytes = pdfService.gerarPdfDeHtml(templateNome, variaveis);
+        CompletableFuture<byte[]> pdfFuture = pdfService.gerarPdfDeHtml(templateNome, variaveis);
+        byte[] pdfBytes = pdfFuture.get(); // .get() waits for the background task to complete
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
@@ -127,7 +129,7 @@ public class RelatorioController {
             @RequestParam(required = false) Long categoriaId,
             @RequestParam(required = false) String descricao,
             @RequestParam(required = false) StatusLancamento status,
-            Principal principal) {
+            Principal principal) throws Exception {
 
         Usuario usuario = getUsuarioLogado(principal);
 
@@ -146,7 +148,8 @@ public class RelatorioController {
         variaveis.put("dataInicio", dataInicio);
         variaveis.put("dataFim", dataFim);
 
-        byte[] pdfBytes = pdfService.gerarPdfDeHtml("relatorio_compras_com_nota", variaveis);
+        CompletableFuture<byte[]> pdfFuture = pdfService.gerarPdfDeHtml("relatorio_compras_com_nota", variaveis);
+        byte[] pdfBytes = pdfFuture.get(); // .get() waits for the background task to complete
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
@@ -166,7 +169,7 @@ public class RelatorioController {
             @RequestParam(required = false) Boolean comNotaFiscal,
             @RequestParam(required = false) String descricao,
             @RequestParam(required = false) StatusLancamento status,
-            Principal principal) {
+            Principal principal) throws Exception {
 
         Usuario usuario = getUsuarioLogado(principal);
 
@@ -192,7 +195,8 @@ public class RelatorioController {
             }
         }
 
-        byte[] pdfBytes = pdfService.gerarPdfDeHtml("relatorio_lancamentos", variaveis);
+        CompletableFuture<byte[]> pdfFuture = pdfService.gerarPdfDeHtml("relatorio_lancamentos", variaveis);
+        byte[] pdfBytes = pdfFuture.get(); // .get() waits for the background task to complete
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);

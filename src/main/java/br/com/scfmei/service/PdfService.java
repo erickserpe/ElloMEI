@@ -2,6 +2,7 @@ package br.com.scfmei.service;
 
 import com.lowagie.text.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -9,6 +10,7 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class PdfService {
@@ -20,14 +22,16 @@ public class PdfService {
     @Autowired
     private FileStorageService fileStorageService;
 
-    public byte[] gerarPdfDeHtml(String templateNome, Map<String, Object> variaveis) {
+    @Async // This annotation runs the method in a background thread
+    public CompletableFuture<byte[]> gerarPdfDeHtml(String templateNome, Map<String, Object> variaveis) {
+        System.out.println("Gerando PDF no thread: " + Thread.currentThread().getName());
+
         Context context = new Context();
         context.setVariables(variaveis);
 
         String html = templateEngine.process(templateNome, context);
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        try {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             ITextRenderer renderer = new ITextRenderer();
 
             // --- MUDANÇA PRINCIPAL AQUI ---
@@ -39,7 +43,8 @@ public class PdfService {
 
             renderer.layout();
             renderer.createPDF(outputStream);
-            return outputStream.toByteArray();
+
+            return CompletableFuture.completedFuture(outputStream.toByteArray());
         } catch (Exception e) {
             throw new RuntimeException("Erro ao gerar PDF: " + e.getMessage(), e);
         }

@@ -4,6 +4,8 @@ import br.com.scfmei.domain.Conta;
 import br.com.scfmei.domain.Usuario;
 import br.com.scfmei.repository.ContaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,17 +20,22 @@ public class ContaService {
     private ContaRepository contaRepository;
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "contasPorUsuario", key = "#usuario.id")
     public List<Conta> buscarTodasPorUsuario(Usuario usuario) {
+        // This log will only appear the FIRST time the method is called for a user
+        System.out.println("Buscando contas do banco de dados para o usuário: " + usuario.getId());
         return contaRepository.findByUsuario(usuario);
     }
 
     @Transactional
+    @CacheEvict(value = "contasPorUsuario", key = "#usuario.id")
     public Conta salvar(Conta conta, Usuario usuario) {
         conta.setUsuario(usuario);
 
         if (conta.getId() == null) {
             conta.setSaldoAtual(conta.getSaldoInicial());
         }
+        System.out.println("Cache de contas invalidado para o usuário: " + usuario.getId());
         return contaRepository.save(conta);
     }
 
@@ -41,6 +48,20 @@ public class ContaService {
     @Transactional
     @PreAuthorize("@customSecurityService.isContaOwner(#id)")
     public void excluirPorId(Long id) {
-        contaRepository.deleteById(id);
+        // First, get the account to obtain the user for cache eviction
+        Optional<Conta> conta = contaRepository.findById(id);
+        if (conta.isPresent()) {
+            Long usuarioId = conta.get().getUsuario().getId();
+            contaRepository.deleteById(id);
+            // Manually evict cache after deletion
+            evictContaCache(usuarioId);
+        } else {
+            contaRepository.deleteById(id);
+        }
+    }
+
+    @CacheEvict(value = "contasPorUsuario", key = "#usuarioId")
+    public void evictContaCache(Long usuarioId) {
+        System.out.println("Cache de contas invalidado para o usuário: " + usuarioId);
     }
 }
