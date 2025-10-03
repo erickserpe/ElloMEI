@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Assinatura - SCF-MEI</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css}">
+</head>
+<body>
+    <div class="container mt-5">
+        <!-- Header -->
+        <div class="mb-4">
+            <h1>
+                <i class="bi bi-credit-card"></i>
+                Gerenciar Assinatura
+            </h1>
+            <p class="text-muted">Gerencie seu plano e histórico de pagamentos</p>
+        </div>
+
+        <!-- Alertas -->
+        <div th:if="${sucesso}" class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle-fill"></i>
+            <span th:text="${sucesso}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${erro}" class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span th:text="${erro}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${aviso}" class="alert alert-warning alert-dismissible fade show">
+            <i class="bi bi-info-circle-fill"></i>
+            <span th:text="${aviso}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Plano Atual -->
+        <div class="card mb-4">
+            <div class="card-header" th:classappend="${planoAtual.name() == 'PRO'} ? 'bg-primary text-white' : 'bg-secondary text-white'">
+                <h4 class="mb-0">
+                    <i class="bi bi-star-fill"></i>
+                    Plano Atual: <span th:text="${planoAtual.name()}"></span>
+                </h4>
+            </div>
+            <div class="card-body">
+                <div th:if="${planoAtual.name() == 'FREE'}">
+                    <p class="lead">Você está no plano FREE</p>
+                    <ul>
+                        <li>Até 20 lançamentos por mês</li>
+                        <li>Recursos básicos</li>
+                    </ul>
+                    <a th:href="@{/assinatura/upgrade}" class="btn btn-primary">
+                        <i class="bi bi-rocket-takeoff"></i>
+                        Fazer Upgrade para PRO
+                    </a>
+                </div>
+                
+                <div th:if="${planoAtual.name() == 'PRO'}">
+                    <p class="lead">Você está no plano PRO! 🎉</p>
+                    <ul>
+                        <li><strong>Lançamentos ilimitados</strong></li>
+                        <li>Relatórios avançados em PDF</li>
+                        <li>Suporte prioritário</li>
+                    </ul>
+                    
+                    <!-- Informações da Assinatura Ativa -->
+                    <div th:if="${assinaturaAtiva != null}" class="mt-4">
+                        <h5>Detalhes da Assinatura</h5>
+                        <table class="table table-sm">
+                            <tr>
+                                <th>Status:</th>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${assinaturaAtiva.status.name() == 'ATIVA'} ? 'bg-success' : 
+                                                         ${assinaturaAtiva.status.name() == 'TRIAL'} ? 'bg-info' : 'bg-warning'"
+                                          th:text="${assinaturaAtiva.status.name()}"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Valor Mensal:</th>
+                                <td>R$ <span th:text="${#numbers.formatDecimal(assinaturaAtiva.valorMensal, 1, 2)}"></span></td>
+                            </tr>
+                            <tr>
+                                <th>Data de Início:</th>
+                                <td th:text="${#temporals.format(assinaturaAtiva.dataInicio, 'dd/MM/yyyy')}"></td>
+                            </tr>
+                            <tr th:if="${assinaturaAtiva.dataProximaCobranca != null}">
+                                <th>Próxima Cobrança:</th>
+                                <td th:text="${#temporals.format(assinaturaAtiva.dataProximaCobranca, 'dd/MM/yyyy')}"></td>
+                            </tr>
+                            <tr th:if="${assinaturaAtiva.formaPagamento != null}">
+                                <th>Forma de Pagamento:</th>
+                                <td th:text="${assinaturaAtiva.formaPagamento.descricao}"></td>
+                            </tr>
+                        </table>
+                        
+                        <!-- Botão Cancelar -->
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelarModal">
+                            <i class="bi bi-x-circle"></i>
+                            Cancelar Assinatura
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Histórico de Assinaturas -->
+        <div class="card mb-4" th:if="${historico != null and !historico.isEmpty()}">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="bi bi-clock-history"></i>
+                    Histórico de Assinaturas
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Plano</th>
+                                <th>Status</th>
+                                <th>Data Início</th>
+                                <th>Data Fim</th>
+                                <th>Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="assinatura : ${historico}">
+                                <td th:text="${assinatura.plano.name()}"></td>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${assinatura.status.name() == 'ATIVA'} ? 'bg-success' : 
+                                                         ${assinatura.status.name() == 'TRIAL'} ? 'bg-info' : 
+                                                         ${assinatura.status.name() == 'CANCELADA'} ? 'bg-secondary' : 'bg-warning'"
+                                          th:text="${assinatura.status.name()}"></span>
+                                </td>
+                                <td th:text="${#temporals.format(assinatura.dataInicio, 'dd/MM/yyyy')}"></td>
+                                <td>
+                                    <span th:if="${assinatura.dataCancelamento != null}" 
+                                          th:text="${#temporals.format(assinatura.dataCancelamento, 'dd/MM/yyyy HH:mm')}"></span>
+                                    <span th:if="${assinatura.dataExpiracao != null and assinatura.dataCancelamento == null}" 
+                                          th:text="${#temporals.format(assinatura.dataExpiracao, 'dd/MM/yyyy')}"></span>
+                                    <span th:if="${assinatura.dataCancelamento == null and assinatura.dataExpiracao == null}">-</span>
+                                </td>
+                                <td>R$ <span th:text="${#numbers.formatDecimal(assinatura.valorMensal, 1, 2)}"></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botão Voltar -->
+        <div class="mb-5">
+            <a th:href="@{/dashboard}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i>
+                Voltar para o Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Modal de Cancelamento -->
+    <div class="modal fade" id="cancelarModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        Cancelar Assinatura
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form th:action="@{/assinatura/cancelar}" method="post">
+                    <div class="modal-body">
+                        <p class="lead">Tem certeza que deseja cancelar sua assinatura PRO?</p>
+                        <p>Ao cancelar:</p>
+                        <ul>
+                            <li>Você voltará para o plano FREE</li>
+                            <li>Terá limite de 20 lançamentos por mês</li>
+                            <li>Perderá acesso aos relatórios avançados</li>
+                        </ul>
+                        
+                        <div class="mb-3">
+                            <label for="motivo" class="form-label">Por que está cancelando? (opcional)</label>
+                            <textarea class="form-control" id="motivo" name="motivo" rows="3" 
+                                      placeholder="Nos ajude a melhorar contando o motivo do cancelamento"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Não, manter assinatura
+                        </button>
+                        <button type="submit" class="btn btn-danger">
+                            Sim, cancelar assinatura
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>
+

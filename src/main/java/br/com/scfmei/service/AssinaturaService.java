@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -193,9 +194,10 @@ public class AssinaturaService {
     
     /**
      * Renova assinaturas que vencem hoje (job agendado).
-     * 
-     * Este método deve ser executado diariamente via @Scheduled.
+     *
+     * Executa todos os dias às 2h da manhã.
      */
+    @Scheduled(cron = "0 0 2 * * *")
     @Transactional
     public void renovarAssinaturasVencidas() {
         logger.info("Iniciando renovação de assinaturas vencidas...");
@@ -226,7 +228,10 @@ public class AssinaturaService {
     
     /**
      * Expira assinaturas suspensas que passaram do prazo (job agendado).
+     *
+     * Executa todos os dias às 3h da manhã.
      */
+    @Scheduled(cron = "0 0 3 * * *")
     @Transactional
     public void expirarAssinaturasSuspensas() {
         logger.info("Iniciando expiração de assinaturas suspensas...");
@@ -252,7 +257,10 @@ public class AssinaturaService {
     
     /**
      * Expira trials que venceram (job agendado).
+     *
+     * Executa todos os dias às 4h da manhã.
      */
+    @Scheduled(cron = "0 0 4 * * *")
     @Transactional
     public void expirarTrials() {
         logger.info("Iniciando expiração de trials...");

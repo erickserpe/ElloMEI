@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upgrade para Plano PRO - SCF-MEI</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css}">
+    <style>
+        .pricing-card {
+            border: 2px solid #dee2e6;
+            border-radius: 15px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .pricing-card.featured {
+            border-color: #0d6efd;
+            box-shadow: 0 5px 20px rgba(13,110,253,0.2);
+        }
+        .price {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #0d6efd;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        .feature-list i {
+            color: #28a745;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <h1 class="display-4">
+                <i class="bi bi-rocket-takeoff text-primary"></i>
+                Upgrade para o Plano PRO
+            </h1>
+            <p class="lead text-muted">
+                Desbloqueie todo o potencial do SCF-MEI
+            </p>
+        </div>
+
+        <!-- Comparação de Planos -->
+        <div class="row g-4 mb-5">
+            <!-- Plano FREE (Atual) -->
+            <div class="col-md-6">
+                <div class="pricing-card p-4 h-100">
+                    <div class="text-center mb-4">
+                        <h3>Plano FREE</h3>
+                        <div class="price">R$ 0</div>
+                        <p class="text-muted">por mês</p>
+                        <span class="badge bg-secondary">Plano Atual</span>
+                    </div>
+                    <ul class="feature-list">
+                        <li><i class="bi bi-check-circle-fill"></i> Até 20 lançamentos por mês</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Gestão de contas</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Gestão de contatos</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Categorias de despesas</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Relatórios básicos</li>
+                        <li><i class="bi bi-x-circle-fill text-danger"></i> Lançamentos ilimitados</li>
+                        <li><i class="bi bi-x-circle-fill text-danger"></i> Relatórios avançados</li>
+                        <li><i class="bi bi-x-circle-fill text-danger"></i> Suporte prioritário</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Plano PRO (Recomendado) -->
+            <div class="col-md-6">
+                <div class="pricing-card featured p-4 h-100">
+                    <div class="text-center mb-4">
+                        <h3>Plano PRO</h3>
+                        <div class="price">R$ 29,90</div>
+                        <p class="text-muted">por mês</p>
+                        <span class="badge bg-primary">Recomendado</span>
+                    </div>
+                    <ul class="feature-list">
+                        <li><i class="bi bi-check-circle-fill"></i> <strong>Lançamentos ILIMITADOS</strong></li>
+                        <li><i class="bi bi-check-circle-fill"></i> Gestão de contas</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Gestão de contatos</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Categorias de despesas</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Relatórios básicos</li>
+                        <li><i class="bi bi-check-circle-fill"></i> <strong>Relatórios avançados em PDF</strong></li>
+                        <li><i class="bi bi-check-circle-fill"></i> <strong>Dashboard completo</strong></li>
+                        <li><i class="bi bi-check-circle-fill"></i> <strong>Suporte prioritário</strong></li>
+                    </ul>
+                    <div class="text-center mt-4">
+                        <form th:action="@{/assinatura/upgrade/checkout}" method="post">
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="bi bi-credit-card"></i>
+                                Fazer Upgrade Agora
+                            </button>
+                        </form>
+                        <p class="text-muted mt-2 small">
+                            <i class="bi bi-shield-check"></i>
+                            Pagamento seguro via Mercado Pago
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Benefícios Adicionais -->
+        <div class="card mb-5">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-star-fill"></i>
+                    Por que fazer upgrade?
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="text-center">
+                            <i class="bi bi-infinity display-1 text-primary"></i>
+                            <h5 class="mt-3">Sem Limites</h5>
+                            <p class="text-muted">
+                                Registre quantos lançamentos precisar, sem se preocupar com limites mensais.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="text-center">
+                            <i class="bi bi-file-earmark-pdf display-1 text-primary"></i>
+                            <h5 class="mt-3">Relatórios Profissionais</h5>
+                            <p class="text-muted">
+                                Gere relatórios em PDF para apresentar ao seu contador ou para análise.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="text-center">
+                            <i class="bi bi-headset display-1 text-primary"></i>
+                            <h5 class="mt-3">Suporte Prioritário</h5>
+                            <p class="text-muted">
+                                Receba atendimento prioritário sempre que precisar de ajuda.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="card mb-5">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="bi bi-question-circle"></i>
+                    Perguntas Frequentes
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                Como funciona o pagamento?
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                O pagamento é processado de forma segura pelo Mercado Pago. Você pode pagar com cartão de crédito, PIX ou boleto bancário. A cobrança é mensal e automática.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                Posso cancelar a qualquer momento?
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Sim! Você pode cancelar sua assinatura a qualquer momento, sem multas ou taxas. Ao cancelar, você voltará para o plano FREE.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                Meus dados estão seguros?
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Absolutamente! Todos os seus dados financeiros são criptografados e armazenados com segurança. Nunca compartilhamos suas informações com terceiros.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botão Voltar -->
+        <div class="text-center mb-5">
+            <a th:href="@{/dashboard}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i>
+                Voltar para o Dashboard
+            </a>
+        </div>
+    </div>
+
+    <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>
+

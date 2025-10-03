@@ -1,9 +1,12 @@
 package br.com.scfmei.listener;
 
 import br.com.scfmei.event.UserRegisteredEvent;
+import br.com.scfmei.service.EmailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,27 +38,32 @@ public class UserRegistrationListener {
 
     private static final Logger logger = LoggerFactory.getLogger(UserRegistrationListener.class);
 
+    @Autowired
+    private EmailService emailService;
+
     /**
      * Manipula o evento de registro de novo usuário.
-     * 
+     *
      * Este método é chamado automaticamente pelo Spring sempre que
      * um UserRegisteredEvent é publicado.
-     * 
+     *
      * @param event O evento contendo informações do usuário registrado
      */
     @EventListener
+    @Async
     public void handleUserRegistration(UserRegisteredEvent event) {
-        // Por enquanto, apenas logamos. No futuro, aqui enviaremos um e-mail de boas-vindas.
         String username = event.getUsuario().getUsername();
         String plano = event.getUsuario().getPlano().name();
-        
+
         logger.info("========================================");
         logger.info("NOVO USUÁRIO REGISTRADO!");
         logger.info("Username: {}", username);
         logger.info("Plano: {}", plano);
         logger.info("========================================");
-        
-        // TODO: Implementar envio de e-mail de boas-vindas
+
+        // Enviar e-mail de boas-vindas
+        emailService.enviarEmailBoasVindas(event.getUsuario());
+
         // TODO: Criar dados iniciais (conta padrão, categorias sugeridas)
         // TODO: Registrar em sistema de analytics
     }

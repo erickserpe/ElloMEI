@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uso do Plano - SCF-MEI</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css}">
+    <style>
+        .usage-card {
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .progress-large {
+            height: 30px;
+            font-size: 1rem;
+        }
+        .stat-icon {
+            font-size: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <!-- Header -->
+        <div class="mb-4">
+            <h1>
+                <i class="bi bi-graph-up"></i>
+                Uso do Plano
+            </h1>
+            <p class="text-muted">Acompanhe seu uso mensal</p>
+        </div>
+
+        <!-- Alerta de Limite -->
+        <div th:if="${metrics.mensagemAlerta != null}" 
+             class="alert" 
+             th:classappend="${metrics.limiteExcedido} ? 'alert-danger' : 'alert-warning'"
+             role="alert">
+            <span th:text="${metrics.mensagemAlerta}"></span>
+        </div>
+
+        <!-- Card Principal de Uso -->
+        <div class="card usage-card mb-4">
+            <div class="card-body p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-2 text-center">
+                        <i class="stat-icon" 
+                           th:classappend="'bi ' + ${metrics.iconeStatus} + ' text-' + ${metrics.corBarraProgresso}"></i>
+                    </div>
+                    <div class="col-md-10">
+                        <h3 class="mb-3">
+                            Lançamentos do Mês
+                            <span class="badge" 
+                                  th:classappend="'bg-' + ${metrics.corBarraProgresso}"
+                                  th:text="${metrics.plano.name()}"></span>
+                        </h3>
+                        
+                        <!-- Barra de Progresso -->
+                        <div class="progress progress-large mb-3">
+                            <div class="progress-bar" 
+                                 th:classappend="'bg-' + ${metrics.corBarraProgresso}"
+                                 role="progressbar" 
+                                 th:style="'width: ' + ${metrics.percentualUso} + '%'"
+                                 th:attr="aria-valuenow=${metrics.lancamentosUsados}, 
+                                         aria-valuemin=0, 
+                                         aria-valuemax=${metrics.lancamentosLimite}">
+                                <span th:if="${metrics.plano.name() == 'PRO'}">Ilimitado</span>
+                                <span th:if="${metrics.plano.name() == 'FREE'}" 
+                                      th:text="${metrics.lancamentosUsados} + ' / ' + ${metrics.lancamentosLimite}"></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Estatísticas -->
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <h4 th:text="${metrics.lancamentosUsados}"></h4>
+                                <p class="text-muted mb-0">Lançamentos Usados</p>
+                            </div>
+                            <div class="col-md-4" th:if="${metrics.plano.name() == 'FREE'}">
+                                <h4 th:text="${metrics.lancamentosLimite - metrics.lancamentosUsados}"></h4>
+                                <p class="text-muted mb-0">Lançamentos Restantes</p>
+                            </div>
+                            <div class="col-md-4" th:if="${metrics.plano.name() == 'PRO'}">
+                                <h4><i class="bi bi-infinity"></i></h4>
+                                <p class="text-muted mb-0">Lançamentos Restantes</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 th:text="${metrics.diasRestantesNoMes}"></h4>
+                                <p class="text-muted mb-0">Dias Restantes no Mês</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cards de Ação -->
+        <div class="row g-4 mb-4">
+            <!-- Upgrade (apenas para FREE) -->
+            <div class="col-md-6" th:if="${metrics.plano.name() == 'FREE'}">
+                <div class="card h-100 border-primary">
+                    <div class="card-body text-center">
+                        <i class="bi bi-rocket-takeoff display-1 text-primary"></i>
+                        <h4 class="mt-3">Precisa de Mais?</h4>
+                        <p class="text-muted">
+                            Faça upgrade para o plano PRO e tenha lançamentos ilimitados!
+                        </p>
+                        <a th:href="@{/assinatura/upgrade}" class="btn btn-primary">
+                            <i class="bi bi-arrow-up-circle"></i>
+                            Fazer Upgrade
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gerenciar Assinatura (para PRO) -->
+            <div class="col-md-6" th:if="${metrics.plano.name() == 'PRO'}">
+                <div class="card h-100 border-success">
+                    <div class="card-body text-center">
+                        <i class="bi bi-credit-card display-1 text-success"></i>
+                        <h4 class="mt-3">Gerenciar Assinatura</h4>
+                        <p class="text-muted">
+                            Visualize detalhes da sua assinatura PRO
+                        </p>
+                        <a th:href="@{/assinatura}" class="btn btn-success">
+                            <i class="bi bi-gear"></i>
+                            Gerenciar
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Novo Lançamento -->
+            <div class="col-md-6">
+                <div class="card h-100 border-info">
+                    <div class="card-body text-center">
+                        <i class="bi bi-plus-circle display-1 text-info"></i>
+                        <h4 class="mt-3">Criar Lançamento</h4>
+                        <p class="text-muted">
+                            Adicione um novo lançamento financeiro
+                        </p>
+                        <a th:href="@{/lancamentos/novo}" class="btn btn-info">
+                            <i class="bi bi-plus"></i>
+                            Novo Lançamento
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informações do Plano -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-info-circle"></i>
+                    Sobre seu Plano
+                </h5>
+            </div>
+            <div class="card-body">
+                <div th:if="${metrics.plano.name() == 'FREE'}">
+                    <h6>Plano FREE</h6>
+                    <ul>
+                        <li>Limite de 20 lançamentos por mês</li>
+                        <li>O contador é resetado no dia 1º de cada mês</li>
+                        <li>Lançamentos com múltiplas parcelas contam como 1 lançamento</li>
+                        <li>Ao atingir o limite, você não poderá criar novos lançamentos até o próximo mês</li>
+                    </ul>
+                    <p class="mb-0">
+                        <strong>Dica:</strong> Faça upgrade para o plano PRO e tenha lançamentos ilimitados por apenas R$ 29,90/mês!
+                    </p>
+                </div>
+                
+                <div th:if="${metrics.plano.name() == 'PRO'}">
+                    <h6>Plano PRO</h6>
+                    <ul>
+                        <li><strong>Lançamentos ilimitados</strong> - Crie quantos precisar!</li>
+                        <li>Relatórios avançados em PDF</li>
+                        <li>Dashboard completo com gráficos</li>
+                        <li>Suporte prioritário</li>
+                    </ul>
+                    <p class="mb-0">
+                        <strong>Obrigado por ser PRO!</strong> Você tem acesso a todos os recursos do SCF-MEI.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botão Voltar -->
+        <div class="mb-5">
+            <a th:href="@{/dashboard}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i>
+                Voltar para o Dashboard
+            </a>
+        </div>
+    </div>
+
+    <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+    
+    <!-- Auto-refresh a cada 30 segundos -->
+    <script>
+        setTimeout(function() {
+            location.reload();
+        }, 30000);
+    </script>
+</body>
+</html>
+

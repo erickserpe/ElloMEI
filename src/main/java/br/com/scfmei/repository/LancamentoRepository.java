@@ -75,4 +75,20 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
             @Param("dataFim") LocalDate dataFim,
             @Param("usuario") Usuario usuario // <-- NOVO PARÂMETRO
     );
+
+    /**
+     * Conta quantos grupos de operação distintos (lançamentos únicos)
+     * o usuário criou em um período.
+     *
+     * Usado para calcular o uso do plano FREE (limite de 20 lançamentos/mês).
+     */
+    @Query("SELECT COUNT(DISTINCT l.grupoOperacao) FROM Lancamento l " +
+           "WHERE l.usuario = :usuario " +
+           "AND l.data >= :dataInicio " +
+           "AND l.data <= :dataFim")
+    int countDistinctGrupoOperacaoByUsuarioAndDataBetween(
+            @Param("usuario") Usuario usuario,
+            @Param("dataInicio") LocalDate dataInicio,
+            @Param("dataFim") LocalDate dataFim
+    );
 }
