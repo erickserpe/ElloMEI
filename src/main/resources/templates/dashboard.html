@@ -79,6 +79,98 @@
         </div>
     </div>
 
+    <!-- Usage Widget (Plan Limits) -->
+    <div class="content-card mb-4" th:if="${usageMetrics != null}">
+        <div class="content-card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5>
+                    <i class="bi bi-speedometer2 text-primary me-2"></i>
+                    Uso do Plano
+                    <span class="badge ms-2"
+                          th:classappend="${usageMetrics.plano.name() == 'PRO'} ? 'bg-success' : 'bg-secondary'"
+                          th:text="${usageMetrics.plano.name()}"></span>
+                </h5>
+                <a th:href="@{/uso}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-graph-up"></i>
+                    Ver Detalhes
+                </a>
+            </div>
+        </div>
+        <div class="content-card-body">
+            <!-- Alerta de Limite -->
+            <div th:if="${usageMetrics.mensagemAlerta != null}"
+                 class="alert mb-3"
+                 th:classappend="${usageMetrics.limiteExcedido} ? 'alert-danger' : 'alert-warning'"
+                 role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <span th:text="${usageMetrics.mensagemAlerta}"></span>
+            </div>
+
+            <div class="row align-items-center">
+                <!-- Ícone e Estatísticas -->
+                <div class="col-md-3 text-center mb-3 mb-md-0">
+                    <i class="display-4"
+                       th:classappend="'bi ' + ${usageMetrics.iconeStatus} + ' text-' + ${usageMetrics.corBarraProgresso}"></i>
+                    <h4 class="mt-2 mb-0" th:text="${usageMetrics.lancamentosUsados}">0</h4>
+                    <p class="text-muted small mb-0">Lançamentos Usados</p>
+                </div>
+
+                <!-- Barra de Progresso e Info -->
+                <div class="col-md-9">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-medium">Lançamentos do Mês</span>
+                            <span class="text-muted" th:if="${usageMetrics.plano.name() == 'FREE'}">
+                                <span th:text="${usageMetrics.lancamentosUsados}">0</span> /
+                                <span th:text="${usageMetrics.lancamentosLimite}">20</span>
+                            </span>
+                            <span class="text-success fw-medium" th:if="${usageMetrics.plano.name() == 'PRO'}">
+                                <i class="bi bi-infinity"></i> Ilimitado
+                            </span>
+                        </div>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar"
+                                 th:classappend="'bg-' + ${usageMetrics.corBarraProgresso}"
+                                 role="progressbar"
+                                 th:style="'width: ' + ${usageMetrics.percentualUso} + '%'"
+                                 th:attr="aria-valuenow=${usageMetrics.lancamentosUsados},
+                                         aria-valuemin=0,
+                                         aria-valuemax=${usageMetrics.lancamentosLimite}">
+                                <span class="fw-medium" th:if="${usageMetrics.plano.name() == 'FREE'}"
+                                      th:text="${usageMetrics.percentualUso} + '%'"></span>
+                                <span class="fw-medium" th:if="${usageMetrics.plano.name() == 'PRO'}">
+                                    <i class="bi bi-check-circle"></i> PRO
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ações Rápidas -->
+                    <div class="d-flex gap-2 flex-wrap">
+                        <span class="badge bg-light text-dark border">
+                            <i class="bi bi-calendar3"></i>
+                            <span th:text="${usageMetrics.diasRestantesNoMes}">0</span> dias restantes
+                        </span>
+
+                        <a th:if="${usageMetrics.plano.name() == 'FREE'}"
+                           th:href="@{/assinatura/upgrade}"
+                           class="badge bg-primary text-decoration-none">
+                            <i class="bi bi-rocket-takeoff"></i>
+                            Fazer Upgrade para PRO
+                        </a>
+
+                        <a th:if="${usageMetrics.plano.name() == 'PRO'}"
+                           th:href="@{/assinatura}"
+                           class="badge bg-success text-decoration-none">
+                            <i class="bi bi-credit-card"></i>
+                            Gerenciar Assinatura
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Advanced Filters Card -->
     <div class="content-card mb-4">
         <div class="content-card-header" style="cursor: pointer;" onclick="toggleFilters()">

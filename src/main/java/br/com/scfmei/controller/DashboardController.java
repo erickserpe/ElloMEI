@@ -1,6 +1,7 @@
 package br.com.scfmei.controller;
 
 import br.com.scfmei.domain.*;
+import br.com.scfmei.dto.UsageMetricsDTO;
 import br.com.scfmei.repository.UsuarioRepository;
 import br.com.scfmei.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ public class DashboardController {
     @Autowired private CategoriaDespesaService categoriaService;
     @Autowired private LancamentoService lancamentoService;
     @Autowired private UsuarioRepository usuarioRepository;
+    @Autowired private UsageMetricsService usageMetricsService;
 
     private Usuario getUsuarioLogado(Principal principal) {
         return usuarioRepository.findByUsername(principal.getName())
@@ -69,6 +71,10 @@ public class DashboardController {
         model.addAttribute("saldoTotal", dashboardService.getSaldoTotal(usuario, contaId));
         model.addAttribute("totalEntradas", totalEntradas);
         model.addAttribute("totalSaidas", totalSaidas);
+
+        // 3.5. Adiciona métricas de uso do plano
+        UsageMetricsDTO usageMetrics = usageMetricsService.calcularMetricas(usuario);
+        model.addAttribute("usageMetrics", usageMetrics);
 
         // 4. Devolve filtros selecionados para a view (completo)
         model.addAttribute("dataInicioSel", dataInicio);
