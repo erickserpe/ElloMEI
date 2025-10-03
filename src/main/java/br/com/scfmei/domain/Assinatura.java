@@ -127,13 +127,32 @@ public class Assinatura {
      */
     @Column(name = "is_trial")
     private boolean isTrial = false;
-    
+
+    /**
+     * Número de tentativas de pagamento falhadas.
+     * Usado para controlar retries automáticos.
+     */
+    @Column(name = "tentativas_pagamento")
+    private int tentativasPagamento = 0;
+
+    /**
+     * Data da última tentativa de pagamento.
+     */
+    @Column(name = "data_ultima_tentativa")
+    private LocalDateTime dataUltimaTentativa;
+
+    /**
+     * Motivo da última falha de pagamento.
+     */
+    @Column(name = "motivo_falha_pagamento", length = 500)
+    private String motivoFalhaPagamento;
+
     /**
      * Data de criação do registro.
      */
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
-    
+
     /**
      * Data da última atualização do registro.
      */
@@ -208,6 +227,16 @@ public class Assinatura {
         // Dar 7 dias de prazo antes de expirar
         this.dataExpiracao = LocalDate.now().plusDays(7);
     }
+
+    /**
+     * Suspende a assinatura com motivo específico.
+     */
+    public void suspender(String motivoFalha) {
+        this.status = StatusAssinatura.SUSPENSA;
+        this.motivoFalhaPagamento = motivoFalha;
+        this.dataExpiracao = LocalDate.now().plusDays(7);
+        this.dataUltimaTentativa = LocalDateTime.now();
+    }
     
     /**
      * Reativa a assinatura após pagamento.
@@ -226,7 +255,24 @@ public class Assinatura {
         this.dataProximaCobranca = LocalDate.now().plusDays(30);
         this.status = StatusAssinatura.ATIVA;
     }
-    
+
+    /**
+     * Incrementa o contador de tentativas de pagamento.
+     */
+    public void incrementarTentativasPagamento() {
+        this.tentativasPagamento++;
+        this.dataUltimaTentativa = LocalDateTime.now();
+    }
+
+    /**
+     * Reseta o contador de tentativas de pagamento.
+     */
+    public void resetarTentativasPagamento() {
+        this.tentativasPagamento = 0;
+        this.motivoFalhaPagamento = null;
+        this.dataUltimaTentativa = null;
+    }
+
     // ==================== GETTERS AND SETTERS ====================
     
     public Long getId() {
@@ -336,15 +382,39 @@ public class Assinatura {
     public boolean isTrial() {
         return isTrial;
     }
-    
+
     public void setTrial(boolean trial) {
         isTrial = trial;
     }
-    
+
+    public int getTentativasPagamento() {
+        return tentativasPagamento;
+    }
+
+    public void setTentativasPagamento(int tentativasPagamento) {
+        this.tentativasPagamento = tentativasPagamento;
+    }
+
+    public LocalDateTime getDataUltimaTentativa() {
+        return dataUltimaTentativa;
+    }
+
+    public void setDataUltimaTentativa(LocalDateTime dataUltimaTentativa) {
+        this.dataUltimaTentativa = dataUltimaTentativa;
+    }
+
+    public String getMotivoFalhaPagamento() {
+        return motivoFalhaPagamento;
+    }
+
+    public void setMotivoFalhaPagamento(String motivoFalhaPagamento) {
+        this.motivoFalhaPagamento = motivoFalhaPagamento;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
-    
+
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }

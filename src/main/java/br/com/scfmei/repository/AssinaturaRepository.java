@@ -74,5 +74,17 @@ public interface AssinaturaRepository extends JpaRepository<Assinatura, Long> {
      * Verifica se um usuário tem assinatura ativa.
      */
     boolean existsByUsuarioAndStatus(Usuario usuario, StatusAssinatura status);
+
+    /**
+     * Busca assinaturas suspensas que precisam de retry de pagamento.
+     */
+    @Query("SELECT a FROM Assinatura a WHERE a.status = :status " +
+           "AND (a.dataUltimaTentativa IS NULL OR CAST(a.dataUltimaTentativa AS date) < :dataLimite) " +
+           "AND a.tentativasPagamento < :maxTentativas")
+    List<Assinatura> findAssinaturasParaRetry(
+        @Param("status") StatusAssinatura status,
+        @Param("dataLimite") LocalDate dataLimite,
+        @Param("maxTentativas") int maxTentativas
+    );
 }
 

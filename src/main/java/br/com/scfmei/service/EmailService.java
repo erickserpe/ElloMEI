@@ -216,7 +216,100 @@ public class EmailService {
         logger.info("");
         logger.info("Equipe SCF-MEI");
         logger.info("========================================");
-        
+
+        // TODO: Implementar envio real de e-mail
+    }
+
+    /**
+     * Envia e-mail de falha de pagamento com informações de retry.
+     */
+    public void enviarEmailFalhaPagamento(Usuario usuario, Assinatura assinatura,
+                                         int tentativaAtual, int maxTentativas) {
+        logger.info("========================================");
+        logger.info("📧 E-MAIL DE FALHA DE PAGAMENTO");
+        logger.info("========================================");
+        logger.info("Para: {}", usuario.getUsername() + "@scfmei.com.br");
+        logger.info("Assunto: Falha no Pagamento - Tentativa {}/{}", tentativaAtual, maxTentativas);
+        logger.info("");
+        logger.info("Olá {},", usuario.getUsername());
+        logger.info("");
+        logger.info("Infelizmente, não conseguimos processar seu pagamento.");
+        logger.info("");
+        logger.info("Motivo: {}", assinatura.getMotivoFalhaPagamento() != null ?
+                   assinatura.getMotivoFalhaPagamento() : "Não especificado");
+        logger.info("Tentativa: {}/{}", tentativaAtual, maxTentativas);
+        logger.info("");
+        logger.info("O que fazer:");
+        logger.info("1. Verifique os dados do seu cartão");
+        logger.info("2. Certifique-se de ter saldo disponível");
+        logger.info("3. Entre em contato com seu banco se necessário");
+        logger.info("");
+        logger.info("Tentaremos processar o pagamento novamente em 24 horas.");
+        logger.info("");
+        logger.info("Atualize seus dados de pagamento:");
+        logger.info("{}/assinatura", baseUrl);
+        logger.info("");
+        logger.info("Equipe SCF-MEI");
+        logger.info("========================================");
+
+        // TODO: Implementar envio real de e-mail
+    }
+
+    /**
+     * Envia e-mail de pagamento recuperado após retry bem-sucedido.
+     */
+    public void enviarEmailPagamentoRecuperado(Usuario usuario, Assinatura assinatura) {
+        logger.info("========================================");
+        logger.info("📧 E-MAIL DE PAGAMENTO RECUPERADO");
+        logger.info("========================================");
+        logger.info("Para: {}", usuario.getUsername() + "@scfmei.com.br");
+        logger.info("Assunto: Pagamento Processado com Sucesso!");
+        logger.info("");
+        logger.info("Olá {},", usuario.getUsername());
+        logger.info("");
+        logger.info("Ótimas notícias! Seu pagamento foi processado com sucesso.");
+        logger.info("");
+        logger.info("Sua assinatura PRO foi reativada e você já pode usar todos os recursos.");
+        logger.info("");
+        logger.info("Valor: R$ {}", assinatura.getValorMensal());
+        logger.info("Próxima cobrança: {}", assinatura.getDataProximaCobranca().format(DATE_FORMATTER));
+        logger.info("");
+        logger.info("Obrigado por continuar conosco!");
+        logger.info("");
+        logger.info("Equipe SCF-MEI");
+        logger.info("========================================");
+
+        // TODO: Implementar envio real de e-mail
+    }
+
+    /**
+     * Envia e-mail de falha definitiva após esgotar tentativas.
+     */
+    public void enviarEmailPagamentoFalhaDefinitiva(Usuario usuario, Assinatura assinatura) {
+        logger.info("========================================");
+        logger.info("📧 E-MAIL DE CANCELAMENTO POR FALHA DE PAGAMENTO");
+        logger.info("========================================");
+        logger.info("Para: {}", usuario.getUsername() + "@scfmei.com.br");
+        logger.info("Assunto: Assinatura Cancelada - Falha de Pagamento");
+        logger.info("");
+        logger.info("Olá {},", usuario.getUsername());
+        logger.info("");
+        logger.info("Lamentamos informar que sua assinatura PRO foi cancelada.");
+        logger.info("");
+        logger.info("Após múltiplas tentativas, não conseguimos processar seu pagamento.");
+        logger.info("");
+        logger.info("Você foi movido para o plano FREE com as seguintes limitações:");
+        logger.info("- Máximo de 20 lançamentos por mês");
+        logger.info("- Recursos básicos");
+        logger.info("");
+        logger.info("Para reativar o plano PRO:");
+        logger.info("{}/assinatura/upgrade", baseUrl);
+        logger.info("");
+        logger.info("Se precisar de ajuda, entre em contato conosco.");
+        logger.info("");
+        logger.info("Equipe SCF-MEI");
+        logger.info("========================================");
+
         // TODO: Implementar envio real de e-mail
     }
 }
