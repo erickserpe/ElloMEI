@@ -1,0 +1,177 @@
+name: CI - Build and Test
+
+# ===================================
+# Workflow de Integração Contínua
+# ===================================
+# Executa build e testes automaticamente em:
+# - Push para branches main e develop
+# - Pull Requests
+# ===================================
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  # ===================================
+  # JOB 1: Build e Testes
+  # ===================================
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    
+    # Serviços (MySQL para testes)
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root_password
+          MYSQL_DATABASE: scf_mei_test
+          MYSQL_USER: scf_user
+          MYSQL_PASSWORD: test_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+    
+    steps:
+      # -----------------------------------
+      # 1. Checkout do código
+      # -----------------------------------
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # -----------------------------------
+      # 2. Setup Java 17
+      # -----------------------------------
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+      
+      # -----------------------------------
+      # 3. Cache de dependências Maven
+      # -----------------------------------
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      
+      # -----------------------------------
+      # 4. Build com Maven
+      # -----------------------------------
+      - name: Build with Maven
+        run: mvn clean install -DskipTests -B -V
+        env:
+          MAVEN_OPTS: "-Xmx1024m"
+      
+      # -----------------------------------
+      # 5. Executar testes
+      # -----------------------------------
+      - name: Run tests
+        run: mvn test -B
+        env:
+          # Variáveis de ambiente para testes
+          SPRING_PROFILES_ACTIVE: test
+          DB_HOST: localhost
+          MYSQL_DATABASE: scf_mei_test
+          MYSQL_USER: scf_user
+          MYSQL_PASSWORD: test_password
+          MERCADOPAGO_ACCESS_TOKEN: TEST-fake-token
+          MERCADOPAGO_PUBLIC_KEY: TEST-fake-key
+          MAIL_USERNAME: test@example.com
+          MAIL_PASSWORD: fake-password
+      
+      # -----------------------------------
+      # 6. Gerar relatório de cobertura
+      # -----------------------------------
+      - name: Generate coverage report
+        run: mvn jacoco:report
+        continue-on-error: true
+      
+      # -----------------------------------
+      # 7. Upload de artefatos
+      # -----------------------------------
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: scf-mei-jar
+          path: target/*.jar
+          retention-days: 7
+      
+      # -----------------------------------
+      # 8. Upload de relatório de testes
+      # -----------------------------------
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-results
+          path: target/surefire-reports/
+          retention-days: 7
+
+  # ===================================
+  # JOB 2: Code Quality (SonarQube)
+  # ===================================
+  # Descomente se tiver SonarQube configurado
+  # code-quality:
+  #   name: Code Quality Analysis
+  #   runs-on: ubuntu-latest
+  #   needs: build
+  #   
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #     
+  #     - name: Set up JDK 17
+  #       uses: actions/setup-java@v4
+  #       with:
+  #         java-version: '17'
+  #         distribution: 'temurin'
+  #     
+  #     - name: SonarQube Scan
+  #       run: mvn sonar:sonar
+  #       env:
+  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+  # ===================================
+  # JOB 3: Security Scan
+  # ===================================
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+      
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+

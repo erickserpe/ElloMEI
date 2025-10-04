@@ -1,0 +1,140 @@
+version: '3.8'
+
+# ===================================
+# Docker Compose - Monitoramento
+# ===================================
+# Stack de monitoramento com Prometheus e Grafana
+#
+# Uso:
+#   docker compose -f docker-compose.yml -f docker-compose.monitoring.yml up -d
+#
+# Serviços:
+#   - Prometheus: Coleta métricas (http://localhost:9090)
+#   - Grafana: Visualização de métricas (http://localhost:3000)
+# ===================================
+
+services:
+  # ===================================
+  # PROMETHEUS - Coleta de Métricas
+  # ===================================
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    container_name: scf-mei-prometheus
+    restart: unless-stopped
+    
+    # Porta do Prometheus
+    ports:
+      - "9090:9090"
+    
+    # Volumes
+    volumes:
+      # Configuração do Prometheus
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      # Dados persistentes
+      - prometheus-data:/prometheus
+    
+    # Comando customizado
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'  # Reter dados por 30 dias
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    
+    # Rede
+    networks:
+      - scf-mei-network
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    
+    # Labels
+    labels:
+      - "com.scfmei.service=prometheus"
+      - "com.scfmei.description=Prometheus metrics collector"
+
+  # ===================================
+  # GRAFANA - Visualização de Métricas
+  # ===================================
+  grafana:
+    image: grafana/grafana:10.2.2
+    container_name: scf-mei-grafana
+    restart: unless-stopped
+    
+    # Porta do Grafana
+    ports:
+      - "3000:3000"
+    
+    # Variáveis de ambiente
+    environment:
+      # Configurações de segurança
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      
+      # Configurações gerais
+      - GF_INSTALL_PLUGINS=
+      - GF_SERVER_ROOT_URL=http://localhost:3000
+      - GF_USERS_ALLOW_SIGN_UP=false
+      
+      # Timezone
+      - TZ=America/Sao_Paulo
+    
+    # Volumes
+    volumes:
+      # Dados persistentes
+      - grafana-data:/var/lib/grafana
+      # Provisioning (datasources e dashboards)
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    
+    # Dependências
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    
+    # Rede
+    networks:
+      - scf-mei-network
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    
+    # Labels
+    labels:
+      - "com.scfmei.service=grafana"
+      - "com.scfmei.description=Grafana metrics visualization"
+
+# ===================================
+# VOLUMES
+# ===================================
+volumes:
+  # Dados do Prometheus
+  prometheus-data:
+    driver: local
+    labels:
+      - "com.scfmei.volume=prometheus-data"
+  
+  # Dados do Grafana
+  grafana-data:
+    driver: local
+    labels:
+      - "com.scfmei.volume=grafana-data"
+
+# ===================================
+# NETWORKS
+# ===================================
+networks:
+  scf-mei-network:
+    external: true
+    name: scf-mei_scf-mei-network
+
