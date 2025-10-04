@@ -37,6 +37,7 @@ public class ProfileService {
     public Usuario atualizarDadosPessoais(Usuario usuarioLogado, Usuario dadosFormulario) {
         // Copia apenas os campos permitidos para atualização
         usuarioLogado.setNomeCompleto(dadosFormulario.getNomeCompleto());
+        usuarioLogado.setEmail(dadosFormulario.getEmail());
         usuarioLogado.setCpf(dadosFormulario.getCpf());
         usuarioLogado.setRazaoSocial(dadosFormulario.getRazaoSocial());
         usuarioLogado.setNomeFantasia(dadosFormulario.getNomeFantasia());

@@ -48,28 +48,43 @@
 
                                 <div class="col-md-6 mb-3">
                                     <label for="username" class="form-label">
-                                        E-mail (Login)
+                                        Usuário (Login)
                                     </label>
-                                    <input type="email" 
-                                           class="form-control" 
-                                           id="username" 
+                                    <input type="text"
+                                           class="form-control"
+                                           id="username"
                                            th:field="*{username}"
                                            readonly
                                            disabled>
                                     <small class="text-muted">
-                                        <i class="bi bi-info-circle me-1"></i>O e-mail não pode ser alterado
+                                        <i class="bi bi-info-circle me-1"></i>O usuário não pode ser alterado
                                     </small>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label">
+                                        E-mail <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="email"
+                                           class="form-control"
+                                           id="email"
+                                           th:field="*{email}"
+                                           th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
+                                           placeholder="seu@email.com"
+                                           required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}"
+                                         th:errors="*{email}"></div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
                                     <label for="cpf" class="form-label">CPF</label>
-                                    <input type="text" 
-                                           class="form-control" 
-                                           id="cpf" 
+                                    <input type="text"
+                                           class="form-control"
+                                           id="cpf"
                                            th:field="*{cpf}"
                                            th:classappend="${#fields.hasErrors('cpf')} ? 'is-invalid' : ''"
                                            placeholder="000.000.000-00">
-                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('cpf')}" 
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('cpf')}"
                                          th:errors="*{cpf}"></div>
                                 </div>
                             </div>

@@ -293,8 +293,19 @@
                                 <input type="text" class="glass-input" id="username" th:field="*{username}"
                                        placeholder="Escolha um nome de usuário único" required>
                             </div>
-                            
+
                             <div class="form-group">
+                                <label for="email" class="form-label">
+                                    <i class="bi bi-envelope"></i>
+                                    E-mail
+                                </label>
+                                <input type="email" class="glass-input" id="email" th:field="*{email}"
+                                       placeholder="seu@email.com" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group" style="grid-column: 1 / -1;">
                                 <label for="password" class="form-label">
                                     <i class="bi bi-lock"></i>
                                     Senha
