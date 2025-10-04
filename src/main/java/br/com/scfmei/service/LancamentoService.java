@@ -280,6 +280,43 @@ public class LancamentoService {
         return lancamentoRepository.findComFiltros(dataInicio, dataFim, contaId, contatoId, tipo, categoriaId, comNotaFiscal, descricao, status, usuario);
     }
 
+    /**
+     * Busca despesas agrupadas por categoria com filtros aplicados.
+     *
+     * Retorna dados agregados para exibição em gráficos de pizza/barras,
+     * mostrando o total gasto em cada categoria de despesa.
+     *
+     * @param dataInicio Data inicial do período
+     * @param dataFim Data final do período
+     * @param contaId ID da conta (opcional)
+     * @param contatoId ID do contato (opcional)
+     * @param categoriaId ID da categoria (opcional)
+     * @param status Status do lançamento (opcional)
+     * @param usuario Usuário proprietário dos dados
+     * @return Lista de dados agregados por categoria
+     */
+    @Transactional(readOnly = true)
+    public List<ChartData> buscarDespesasPorCategoria(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long contatoId, Long categoriaId, StatusLancamento status, Usuario usuario) {
+        return lancamentoRepository.findDespesasPorCategoriaComFiltros(dataInicio, dataFim, contaId, contatoId, categoriaId, status, usuario);
+    }
+
+    /**
+     * Calcula a soma das entradas bancárias (excluindo caixa) em um período.
+     *
+     * Usado para calcular o faturamento bancário oficial, que exclui
+     * movimentações em dinheiro (caixa).
+     *
+     * @param dataInicio Data inicial do período
+     * @param dataFim Data final do período
+     * @param usuario Usuário proprietário dos dados
+     * @return Soma das entradas bancárias ou BigDecimal.ZERO se não houver
+     */
+    @Transactional(readOnly = true)
+    public BigDecimal calcularEntradasBancarias(LocalDate dataInicio, LocalDate dataFim, Usuario usuario) {
+        BigDecimal total = lancamentoRepository.sumEntradasBancariasNoPeriodo(dataInicio, dataFim, usuario);
+        return total != null ? total : BigDecimal.ZERO;
+    }
+
     // Método legado (sem paginação) - mantido para compatibilidade
     @Transactional(readOnly = true)
     public List<LancamentoGrupoDTO> buscarComFiltrosAgrupados(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long contatoId, TipoLancamento tipo, Long categoriaId, Boolean comNotaFiscal, String descricao, StatusLancamento status, Usuario usuario) {

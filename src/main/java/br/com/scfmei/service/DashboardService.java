@@ -2,8 +2,8 @@ package br.com.scfmei.service;
 
 import br.com.scfmei.domain.*;
 import br.com.scfmei.repository.ContaRepository;
-import br.com.scfmei.repository.LancamentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -23,7 +23,7 @@ public class DashboardService {
     private ContaRepository contaRepository;
 
     @Autowired
-    private LancamentoRepository lancamentoRepository;
+    private LancamentoService lancamentoService;
 
 
     public BigDecimal getSaldoTotal(Usuario usuario, Long contaId) {
@@ -45,9 +45,11 @@ public class DashboardService {
             dataInicio = mesAtual.atDay(1);
             dataFim = mesAtual.atEndOfMonth();
         }
-        List<Lancamento> entradas = lancamentoRepository.findComFiltros(dataInicio, dataFim, contaId, contatoId, TipoLancamento.ENTRADA, null, null, null, null, usuario);
-        return entradas.stream()
-                .map(Lancamento::getValor)
+        List<LancamentoGrupoDTO> entradasAgrupadas = lancamentoService.buscarComFiltrosAgrupados(
+                dataInicio, dataFim, contaId, contatoId, TipoLancamento.ENTRADA, null, null, null, null, usuario, Pageable.unpaged()
+        ).getContent();
+        return entradasAgrupadas.stream()
+                .map(LancamentoGrupoDTO::getValorTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
@@ -58,7 +60,7 @@ public class DashboardService {
             dataFim = mesAtual.atEndOfMonth();
         }
 
-        return lancamentoRepository.findDespesasPorCategoriaComFiltros(dataInicio, dataFim, contaId, contatoId, categoriaId, status, usuario);
+        return lancamentoService.buscarDespesasPorCategoria(dataInicio, dataFim, contaId, contatoId, categoriaId, status, usuario);
     }
 
     public Map<String, List<?>> getFluxoDeCaixaUltimos12Meses(Usuario usuario) {
@@ -77,11 +79,17 @@ public class DashboardService {
             LocalDate inicioDoMes = mes.atDay(1);
             LocalDate fimDoMes = mes.atEndOfMonth();
 
+            BigDecimal totalEntradas = lancamentoService.buscarComFiltrosAgrupados(
+                    inicioDoMes, fimDoMes, null, null, TipoLancamento.ENTRADA, null, null, null, StatusLancamento.PAGO, usuario, Pageable.unpaged()
+            ).getContent().stream()
+                    .map(LancamentoGrupoDTO::getValorTotal)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            BigDecimal totalEntradas = lancamentoRepository.findComFiltros(inicioDoMes, fimDoMes, null, null, TipoLancamento.ENTRADA, null, null, null, StatusLancamento.PAGO, usuario)
-                    .stream().map(Lancamento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add);
-            BigDecimal totalSaidas = lancamentoRepository.findComFiltros(inicioDoMes, fimDoMes, null, null, TipoLancamento.SAIDA, null, null, null, StatusLancamento.PAGO, usuario)
-                    .stream().map(Lancamento::getValor).reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal totalSaidas = lancamentoService.buscarComFiltrosAgrupados(
+                    inicioDoMes, fimDoMes, null, null, TipoLancamento.SAIDA, null, null, null, StatusLancamento.PAGO, usuario, Pageable.unpaged()
+            ).getContent().stream()
+                    .map(LancamentoGrupoDTO::getValorTotal)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
 
             entradas.add(totalEntradas);
             saidas.add(totalSaidas);
@@ -96,33 +104,35 @@ public class DashboardService {
     public BigDecimal getFaturamentoOficial(int ano, Usuario usuario) {
         LocalDate inicioDoAno = LocalDate.of(ano, 1, 1);
         LocalDate fimDoAno = LocalDate.of(ano, 12, 31);
-        List<Lancamento> entradas = lancamentoRepository.findComFiltros(inicioDoAno, fimDoAno, null, null, TipoLancamento.ENTRADA, null, null, null, null, usuario);
+        List<LancamentoGrupoDTO> entradas = lancamentoService.buscarComFiltrosAgrupados(
+                inicioDoAno, fimDoAno, null, null, TipoLancamento.ENTRADA, null, null, null, null, usuario, Pageable.unpaged()
+        ).getContent();
         return entradas.stream()
-                .map(Lancamento::getValor)
+                .map(LancamentoGrupoDTO::getValorTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public BigDecimal getFaturamentoBancario(int ano, Usuario usuario) {
         LocalDate inicioDoAno = LocalDate.of(ano, 1, 1);
         LocalDate fimDoAno = LocalDate.of(ano, 12, 31);
-        BigDecimal total = lancamentoRepository.sumEntradasBancariasNoPeriodo(inicioDoAno, fimDoAno, usuario);
-        return total != null ? total : BigDecimal.ZERO;
+        return lancamentoService.calcularEntradasBancarias(inicioDoAno, fimDoAno, usuario);
     }
 
     public BigDecimal getFaturamentoBancarioMesAtual(Usuario usuario) {
         YearMonth mesAtual = YearMonth.now();
         LocalDate inicioDoMes = mesAtual.atDay(1);
         LocalDate fimDoMes = mesAtual.atEndOfMonth();
-        BigDecimal total = lancamentoRepository.sumEntradasBancariasNoPeriodo(inicioDoMes, fimDoMes, usuario);
-        return total != null ? total : BigDecimal.ZERO;
+        return lancamentoService.calcularEntradasBancarias(inicioDoMes, fimDoMes, usuario);
     }
 
     public BigDecimal getMetaFaturamentoBaseadoEmCustos(int ano, Usuario usuario) {
         LocalDate inicioDoAno = LocalDate.of(ano, 1, 1);
         LocalDate fimDoAno = LocalDate.of(ano, 12, 31);
-        List<Lancamento> comprasComNota = lancamentoRepository.findComFiltros(inicioDoAno, fimDoAno, null, null, TipoLancamento.SAIDA, null, true, null, null, usuario);
+        List<LancamentoGrupoDTO> comprasComNota = lancamentoService.buscarComFiltrosAgrupados(
+                inicioDoAno, fimDoAno, null, null, TipoLancamento.SAIDA, null, true, null, null, usuario, Pageable.unpaged()
+        ).getContent();
         BigDecimal totalComprasComNota = comprasComNota.stream()
-                .map(Lancamento::getValor)
+                .map(LancamentoGrupoDTO::getValorTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         if (totalComprasComNota.equals(BigDecimal.ZERO)) {
             return BigDecimal.ZERO;
@@ -134,9 +144,11 @@ public class DashboardService {
         YearMonth mesAtual = YearMonth.now();
         LocalDate inicioDoMes = mesAtual.atDay(1);
         LocalDate fimDoMes = mesAtual.atEndOfMonth();
-        List<Lancamento> comprasComNota = lancamentoRepository.findComFiltros(inicioDoMes, fimDoMes, null, null, TipoLancamento.SAIDA, null, true, null, null, usuario);
+        List<LancamentoGrupoDTO> comprasComNota = lancamentoService.buscarComFiltrosAgrupados(
+                inicioDoMes, fimDoMes, null, null, TipoLancamento.SAIDA, null, true, null, null, usuario, Pageable.unpaged()
+        ).getContent();
         BigDecimal totalComprasComNota = comprasComNota.stream()
-                .map(Lancamento::getValor)
+                .map(LancamentoGrupoDTO::getValorTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         if (totalComprasComNota.equals(BigDecimal.ZERO)) {
             return BigDecimal.ZERO;
