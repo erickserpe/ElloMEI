@@ -30,12 +30,16 @@ public class DetalheUsuarioServiceImpl implements UserDetailsService {
 
         // Converte o Set<Role> para List<SimpleGrantedAuthority>
         // O Spring Security espera objetos GrantedAuthority
+        // Filtra roles nulas ou com nome nulo para evitar NullPointerException
         return new User(
                 usuario.getUsername(),
                 usuario.getPassword(),
-                usuario.getRoles().stream()
-                        .map(role -> new SimpleGrantedAuthority(role.getNome()))
-                        .collect(Collectors.toList())
+                usuario.getRoles() != null
+                    ? usuario.getRoles().stream()
+                            .filter(role -> role != null && role.getNome() != null)
+                            .map(role -> new SimpleGrantedAuthority(role.getNome()))
+                            .collect(Collectors.toList())
+                    : java.util.Collections.emptyList()
         );
     }
 }
