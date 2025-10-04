@@ -53,3 +53,11 @@ logs/
 backups/
 *.sql
 *.sql.gz
+
+### SSL/HTTPS ###
+# Ignorar keystores (contêm certificados SSL)
+*.p12
+*.jks
+*.keystore
+# Exceto exemplos de documentação
+!docs/*.p12
