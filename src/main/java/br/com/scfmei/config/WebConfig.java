@@ -1,9 +1,12 @@
 package br.com.scfmei.config;
 
 import br.com.scfmei.config.security.CurrentUserArgumentResolver;
+import br.com.scfmei.interceptor.RateLimitInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -17,6 +20,9 @@ public class WebConfig implements WebMvcConfigurer {
     private String uploadDir;
 
     private final CurrentUserArgumentResolver currentUserArgumentResolver;
+
+    @Autowired
+    private RateLimitInterceptor rateLimitInterceptor;
 
     public WebConfig(CurrentUserArgumentResolver currentUserArgumentResolver) {
         this.currentUserArgumentResolver = currentUserArgumentResolver;
@@ -38,5 +44,16 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(currentUserArgumentResolver);
+    }
+
+    /**
+     * Registra interceptors para processar requisições HTTP.
+     *
+     * RateLimitInterceptor: Aplica rate limiting em endpoints sensíveis
+     * para proteção contra brute force e abuso de API.
+     */
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(rateLimitInterceptor);
     }
 }
