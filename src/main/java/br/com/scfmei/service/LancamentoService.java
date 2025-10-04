@@ -42,42 +42,97 @@ public class LancamentoService {
         comprovanteRepository.delete(comprovante);
     }
 
+    /**
+     * Orquestra a criação ou atualização de uma operação financeira (grupo de lançamentos).
+     *
+     * Este método coordena todo o fluxo:
+     * 1. Gera ou reutiliza o grupoOperacao
+     * 2. Se for edição, reverte e exclui lançamentos antigos
+     * 3. Cria os novos lançamentos
+     * 4. Processa os comprovantes anexados
+     * 5. Aplica os efeitos financeiros (atualiza saldos)
+     *
+     * @param form Dados do formulário com informações da operação
+     * @param comprovanteFiles Arquivos de comprovante enviados
+     * @param usuario Usuário proprietário da operação
+     */
+    @Transactional
     public void salvarOuAtualizarOperacao(LancamentoFormDTO form, MultipartFile[] comprovanteFiles, Usuario usuario) {
-        String grupoOperacao = (form.getGrupoOperacao() != null && !form.getGrupoOperacao().isBlank())
+        final String grupoOperacao = (form.getGrupoOperacao() != null && !form.getGrupoOperacao().isBlank())
                 ? form.getGrupoOperacao()
                 : UUID.randomUUID().toString();
+        form.setGrupoOperacao(grupoOperacao);
 
-        // If it's an existing operation, we need to delete the old lancamentos before recreating them
-        if (form.getGrupoOperacao() != null && !form.getGrupoOperacao().isBlank()) {
-            List<Lancamento> lancamentosAntigos = lancamentoRepository.findByGrupoOperacaoAndUsuario(form.getGrupoOperacao(), usuario);
-            for (Lancamento lancamento : lancamentosAntigos) {
-                if (lancamento.getStatus() == StatusLancamento.PAGO) {
-                    reverterLancamentoNaConta(lancamento);
-                }
-            }
-            lancamentoRepository.deleteAll(lancamentosAntigos);
+        // Se for uma edição, lida com os lançamentos antigos primeiro
+        if (isUpdateOperation(form)) {
+            reverterEExcluirLancamentosAntigos(form.getGrupoOperacao(), usuario);
         }
 
-        // Save the new or updated lancamentos
+        // Processa os novos lançamentos
+        List<Lancamento> novosLancamentos = criarNovosLancamentos(form, usuario);
+
+        // Processa os comprovantes
+        processarComprovantes(novosLancamentos, comprovanteFiles);
+
+        // Aplica os efeitos financeiros
+        aplicarEfeitosFinanceiros(novosLancamentos);
+    }
+
+    /**
+     * Verifica se a operação é uma atualização (edição) ou uma nova criação.
+     *
+     * Uma operação é considerada edição quando já possui um grupoOperacao definido,
+     * indicando que é uma operação existente sendo modificada.
+     *
+     * @param form Dados do formulário
+     * @return true se for uma edição, false se for uma nova operação
+     */
+    private boolean isUpdateOperation(LancamentoFormDTO form) {
+        return form.getGrupoOperacao() != null && !form.getGrupoOperacao().isBlank();
+    }
+
+    /**
+     * Reverte os efeitos financeiros e exclui os lançamentos antigos de um grupo.
+     *
+     * Este método é chamado durante a edição de uma operação para limpar
+     * os lançamentos anteriores antes de criar os novos.
+     *
+     * @param grupoOperacao Identificador do grupo de lançamentos
+     * @param usuario Usuário proprietário dos lançamentos
+     */
+    private void reverterEExcluirLancamentosAntigos(String grupoOperacao, Usuario usuario) {
+        List<Lancamento> lancamentosAntigos = lancamentoRepository.findByGrupoOperacaoAndUsuario(grupoOperacao, usuario);
+        lancamentosAntigos.forEach(this::reverterLancamentoNaContaSePago);
+        lancamentoRepository.deleteAll(lancamentosAntigos);
+    }
+
+    /**
+     * Reverte o lançamento na conta se ele estiver com status PAGO.
+     *
+     * @param lancamento Lançamento a ser revertido
+     */
+    private void reverterLancamentoNaContaSePago(Lancamento lancamento) {
+        if (lancamento.getStatus() == StatusLancamento.PAGO) {
+            reverterLancamentoNaConta(lancamento);
+        }
+    }
+
+    /**
+     * Cria e salva os novos lançamentos a partir dos dados do formulário.
+     *
+     * @param form Dados do formulário com informações da operação
+     * @param usuario Usuário proprietário dos lançamentos
+     * @return Lista de lançamentos salvos
+     */
+    private List<Lancamento> criarNovosLancamentos(LancamentoFormDTO form, Usuario usuario) {
+        List<Lancamento> lancamentosSalvos = new ArrayList<>();
         for (PagamentoDTO pagamento : form.getPagamentos()) {
             if (pagamento.getValor() == null || pagamento.getConta() == null) continue;
 
             Lancamento lancamento = new Lancamento();
-            lancamento.setDescricao(form.getDescricao());
-            lancamento.setData(form.getData());
-            lancamento.setTipo(form.getTipo());
-            lancamento.setCategoriaDespesa(form.getCategoriaDespesa());
-            lancamento.setContato(form.getContato());
-            lancamento.setComNotaFiscal(form.getComNotaFiscal());
-            lancamento.setGrupoOperacao(grupoOperacao);
-            lancamento.setStatus(form.getStatus());
-            lancamento.setUsuario(usuario);
+            mapearFormParaLancamento(form, lancamento, usuario, pagamento);
 
-            Conta conta = contaService.buscarPorId(pagamento.getConta()).orElseThrow(() -> new RuntimeException("Conta não encontrada!"));
-            lancamento.setConta(conta);
-            lancamento.setValor(pagamento.getValor());
-
-            // Get existing attachments for this group operation before saving
+            // Associa comprovantes existentes (caso de edição)
             if (form.getGrupoOperacao() != null && form.getComprovantes() != null) {
                 form.getComprovantes().forEach(comp -> {
                     comp.setLancamento(lancamento);
@@ -85,34 +140,82 @@ public class LancamentoService {
                 });
             }
 
-            Lancamento lancamentoSalvo = lancamentoRepository.save(lancamento);
+            lancamentosSalvos.add(lancamentoRepository.save(lancamento));
+        }
+        return lancamentosSalvos;
+    }
 
-            // --- START: Robust multiple file processing ---
-            // If new files were uploaded, add them to the list of attachments for each created lancamento
-            if (comprovanteFiles != null && comprovanteFiles.length > 0) {
-                // Check if the array contains more than just one empty file
-                if (comprovanteFiles.length > 1 || !comprovanteFiles[0].isEmpty()) {
-                    for (MultipartFile file : comprovanteFiles) {
-                        if (file != null && !file.isEmpty()) {
-                            // The storeFile service already handles PDF page splitting
-                            List<String> comprovantePaths = fileStorageService.storeFile(file);
-                            for (String path : comprovantePaths) {
-                                Comprovante comprovante = new Comprovante();
-                                comprovante.setPathArquivo(path);
-                                // Associate with the correct lancamento being processed
-                                comprovante.setLancamento(lancamentoSalvo);
-                                comprovanteRepository.save(comprovante);
-                            }
-                        }
-                    }
-                }
-            }
-            // --- END: Robust multiple file processing ---
+    /**
+     * Mapeia os dados do formulário para a entidade Lancamento.
+     *
+     * @param form Dados do formulário
+     * @param lancamento Entidade a ser preenchida
+     * @param usuario Usuário proprietário
+     * @param pagamento Dados específicos do pagamento (conta e valor)
+     */
+    private void mapearFormParaLancamento(LancamentoFormDTO form, Lancamento lancamento, Usuario usuario, PagamentoDTO pagamento) {
+        lancamento.setDescricao(form.getDescricao());
+        lancamento.setData(form.getData());
+        lancamento.setTipo(form.getTipo());
+        lancamento.setCategoriaDespesa(form.getCategoriaDespesa());
+        lancamento.setContato(form.getContato());
+        lancamento.setComNotaFiscal(form.getComNotaFiscal());
+        lancamento.setGrupoOperacao(form.getGrupoOperacao());
+        lancamento.setStatus(form.getStatus());
+        lancamento.setUsuario(usuario);
 
-            if (lancamentoSalvo.getStatus() == StatusLancamento.PAGO) {
-                aplicarLancamentoNaConta(lancamentoSalvo);
+        Conta conta = contaService.buscarPorId(pagamento.getConta())
+                .orElseThrow(() -> new RuntimeException("Conta não encontrada!"));
+        lancamento.setConta(conta);
+        lancamento.setValor(pagamento.getValor());
+    }
+
+    /**
+     * Processa e salva os arquivos de comprovante para os lançamentos.
+     *
+     * Os arquivos são armazenados e associados a todos os lançamentos do grupo.
+     * PDFs com múltiplas páginas são automaticamente divididos.
+     *
+     * @param lancamentos Lista de lançamentos que receberão os comprovantes
+     * @param comprovanteFiles Arquivos enviados
+     */
+    private void processarComprovantes(List<Lancamento> lancamentos, MultipartFile[] comprovanteFiles) {
+        if (comprovanteFiles == null || comprovanteFiles.length == 0 ||
+            (comprovanteFiles.length == 1 && comprovanteFiles[0].isEmpty())) {
+            return;
+        }
+
+        List<String> todosOsPaths = new ArrayList<>();
+        for (MultipartFile file : comprovanteFiles) {
+            if (file != null && !file.isEmpty()) {
+                // O serviço de armazenamento já lida com divisão de páginas de PDF
+                todosOsPaths.addAll(fileStorageService.storeFile(file));
             }
         }
+
+        if (!todosOsPaths.isEmpty()) {
+            for (Lancamento lancamento : lancamentos) {
+                for (String path : todosOsPaths) {
+                    Comprovante comprovante = new Comprovante();
+                    comprovante.setPathArquivo(path);
+                    comprovante.setLancamento(lancamento);
+                    comprovanteRepository.save(comprovante);
+                }
+            }
+        }
+    }
+
+    /**
+     * Aplica os efeitos financeiros dos lançamentos nas contas.
+     *
+     * Apenas lançamentos com status PAGO afetam o saldo das contas.
+     *
+     * @param lancamentos Lista de lançamentos a serem aplicados
+     */
+    private void aplicarEfeitosFinanceiros(List<Lancamento> lancamentos) {
+        lancamentos.stream()
+                .filter(l -> l.getStatus() == StatusLancamento.PAGO)
+                .forEach(this::aplicarLancamentoNaConta);
     }
 
 
