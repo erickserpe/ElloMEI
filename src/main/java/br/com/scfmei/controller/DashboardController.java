@@ -1,8 +1,8 @@
 package br.com.scfmei.controller;
 
+import br.com.scfmei.config.security.CurrentUser;
 import br.com.scfmei.domain.*;
 import br.com.scfmei.dto.UsageMetricsDTO;
-import br.com.scfmei.repository.UsuarioRepository;
 import br.com.scfmei.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
-import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -23,13 +22,7 @@ public class DashboardController {
     @Autowired private ContatoService contatoService;
     @Autowired private CategoriaDespesaService categoriaService;
     @Autowired private LancamentoService lancamentoService;
-    @Autowired private UsuarioRepository usuarioRepository;
     @Autowired private UsageMetricsService usageMetricsService;
-
-    private Usuario getUsuarioLogado(Principal principal) {
-        return usuarioRepository.findByUsername(principal.getName())
-                .orElseThrow(() -> new IllegalStateException("Usuário logado não encontrado."));
-    }
 
     @GetMapping("/dashboard")
     public String mostrarDashboard(
@@ -42,10 +35,8 @@ public class DashboardController {
             @RequestParam(required = false) Boolean comNotaFiscal,
             @RequestParam(required = false) String descricao,
             @RequestParam(required = false) StatusLancamento status,
-            Principal principal,
+            @CurrentUser Usuario usuario,
             Model model) {
-
-        Usuario usuario = getUsuarioLogado(principal);
 
         // 1. Busca dados para os dropdowns dos filtros
         model.addAttribute("listaDeContas", contaService.buscarTodasPorUsuario(usuario));

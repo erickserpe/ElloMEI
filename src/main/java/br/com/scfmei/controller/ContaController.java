@@ -1,41 +1,28 @@
 // src/main/java/br/com/scfmei/controller/ContaController.java
 package br.com.scfmei.controller;
 
+import br.com.scfmei.config.security.CurrentUser;
 import br.com.scfmei.domain.Conta;
 import br.com.scfmei.domain.Usuario;
-import br.com.scfmei.repository.UsuarioRepository;
 import br.com.scfmei.service.ContaService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.security.access.AccessDeniedException; // Importante para segurança
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
-import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("/contas")
 public class ContaController {
 
     @Autowired private ContaService contaService;
-    @Autowired private UsuarioRepository usuarioRepository;
-
-    // Função auxiliar para pegar o usuário logado
-    private Usuario getUsuarioLogado(Principal principal) {
-        return usuarioRepository.findByUsername(principal.getName())
-                .orElseThrow(() -> new IllegalStateException("Usuário logado não encontrado no banco de dados."));
-    }
 
     @GetMapping
-    public String listarContas(Model model, Principal principal, @PageableDefault(size = 10, sort = "id") Pageable pageable) {
-        Usuario usuario = getUsuarioLogado(principal);
+    public String listarContas(Model model, @CurrentUser Usuario usuario, @PageableDefault(size = 10, sort = "id") Pageable pageable) {
         Page<Conta> contasPage = contaService.buscarTodasPorUsuario(usuario, pageable);
         model.addAttribute("contasPage", contasPage);
         // Mantém compatibilidade com HTML antigo
@@ -50,11 +37,10 @@ public class ContaController {
     }
 
     @PostMapping
-    public String salvarConta(@Valid @ModelAttribute("conta") Conta conta, BindingResult result, Principal principal) {
+    public String salvarConta(@Valid @ModelAttribute("conta") Conta conta, BindingResult result, @CurrentUser Usuario usuario) {
         if (result.hasErrors()) {
             return "form-conta";
         }
-        Usuario usuario = getUsuarioLogado(principal);
         contaService.salvar(conta, usuario);
         return "redirect:/contas";
     }

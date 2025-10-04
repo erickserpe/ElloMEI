@@ -1,21 +1,19 @@
 package br.com.scfmei.controller;
 
+import br.com.scfmei.config.security.CurrentUser;
 import br.com.scfmei.domain.*;
-import br.com.scfmei.repository.UsuarioRepository;
 import br.com.scfmei.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
-import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -27,12 +25,6 @@ public class LancamentoController {
     @Autowired private ContaService contaService;
     @Autowired private CategoriaDespesaService categoriaService;
     @Autowired private ContatoService contatoService;
-    @Autowired private UsuarioRepository usuarioRepository;
-
-    private Usuario getUsuarioLogado(Principal principal) {
-        return usuarioRepository.findByUsername(principal.getName())
-                .orElseThrow(() -> new IllegalStateException("Usuário logado não encontrado."));
-    }
 
     @GetMapping
     public String listarLancamentos(
@@ -46,9 +38,7 @@ public class LancamentoController {
             @RequestParam(required = false) String descricao,
             @RequestParam(required = false) StatusLancamento status,
             @PageableDefault(size = 20, sort = "data") Pageable pageable,
-            Principal principal, Model model) {
-
-        Usuario usuario = getUsuarioLogado(principal);
+            @CurrentUser Usuario usuario, Model model) {
 
         // Busca os lançamentos agrupados com base nos filtros (com paginação)
         Page<LancamentoGrupoDTO> lancamentosAgrupadosPage = lancamentoService.buscarComFiltrosAgrupados(dataInicio, dataFim, contaId, contatoId, tipo, categoriaId, comNotaFiscal, descricao, status, usuario, pageable);
@@ -91,8 +81,8 @@ public class LancamentoController {
     }
 
     @GetMapping("/novo/entrada")
-    public String mostrarFormularioDeNovaEntrada(Model model, Principal principal) {
-        carregarDadosDoFormulario(model, getUsuarioLogado(principal));
+    public String mostrarFormularioDeNovaEntrada(Model model, @CurrentUser Usuario usuario) {
+        carregarDadosDoFormulario(model, usuario);
         LancamentoFormDTO lancamentoForm = new LancamentoFormDTO();
         lancamentoForm.setTipo(TipoLancamento.ENTRADA);
         model.addAttribute("lancamentoForm", lancamentoForm);
@@ -100,8 +90,8 @@ public class LancamentoController {
     }
 
     @GetMapping("/novo/saida")
-    public String mostrarFormularioDeNovaSaida(Model model, Principal principal) {
-        carregarDadosDoFormulario(model, getUsuarioLogado(principal));
+    public String mostrarFormularioDeNovaSaida(Model model, @CurrentUser Usuario usuario) {
+        carregarDadosDoFormulario(model, usuario);
         LancamentoFormDTO lancamentoForm = new LancamentoFormDTO();
         lancamentoForm.setTipo(TipoLancamento.SAIDA);
         model.addAttribute("lancamentoForm", lancamentoForm);
@@ -109,8 +99,7 @@ public class LancamentoController {
     }
 
     @GetMapping("/editar/{id}")
-    public String mostrarFormularioDeEdicao(@PathVariable Long id, Model model, Principal principal) {
-        Usuario usuario = getUsuarioLogado(principal);
+    public String mostrarFormularioDeEdicao(@PathVariable Long id, Model model, @CurrentUser Usuario usuario) {
         Lancamento lancamento = lancamentoService.buscarPorId(id).orElseThrow(() -> new RuntimeException("Lançamento não encontrado"));
 
         carregarDadosDoFormulario(model, usuario);
@@ -127,21 +116,19 @@ public class LancamentoController {
 
     @PostMapping
     public String salvarLancamento(@ModelAttribute("lancamentoForm") LancamentoFormDTO lancamentoForm,
-                                   @RequestParam(value = "comprovanteFiles", required = false) MultipartFile[] comprovanteFiles, Principal principal) {
-        lancamentoService.salvarOuAtualizarOperacao(lancamentoForm, comprovanteFiles, getUsuarioLogado(principal));
+                                   @RequestParam(value = "comprovanteFiles", required = false) MultipartFile[] comprovanteFiles, @CurrentUser Usuario usuario) {
+        lancamentoService.salvarOuAtualizarOperacao(lancamentoForm, comprovanteFiles, usuario);
         return "redirect:/lancamentos";
     }
 
     @DeleteMapping("/excluir/{id}")
-    public String excluirLancamento(@PathVariable Long id, Principal principal) {
-        Usuario usuario = getUsuarioLogado(principal);
+    public String excluirLancamento(@PathVariable Long id, @CurrentUser Usuario usuario) {
         lancamentoService.excluirOperacao(id, usuario);
         return "redirect:/lancamentos";
     }
 
     @DeleteMapping("/comprovante/{comprovanteId}")
-    public ResponseEntity<Void> excluirComprovante(@PathVariable Long comprovanteId, Principal principal) {
-        Usuario usuario = getUsuarioLogado(principal);
+    public ResponseEntity<Void> excluirComprovante(@PathVariable Long comprovanteId, @CurrentUser Usuario usuario) {
         lancamentoService.excluirComprovante(comprovanteId, usuario);
         return ResponseEntity.ok().build();
     }
