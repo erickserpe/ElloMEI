@@ -1,6 +1,8 @@
 package br.com.scfmei.service;
 
 import com.lowagie.text.DocumentException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,8 @@ import java.util.concurrent.CompletableFuture;
 @Service
 public class PdfService {
 
+    private static final Logger logger = LoggerFactory.getLogger(PdfService.class);
+
     @Autowired
     private TemplateEngine templateEngine;
 
@@ -24,7 +28,7 @@ public class PdfService {
 
     @Async // This annotation runs the method in a background thread
     public CompletableFuture<byte[]> gerarPdfDeHtml(String templateNome, Map<String, Object> variaveis) {
-        System.out.println("Gerando PDF no thread: " + Thread.currentThread().getName());
+        logger.debug("Gerando PDF no thread: {}", Thread.currentThread().getName());
 
         Context context = new Context();
         context.setVariables(variaveis);

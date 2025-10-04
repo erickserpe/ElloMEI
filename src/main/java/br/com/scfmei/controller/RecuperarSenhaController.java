@@ -5,6 +5,8 @@ import br.com.scfmei.domain.Usuario;
 import br.com.scfmei.repository.PasswordResetTokenRepository;
 import br.com.scfmei.repository.UsuarioRepository;
 import br.com.scfmei.service.EmailService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -29,6 +31,8 @@ import java.util.UUID;
  */
 @Controller
 public class RecuperarSenhaController {
+
+    private static final Logger logger = LoggerFactory.getLogger(RecuperarSenhaController.class);
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -88,7 +92,7 @@ public class RecuperarSenhaController {
         } catch (Exception e) {
             // Se falhar ao enviar email, ainda mostra mensagem de sucesso por segurança
             // mas loga o erro
-            System.err.println("Erro ao enviar email de recuperação: " + e.getMessage());
+            logger.error("Erro ao enviar email de recuperação para {}: {}", email, e.getMessage(), e);
         }
 
         redirectAttributes.addFlashAttribute("mensagemSucesso",

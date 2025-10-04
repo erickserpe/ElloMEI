@@ -2,8 +2,10 @@
 package br.com.scfmei.service;
 
 import br.com.scfmei.domain.Contato;
-import br.com.scfmei.domain.Usuario; // Importe Usuario
+import br.com.scfmei.domain.Usuario;
 import br.com.scfmei.repository.ContatoRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -19,6 +21,8 @@ import java.util.Optional;
 @Service
 public class ContatoService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ContatoService.class);
+
     @Autowired
     private ContatoRepository contatoRepository;
 
@@ -27,14 +31,14 @@ public class ContatoService {
     @Cacheable(value = "contatosPorUsuario", key = "#usuario.id")
     public List<Contato> buscarTodosPorUsuario(Usuario usuario) {
         // This log will only appear the FIRST time the method is called for a user
-        System.out.println("Buscando contatos do banco de dados para o usuário: " + usuario.getId());
+        logger.debug("Buscando contatos do banco de dados para o usuário: {}", usuario.getId());
         return contatoRepository.findByUsuario(usuario);
     }
 
     // Novo método com paginação (sem cache por enquanto)
     @Transactional(readOnly = true)
     public Page<Contato> buscarTodosPorUsuario(Usuario usuario, Pageable pageable) {
-        System.out.println("Buscando contatos paginados do banco de dados para o usuário: " + usuario.getId());
+        logger.debug("Buscando contatos paginados do banco de dados para o usuário: {}", usuario.getId());
         return contatoRepository.findByUsuario(usuario, pageable);
     }
 
@@ -42,7 +46,7 @@ public class ContatoService {
     @CacheEvict(value = "contatosPorUsuario", key = "#usuario.id")
     public Contato salvar(Contato contato, Usuario usuario) {
         contato.setUsuario(usuario); // Associa o contato ao usuário logado
-        System.out.println("Cache de contatos invalidado para o usuário: " + usuario.getId());
+        logger.debug("Cache de contatos invalidado para o usuário: {}", usuario.getId());
         return contatoRepository.save(contato);
     }
 
@@ -69,6 +73,6 @@ public class ContatoService {
 
     @CacheEvict(value = "contatosPorUsuario", key = "#usuarioId")
     public void evictContatoCache(Long usuarioId) {
-        System.out.println("Cache de contatos invalidado para o usuário: " + usuarioId);
+        logger.debug("Cache de contatos invalidado para o usuário: {}", usuarioId);
     }
 }

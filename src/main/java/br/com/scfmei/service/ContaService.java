@@ -3,6 +3,8 @@ package br.com.scfmei.service;
 import br.com.scfmei.domain.Conta;
 import br.com.scfmei.domain.Usuario;
 import br.com.scfmei.repository.ContaRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -18,6 +20,8 @@ import java.util.Optional;
 @Service
 public class ContaService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ContaService.class);
+
     @Autowired
     private ContaRepository contaRepository;
 
@@ -26,14 +30,14 @@ public class ContaService {
     @Cacheable(value = "contasPorUsuario", key = "#usuario.id")
     public List<Conta> buscarTodasPorUsuario(Usuario usuario) {
         // This log will only appear the FIRST time the method is called for a user
-        System.out.println("Buscando contas do banco de dados para o usuário: " + usuario.getId());
+        logger.debug("Buscando contas do banco de dados para o usuário: {}", usuario.getId());
         return contaRepository.findByUsuario(usuario);
     }
 
     // Novo método com paginação (sem cache por enquanto)
     @Transactional(readOnly = true)
     public Page<Conta> buscarTodasPorUsuario(Usuario usuario, Pageable pageable) {
-        System.out.println("Buscando contas paginadas do banco de dados para o usuário: " + usuario.getId());
+        logger.debug("Buscando contas paginadas do banco de dados para o usuário: {}", usuario.getId());
         return contaRepository.findByUsuario(usuario, pageable);
     }
 
@@ -45,7 +49,7 @@ public class ContaService {
         if (conta.getId() == null) {
             conta.setSaldoAtual(conta.getSaldoInicial());
         }
-        System.out.println("Cache de contas invalidado para o usuário: " + usuario.getId());
+        logger.debug("Cache de contas invalidado para o usuário: {}", usuario.getId());
         return contaRepository.save(conta);
     }
 
@@ -72,6 +76,6 @@ public class ContaService {
 
     @CacheEvict(value = "contasPorUsuario", key = "#usuarioId")
     public void evictContaCache(Long usuarioId) {
-        System.out.println("Cache de contas invalidado para o usuário: " + usuarioId);
+        logger.debug("Cache de contas invalidado para o usuário: {}", usuarioId);
     }
 }

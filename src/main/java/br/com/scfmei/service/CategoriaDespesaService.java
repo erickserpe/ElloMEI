@@ -3,6 +3,8 @@ package br.com.scfmei.service;
 import br.com.scfmei.domain.CategoriaDespesa;
 import br.com.scfmei.domain.Usuario;
 import br.com.scfmei.repository.CategoriaDespesaRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -17,6 +19,8 @@ import java.util.List;
 @Service
 public class CategoriaDespesaService {
 
+    private static final Logger logger = LoggerFactory.getLogger(CategoriaDespesaService.class);
+
     @Autowired
     private CategoriaDespesaRepository categoriaDespesaRepository;
 
@@ -25,14 +29,14 @@ public class CategoriaDespesaService {
     @Cacheable(value = "categoriasPorUsuario", key = "#usuario.id")
     public List<CategoriaDespesa> buscarTodasPorUsuario(Usuario usuario) {
         // This log will only appear the FIRST time the method is called for a user
-        System.out.println("Buscando categorias do banco de dados para o usuário: " + usuario.getId());
+        logger.debug("Buscando categorias do banco de dados para o usuário: {}", usuario.getId());
         return categoriaDespesaRepository.findByUsuario(usuario);
     }
 
     // Novo método com paginação (sem cache por enquanto)
     @Transactional(readOnly = true)
     public Page<CategoriaDespesa> buscarTodasPorUsuario(Usuario usuario, Pageable pageable) {
-        System.out.println("Buscando categorias paginadas do banco de dados para o usuário: " + usuario.getId());
+        logger.debug("Buscando categorias paginadas do banco de dados para o usuário: {}", usuario.getId());
         return categoriaDespesaRepository.findByUsuario(usuario, pageable);
     }
 
@@ -40,7 +44,7 @@ public class CategoriaDespesaService {
     @CacheEvict(value = "categoriasPorUsuario", key = "#usuario.id")
     public CategoriaDespesa salvar(CategoriaDespesa categoriaDespesa, Usuario usuario) {
         categoriaDespesa.setUsuario(usuario); // Associa a categoria ao usuário logado
-        System.out.println("Cache de categorias invalidado para o usuário: " + usuario.getId());
+        logger.debug("Cache de categorias invalidado para o usuário: {}", usuario.getId());
         return categoriaDespesaRepository.save(categoriaDespesa);
     }
 
@@ -67,6 +71,6 @@ public class CategoriaDespesaService {
 
     @CacheEvict(value = "categoriasPorUsuario", key = "#usuarioId")
     public void evictCategoriaCache(Long usuarioId) {
-        System.out.println("Cache de categorias invalidado para o usuário: " + usuarioId);
+        logger.debug("Cache de categorias invalidado para o usuário: {}", usuarioId);
     }
 }
