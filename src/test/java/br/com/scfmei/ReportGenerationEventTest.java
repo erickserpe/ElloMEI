@@ -1,9 +1,13 @@
 package br.com.scfmei;
 
+import static br.com.scfmei.TestHelper.*;
+
 import br.com.scfmei.domain.PlanoAssinatura;
 import br.com.scfmei.domain.Usuario;
+import br.com.scfmei.domain.Role;
 import br.com.scfmei.event.ReportGenerationRequestedEvent;
 import br.com.scfmei.repository.UsuarioRepository;
+import br.com.scfmei.repository.RoleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +52,8 @@ public class ReportGenerationEventTest {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -66,7 +72,7 @@ public class ReportGenerationEventTest {
         usuarioTeste = new Usuario();
         usuarioTeste.setUsername("reportuser");
         usuarioTeste.setPassword(passwordEncoder.encode("senha123"));
-        usuarioTeste.setRoles("USER");
+        usuarioTeste.setRoles(TestHelper.createUserRole(roleRepository));
         usuarioTeste.setPlano(PlanoAssinatura.PRO);
         usuarioTeste = usuarioRepository.save(usuarioTeste);
     }

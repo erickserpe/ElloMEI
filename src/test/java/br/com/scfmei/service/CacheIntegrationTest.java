@@ -1,10 +1,13 @@
 package br.com.scfmei.service;
 
+import br.com.scfmei.TestHelper;
 import br.com.scfmei.domain.CategoriaDespesa;
 import br.com.scfmei.domain.Contato;
 import br.com.scfmei.domain.Conta;
 import br.com.scfmei.domain.Usuario;
+import br.com.scfmei.domain.Role;
 import br.com.scfmei.repository.UsuarioRepository;
+import br.com.scfmei.repository.RoleRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,6 +41,8 @@ public class CacheIntegrationTest {
     
     @Autowired
     private UsuarioRepository usuarioRepository;
+    @Autowired
+    private RoleRepository roleRepository;
     
     @Autowired
     private CacheManager cacheManager;
@@ -48,7 +53,7 @@ public class CacheIntegrationTest {
         Usuario usuario = new Usuario();
         usuario.setUsername("testuser");
         usuario.setPassword("password");
-        usuario.setRoles("USER");
+        usuario.setRoles(TestHelper.createUserRole(roleRepository));
         usuario.setNomeCompleto("Test User");
         usuario = usuarioRepository.save(usuario);
 
@@ -74,7 +79,7 @@ public class CacheIntegrationTest {
         Usuario usuario = new Usuario();
         usuario.setUsername("testuser2");
         usuario.setPassword("password");
-        usuario.setRoles("USER");
+        usuario.setRoles(TestHelper.createUserRole(roleRepository));
         usuario.setNomeCompleto("Test User 2");
         usuario = usuarioRepository.save(usuario);
 
@@ -100,7 +105,7 @@ public class CacheIntegrationTest {
         Usuario usuario = new Usuario();
         usuario.setUsername("testuser3");
         usuario.setPassword("password");
-        usuario.setRoles("USER");
+        usuario.setRoles(TestHelper.createUserRole(roleRepository));
         usuario.setNomeCompleto("Test User 3");
         usuario = usuarioRepository.save(usuario);
 
@@ -126,7 +131,7 @@ public class CacheIntegrationTest {
         Usuario usuario = new Usuario();
         usuario.setUsername("testuser4");
         usuario.setPassword("password");
-        usuario.setRoles("USER");
+        usuario.setRoles(TestHelper.createUserRole(roleRepository));
         usuario.setNomeCompleto("Test User 4");
         usuario = usuarioRepository.save(usuario);
 

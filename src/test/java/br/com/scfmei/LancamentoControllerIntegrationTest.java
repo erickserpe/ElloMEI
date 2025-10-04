@@ -1,11 +1,13 @@
 package br.com.scfmei;
 
 import br.com.scfmei.domain.Conta;
+import br.com.scfmei.domain.Role;
 import br.com.scfmei.domain.StatusLancamento;
 import br.com.scfmei.domain.TipoLancamento;
 import br.com.scfmei.domain.Usuario;
 import br.com.scfmei.repository.ContaRepository;
 import br.com.scfmei.repository.LancamentoRepository;
+import br.com.scfmei.repository.RoleRepository;
 import br.com.scfmei.repository.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -51,6 +54,9 @@ class LancamentoControllerIntegrationTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private RoleRepository roleRepository;
+
     private Usuario testUser;
     private Conta testConta;
 
@@ -65,7 +71,7 @@ class LancamentoControllerIntegrationTest {
         testUser = new Usuario();
         testUser.setUsername("testuser");
         testUser.setPassword(passwordEncoder.encode("password"));
-        testUser.setRoles("USER");
+        testUser.setRoles(TestHelper.createUserRole(roleRepository));
         testUser.setNomeCompleto("Test User");
         testUser.setCpf("11144477735"); // CPF válido para testes
         testUser.setRazaoSocial("Test Company LTDA");

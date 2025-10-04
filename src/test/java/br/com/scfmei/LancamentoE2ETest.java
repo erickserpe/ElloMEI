@@ -1,10 +1,14 @@
 package br.com.scfmei;
 
+import static br.com.scfmei.TestHelper.*;
+
 import br.com.scfmei.domain.Conta;
 import br.com.scfmei.domain.Usuario;
+import br.com.scfmei.domain.Role;
 import br.com.scfmei.repository.ContaRepository;
 import br.com.scfmei.repository.LancamentoRepository;
 import br.com.scfmei.repository.UsuarioRepository;
+import br.com.scfmei.repository.RoleRepository;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +45,8 @@ class LancamentoE2ETest {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Autowired
     private ContaRepository contaRepository;
@@ -68,7 +74,7 @@ class LancamentoE2ETest {
         testUser = new Usuario();
         testUser.setUsername("lancamento_user");
         testUser.setPassword(passwordEncoder.encode("password"));
-        testUser.setRoles("USER");
+        testUser.setRoles(TestHelper.createUserRole(roleRepository));
         testUser.setNomeCompleto("Usuario Teste E2E");
         testUser.setNomeFantasia("Empresa Teste E2E");
         // Não definimos CPF e CNPJ para evitar validações

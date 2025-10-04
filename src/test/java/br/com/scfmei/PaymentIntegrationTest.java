@@ -1,8 +1,11 @@
 package br.com.scfmei;
 
+import static br.com.scfmei.TestHelper.*;
+
 import br.com.scfmei.domain.*;
 import br.com.scfmei.repository.AssinaturaRepository;
 import br.com.scfmei.repository.UsuarioRepository;
+import br.com.scfmei.repository.RoleRepository;
 import br.com.scfmei.service.AssinaturaService;
 import com.mercadopago.resources.payment.Payment;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +20,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -47,6 +51,8 @@ public class PaymentIntegrationTest {
     
     @Autowired
     private UsuarioRepository usuarioRepository;
+    @Autowired
+    private RoleRepository roleRepository;
     
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -61,7 +67,7 @@ public class PaymentIntegrationTest {
         usuarioTeste.setCpf("12345678901");
         usuarioTeste.setPassword(passwordEncoder.encode("senha123"));
         usuarioTeste.setPlano(PlanoAssinatura.FREE);
-        usuarioTeste.setRoles("ROLE_USER");
+        usuarioTeste.setRoles(TestHelper.createUserRole(roleRepository));
         usuarioTeste = usuarioRepository.save(usuarioTeste);
     }
     

@@ -1,10 +1,13 @@
 package br.com.scfmei;
 
+import static br.com.scfmei.TestHelper.*;
+
 import br.com.scfmei.domain.*;
 import br.com.scfmei.exception.PlanLimitExceededException;
 import br.com.scfmei.repository.ContaRepository;
 import br.com.scfmei.repository.LancamentoRepository;
 import br.com.scfmei.repository.UsuarioRepository;
+import br.com.scfmei.repository.RoleRepository;
 import br.com.scfmei.service.LancamentoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,6 +59,8 @@ public class PlanLimitIntegrationTest {
     @Autowired private LancamentoRepository lancamentoRepository;
     @Autowired private ContaRepository contaRepository;
     @Autowired private UsuarioRepository usuarioRepository;
+    @Autowired
+    private RoleRepository roleRepository;
     @Autowired private PasswordEncoder passwordEncoder;
 
     private Usuario userFree;
@@ -73,7 +78,7 @@ public class PlanLimitIntegrationTest {
         userFree = new Usuario();
         userFree.setUsername("userFree");
         userFree.setPassword(passwordEncoder.encode("password"));
-        userFree.setRoles("USER");
+        userFree.setRoles(TestHelper.createUserRole(roleRepository));
         userFree.setPlano(PlanoAssinatura.FREE);
         usuarioRepository.save(userFree);
 
@@ -81,7 +86,7 @@ public class PlanLimitIntegrationTest {
         userPro = new Usuario();
         userPro.setUsername("userPro");
         userPro.setPassword(passwordEncoder.encode("password"));
-        userPro.setRoles("USER");
+        userPro.setRoles(TestHelper.createUserRole(roleRepository));
         userPro.setPlano(PlanoAssinatura.PRO);
         usuarioRepository.save(userPro);
 

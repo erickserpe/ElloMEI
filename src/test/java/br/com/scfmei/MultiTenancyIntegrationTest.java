@@ -1,9 +1,13 @@
 package br.com.scfmei;
 
+import static br.com.scfmei.TestHelper.*;
+
 import br.com.scfmei.domain.Conta;
 import br.com.scfmei.domain.Usuario;
+import br.com.scfmei.domain.Role;
 import br.com.scfmei.repository.ContaRepository;
 import br.com.scfmei.repository.UsuarioRepository;
+import br.com.scfmei.repository.RoleRepository;
 import br.com.scfmei.service.ContaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,6 +43,8 @@ public class MultiTenancyIntegrationTest {
     @Autowired private ContaService contaService;
     @Autowired private ContaRepository contaRepository;
     @Autowired private UsuarioRepository usuarioRepository;
+    @Autowired
+    private RoleRepository roleRepository;
     @Autowired private PasswordEncoder passwordEncoder;
 
     private Usuario userA;
@@ -53,14 +59,14 @@ public class MultiTenancyIntegrationTest {
         userA = new Usuario();
         userA.setUsername("userA");
         userA.setPassword(passwordEncoder.encode("password"));
-        userA.setRoles("USER");
+        userA.setRoles(TestHelper.createUserRole(roleRepository));
         usuarioRepository.save(userA);
 
         // Cria o User B
         userB = new Usuario();
         userB.setUsername("userB");
         userB.setPassword(passwordEncoder.encode("password"));
-        userB.setRoles("USER");
+        userB.setRoles(TestHelper.createUserRole(roleRepository));
         usuarioRepository.save(userB);
 
         // Cria uma conta para o User A

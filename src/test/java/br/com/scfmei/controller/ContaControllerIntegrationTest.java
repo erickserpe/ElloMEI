@@ -1,9 +1,12 @@
 package br.com.scfmei.controller;
 
+import br.com.scfmei.TestHelper;
 import br.com.scfmei.domain.Conta;
 import br.com.scfmei.domain.Usuario;
+import br.com.scfmei.domain.Role;
 import br.com.scfmei.repository.ContaRepository;
 import br.com.scfmei.repository.UsuarioRepository;
+import br.com.scfmei.repository.RoleRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,6 +57,8 @@ class ContaControllerIntegrationTest {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -74,7 +79,7 @@ class ContaControllerIntegrationTest {
         userA = new Usuario();
         userA.setUsername("userA");
         userA.setPassword(passwordEncoder.encode("password"));
-        userA.setRoles("USER");
+        userA.setRoles(TestHelper.createUserRole(roleRepository));
         userA.setNomeCompleto("User A");
         userA.setCpf("11144477735"); // CPF válido para testes
         userA.setRazaoSocial("Empresa A LTDA");
@@ -85,7 +90,7 @@ class ContaControllerIntegrationTest {
         userB = new Usuario();
         userB.setUsername("userB");
         userB.setPassword(passwordEncoder.encode("password"));
-        userB.setRoles("USER");
+        userB.setRoles(TestHelper.createUserRole(roleRepository));
         userB.setNomeCompleto("User B");
         userB.setCpf("22233344456"); // CPF válido para testes
         userB.setRazaoSocial("Empresa B LTDA");
