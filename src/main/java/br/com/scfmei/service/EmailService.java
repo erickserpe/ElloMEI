@@ -2,9 +2,14 @@ package br.com.scfmei.service;
 
 import br.com.scfmei.domain.Assinatura;
 import br.com.scfmei.domain.Usuario;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
@@ -31,12 +36,18 @@ import java.time.format.DateTimeFormatter;
  */
 @Service
 public class EmailService {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
-    
+
+    @Autowired(required = false)
+    private JavaMailSender mailSender;
+
+    @Value("${spring.mail.username:noreply@scfmei.com.br}")
+    private String remetente;
+
     @Value("${app.base-url:http://localhost:8080}")
     private String baseUrl;
-    
+
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     
     /**
@@ -311,6 +322,170 @@ public class EmailService {
         logger.info("========================================");
 
         // TODO: Implementar envio real de e-mail
+    }
+
+    /**
+     * Envia email de recuperação de senha com link contendo token.
+     *
+     * @param destinatario Email do destinatário
+     * @param nomeUsuario Nome do usuário
+     * @param token Token de recuperação
+     */
+    public void enviarEmailRecuperacaoSenha(String destinatario, String nomeUsuario, String token) {
+        if (mailSender == null) {
+            logger.warn("JavaMailSender não configurado. Email de recuperação não será enviado.");
+            logger.info("========================================");
+            logger.info("📧 E-MAIL DE RECUPERAÇÃO DE SENHA (MOCK)");
+            logger.info("========================================");
+            logger.info("Para: {}", destinatario);
+            logger.info("Nome: {}", nomeUsuario);
+            logger.info("Token: {}", token);
+            logger.info("Link: {}/recuperar-senha/redefinir?token={}", baseUrl, token);
+            logger.info("========================================");
+            return;
+        }
+
+        try {
+            String assunto = "Recuperação de Senha - Ello MEI";
+            String linkRecuperacao = baseUrl + "/recuperar-senha/redefinir?token=" + token;
+
+            String corpo = construirEmailRecuperacaoSenha(nomeUsuario, linkRecuperacao);
+
+            enviarEmailHtml(destinatario, assunto, corpo);
+
+            logger.info("✅ Email de recuperação de senha enviado para: {}", destinatario);
+
+        } catch (Exception e) {
+            logger.error("❌ Erro ao enviar email de recuperação de senha para {}: {}", destinatario, e.getMessage());
+            throw new RuntimeException("Erro ao enviar email de recuperação de senha", e);
+        }
+    }
+
+    /**
+     * Envia email HTML usando JavaMailSender.
+     */
+    private void enviarEmailHtml(String destinatario, String assunto, String corpoHtml) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+        helper.setFrom(remetente);
+        helper.setTo(destinatario);
+        helper.setSubject(assunto);
+        helper.setText(corpoHtml, true); // true = HTML
+
+        mailSender.send(message);
+    }
+
+    /**
+     * Constrói o HTML do email de recuperação de senha.
+     */
+    private String construirEmailRecuperacaoSenha(String nomeUsuario, String linkRecuperacao) {
+        return """
+            <!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    body {
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        background-color: #f4f4f4;
+                        margin: 0;
+                        padding: 0;
+                    }
+                    .container {
+                        max-width: 600px;
+                        margin: 40px auto;
+                        background-color: #ffffff;
+                        border-radius: 10px;
+                        overflow: hidden;
+                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                    }
+                    .header {
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white;
+                        padding: 30px;
+                        text-align: center;
+                    }
+                    .header h1 {
+                        margin: 0;
+                        font-size: 28px;
+                    }
+                    .content {
+                        padding: 40px 30px;
+                    }
+                    .content h2 {
+                        color: #333;
+                        margin-top: 0;
+                    }
+                    .content p {
+                        color: #666;
+                        line-height: 1.6;
+                        font-size: 16px;
+                    }
+                    .button {
+                        display: inline-block;
+                        padding: 15px 40px;
+                        margin: 20px 0;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white;
+                        text-decoration: none;
+                        border-radius: 5px;
+                        font-weight: bold;
+                        font-size: 16px;
+                    }
+                    .button:hover {
+                        opacity: 0.9;
+                    }
+                    .footer {
+                        background-color: #f8f8f8;
+                        padding: 20px;
+                        text-align: center;
+                        color: #999;
+                        font-size: 14px;
+                    }
+                    .warning {
+                        background-color: #fff3cd;
+                        border-left: 4px solid #ffc107;
+                        padding: 15px;
+                        margin: 20px 0;
+                        border-radius: 4px;
+                    }
+                    .warning p {
+                        margin: 0;
+                        color: #856404;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>🔐 Ello MEI</h1>
+                    </div>
+                    <div class="content">
+                        <h2>Olá, %s!</h2>
+                        <p>Recebemos uma solicitação para redefinir a senha da sua conta no <strong>Ello MEI</strong>.</p>
+                        <p>Para criar uma nova senha, clique no botão abaixo:</p>
+                        <div style="text-align: center;">
+                            <a href="%s" class="button">Redefinir Senha</a>
+                        </div>
+                        <p>Ou copie e cole o link abaixo no seu navegador:</p>
+                        <p style="word-break: break-all; background-color: #f8f8f8; padding: 10px; border-radius: 4px; font-size: 14px;">
+                            %s
+                        </p>
+                        <div class="warning">
+                            <p><strong>⚠️ Importante:</strong> Este link expira em <strong>1 hora</strong>.</p>
+                        </div>
+                        <p>Se você não solicitou a redefinição de senha, ignore este email. Sua senha permanecerá inalterada.</p>
+                    </div>
+                    <div class="footer">
+                        <p>© 2024 Ello MEI - Sistema de Controle Financeiro para MEI</p>
+                        <p>Este é um email automático, por favor não responda.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """.formatted(nomeUsuario, linkRecuperacao, linkRecuperacao);
     }
 }
 
