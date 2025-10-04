@@ -32,12 +32,18 @@
                     <div class="text-white-50 small">Microempreendedor</div>
                 </div>
             </div>
-            <form th:action="@{/logout}" method="post">
-                <button class="btn btn-outline-light w-100 d-flex align-items-center justify-content-center" type="submit">
-                    <i class="bi bi-box-arrow-right me-2"></i>
-                    Sair
-                </button>
-            </form>
+            <div class="d-grid gap-2">
+                <a th:href="@{/perfil}" class="btn btn-outline-light btn-sm d-flex align-items-center justify-content-center">
+                    <i class="bi bi-person-circle me-2"></i>
+                    Meu Perfil
+                </a>
+                <form th:action="@{/logout}" method="post">
+                    <button class="btn btn-outline-light w-100 d-flex align-items-center justify-content-center" type="submit">
+                        <i class="bi bi-box-arrow-right me-2"></i>
+                        Sair
+                    </button>
+                </form>
+            </div>
         </div>
     </nav>
 

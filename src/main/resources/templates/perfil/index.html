@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout-base(~{::title}, ~{::main})}">
+<head>
+    <title>Meu Perfil - SCF-MEI</title>
+</head>
+<body>
+<main>
+    <div class="container-fluid">
+        <!-- Cabeçalho da Página -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-0">
+                    <i class="bi bi-person-circle me-2"></i>Meu Perfil
+                </h1>
+                <p class="text-muted mb-0">Gerencie seus dados pessoais, assinatura e configurações</p>
+            </div>
+        </div>
+
+        <!-- Mensagens de Sucesso/Erro -->
+        <div th:if="${mensagemSucesso}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i>
+            <span th:text="${mensagemSucesso}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${mensagemErro}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <span th:text="${mensagemErro}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="row">
+            <!-- Coluna Esquerda: Dados Pessoais -->
+            <div class="col-lg-6 mb-4">
+                <!-- Card: Dados Pessoais -->
+                <div class="content-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-person-badge me-2"></i>Dados Pessoais
+                        </h5>
+                        <a th:href="@{/perfil/editar}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-pencil me-1"></i>Editar
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-sm-4 text-muted">
+                                <i class="bi bi-person me-1"></i>Nome Completo:
+                            </div>
+                            <div class="col-sm-8">
+                                <strong th:text="${usuario.nomeCompleto ?: 'Não informado'}"></strong>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-sm-4 text-muted">
+                                <i class="bi bi-envelope me-1"></i>E-mail:
+                            </div>
+                            <div class="col-sm-8">
+                                <strong th:text="${usuario.username}"></strong>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-sm-4 text-muted">
+                                <i class="bi bi-card-text me-1"></i>CPF:
+                            </div>
+                            <div class="col-sm-8">
+                                <strong th:text="${usuario.cpf ?: 'Não informado'}"></strong>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <h6 class="text-muted mb-3">
+                            <i class="bi bi-building me-2"></i>Dados da Empresa (MEI)
+                        </h6>
+
+                        <div class="row mb-3">
+                            <div class="col-sm-4 text-muted">Razão Social:</div>
+                            <div class="col-sm-8">
+                                <strong th:text="${usuario.razaoSocial ?: 'Não informado'}"></strong>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-sm-4 text-muted">Nome Fantasia:</div>
+                            <div class="col-sm-8">
+                                <strong th:text="${usuario.nomeFantasia ?: 'Não informado'}"></strong>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-sm-4 text-muted">CNPJ:</div>
+                            <div class="col-sm-8">
+                                <strong th:text="${usuario.cnpj ?: 'Não informado'}"></strong>
+                            </div>
+                        </div>
+
+                        <div class="row mb-0">
+                            <div class="col-sm-4 text-muted">Data de Abertura:</div>
+                            <div class="col-sm-8">
+                                <strong th:text="${usuario.dataAberturaMei != null ? #temporals.format(usuario.dataAberturaMei, 'dd/MM/yyyy') : 'Não informado'}"></strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coluna Direita: Plano e Configurações -->
+            <div class="col-lg-6 mb-4">
+                <!-- Card: Plano e Assinatura -->
+                <div class="content-card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-credit-card me-2"></i>Plano e Assinatura
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-sm-4 text-muted">Plano Atual:</div>
+                            <div class="col-sm-8">
+                                <span th:if="${usuario.plano.name() == 'FREE'}" class="badge bg-secondary">
+                                    <i class="bi bi-gift me-1"></i>FREE
+                                </span>
+                                <span th:if="${usuario.plano.name() == 'PRO'}" class="badge bg-success">
+                                    <i class="bi bi-star-fill me-1"></i>PRO
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Se houver assinatura ativa -->
+                        <div th:if="${assinaturaAtiva != null}">
+                            <div class="row mb-3">
+                                <div class="col-sm-4 text-muted">Status:</div>
+                                <div class="col-sm-8">
+                                    <span th:class="'badge ' + ${assinaturaAtiva.status == 'ATIVA' ? 'bg-success' : 'bg-warning'}"
+                                          th:text="${assinaturaAtiva.status}"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-sm-4 text-muted">Data de Início:</div>
+                                <div class="col-sm-8">
+                                    <strong th:text="${#temporals.format(assinaturaAtiva.dataInicio, 'dd/MM/yyyy')}"></strong>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3" th:if="${assinaturaAtiva.dataProximaCobranca != null}">
+                                <div class="col-sm-4 text-muted">Próxima Cobrança:</div>
+                                <div class="col-sm-8">
+                                    <strong th:text="${#temporals.format(assinaturaAtiva.dataProximaCobranca, 'dd/MM/yyyy')}"></strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Ações do Plano -->
+                        <div class="d-grid gap-2">
+                            <a th:if="${usuario.plano.name() == 'FREE'}" 
+                               th:href="@{/assinatura/upgrade}" 
+                               class="btn btn-success">
+                                <i class="bi bi-arrow-up-circle me-2"></i>Fazer Upgrade para PRO
+                            </a>
+
+                            <a th:if="${usuario.plano.name() == 'PRO'}" 
+                               href="#" 
+                               class="btn btn-outline-danger"
+                               data-bs-toggle="modal" 
+                               data-bs-target="#modalCancelarAssinatura">
+                                <i class="bi bi-x-circle me-2"></i>Cancelar Assinatura
+                            </a>
+
+                            <a th:href="@{/assinatura/historico}" class="btn btn-outline-primary">
+                                <i class="bi bi-clock-history me-2"></i>Histórico de Pagamentos
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card: Configurações da Conta -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-gear me-2"></i>Configurações da Conta
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a th:href="@{/perfil/alterar-senha}" class="btn btn-outline-primary">
+                                <i class="bi bi-key me-2"></i>Alterar Senha
+                            </a>
+
+                            <button class="btn btn-outline-danger" disabled>
+                                <i class="bi bi-trash me-2"></i>Excluir Conta (Em breve)
+                            </button>
+                        </div>
+
+                        <hr>
+
+                        <div class="text-muted small">
+                            <i class="bi bi-info-circle me-1"></i>
+                            <strong>Nota:</strong> A exclusão de conta removerá permanentemente todos os seus dados.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Cancelar Assinatura -->
+    <div class="modal fade" id="modalCancelarAssinatura" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle text-warning me-2"></i>Cancelar Assinatura
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Tem certeza que deseja cancelar sua assinatura PRO?</p>
+                    <p class="text-muted small">
+                        Você perderá acesso aos recursos premium ao final do período de cobrança atual.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Não, manter assinatura</button>
+                    <form th:action="@{/assinatura/cancelar}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-danger">Sim, cancelar assinatura</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>
+

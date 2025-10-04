@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout-base(~{::title}, ~{::main})}">
+<head>
+    <title>Editar Perfil - SCF-MEI</title>
+</head>
+<body>
+<main>
+    <div class="container-fluid">
+        <!-- Cabeçalho da Página -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-0">
+                    <i class="bi bi-pencil-square me-2"></i>Editar Perfil
+                </h1>
+                <p class="text-muted mb-0">Atualize seus dados pessoais e informações da empresa</p>
+            </div>
+            <a th:href="@{/perfil}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Voltar
+            </a>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <form th:action="@{/perfil/editar}" th:object="${usuario}" method="post">
+                    <!-- Card: Dados Pessoais -->
+                    <div class="form-section-card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="bi bi-person-badge me-2"></i>Dados Pessoais
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label for="nomeCompleto" class="form-label">
+                                        Nome Completo <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="nomeCompleto" 
+                                           th:field="*{nomeCompleto}"
+                                           th:classappend="${#fields.hasErrors('nomeCompleto')} ? 'is-invalid' : ''"
+                                           required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('nomeCompleto')}" 
+                                         th:errors="*{nomeCompleto}"></div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="username" class="form-label">
+                                        E-mail (Login)
+                                    </label>
+                                    <input type="email" 
+                                           class="form-control" 
+                                           id="username" 
+                                           th:field="*{username}"
+                                           readonly
+                                           disabled>
+                                    <small class="text-muted">
+                                        <i class="bi bi-info-circle me-1"></i>O e-mail não pode ser alterado
+                                    </small>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="cpf" class="form-label">CPF</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="cpf" 
+                                           th:field="*{cpf}"
+                                           th:classappend="${#fields.hasErrors('cpf')} ? 'is-invalid' : ''"
+                                           placeholder="000.000.000-00">
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('cpf')}" 
+                                         th:errors="*{cpf}"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card: Dados da Empresa (MEI) -->
+                    <div class="form-section-card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="bi bi-building me-2"></i>Dados da Empresa (MEI)
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label for="razaoSocial" class="form-label">Razão Social</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="razaoSocial" 
+                                           th:field="*{razaoSocial}"
+                                           placeholder="Nome completo do MEI">
+                                </div>
+
+                                <div class="col-md-12 mb-3">
+                                    <label for="nomeFantasia" class="form-label">Nome Fantasia</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="nomeFantasia" 
+                                           th:field="*{nomeFantasia}"
+                                           placeholder="Nome comercial da empresa">
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="cnpj" class="form-label">CNPJ</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="cnpj" 
+                                           th:field="*{cnpj}"
+                                           th:classappend="${#fields.hasErrors('cnpj')} ? 'is-invalid' : ''"
+                                           placeholder="00.000.000/0000-00">
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('cnpj')}" 
+                                         th:errors="*{cnpj}"></div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="dataAberturaMei" class="form-label">Data de Abertura do MEI</label>
+                                    <input type="date" 
+                                           class="form-control" 
+                                           id="dataAberturaMei" 
+                                           th:field="*{dataAberturaMei}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botões de Ação -->
+                    <div class="d-flex justify-content-between">
+                        <a th:href="@{/perfil}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle me-1"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-1"></i>Salvar Alterações
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>
+
