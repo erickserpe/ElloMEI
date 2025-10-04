@@ -5,6 +5,9 @@ import br.com.scfmei.domain.Usuario;
 import br.com.scfmei.repository.UsuarioRepository;
 import br.com.scfmei.service.CategoriaDespesaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,10 +32,12 @@ public class CategoriaDespesaController {
     }
 
     @GetMapping
-    public String listarCategorias(Model model, Principal principal) {
+    public String listarCategorias(Model model, Principal principal, @PageableDefault(size = 10, sort = "id") Pageable pageable) {
         Usuario usuario = getUsuarioLogado(principal);
-        List<CategoriaDespesa> categorias = categoriaService.buscarTodasPorUsuario(usuario);
-        model.addAttribute("listaDeCategorias", categorias);
+        Page<CategoriaDespesa> categoriasPage = categoriaService.buscarTodasPorUsuario(usuario, pageable);
+        model.addAttribute("categoriasPage", categoriasPage);
+        // Mantém compatibilidade com HTML antigo
+        model.addAttribute("listaDeCategorias", categoriasPage.getContent());
         return "categorias";
     }
 

@@ -7,6 +7,9 @@ import br.com.scfmei.repository.UsuarioRepository;
 import br.com.scfmei.service.ContaService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.AccessDeniedException; // Importante para segurança
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,10 +34,12 @@ public class ContaController {
     }
 
     @GetMapping
-    public String listarContas(Model model, Principal principal) {
+    public String listarContas(Model model, Principal principal, @PageableDefault(size = 10, sort = "id") Pageable pageable) {
         Usuario usuario = getUsuarioLogado(principal);
-        List<Conta> contas = contaService.buscarTodasPorUsuario(usuario);
-        model.addAttribute("listaDeContas", contas);
+        Page<Conta> contasPage = contaService.buscarTodasPorUsuario(usuario, pageable);
+        model.addAttribute("contasPage", contasPage);
+        // Mantém compatibilidade com HTML antigo
+        model.addAttribute("listaDeContas", contasPage.getContent());
         return "contas";
     }
 

@@ -7,6 +7,9 @@ import br.com.scfmei.repository.UsuarioRepository;
 import br.com.scfmei.service.ContatoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,10 +33,12 @@ public class ContatoController {
     }
 
     @GetMapping
-    public String listarContatos(Model model, Principal principal) {
+    public String listarContatos(Model model, Principal principal, @PageableDefault(size = 10, sort = "id") Pageable pageable) {
         Usuario usuario = getUsuarioLogado(principal);
-        List<Contato> contatos = contatoService.buscarTodosPorUsuario(usuario);
-        model.addAttribute("listaDeContatos", contatos);
+        Page<Contato> contatosPage = contatoService.buscarTodosPorUsuario(usuario, pageable);
+        model.addAttribute("contatosPage", contatosPage);
+        // Mantém compatibilidade com HTML antigo
+        model.addAttribute("listaDeContatos", contatosPage.getContent());
         return "contatos";
     }
 
