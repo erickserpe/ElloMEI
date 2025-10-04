@@ -1,8 +1,8 @@
 package br.com.scfmei.controller;
 
+import br.com.scfmei.config.security.CurrentUser;
 import br.com.scfmei.domain.*;
 import br.com.scfmei.repository.HistoricoPagamentoRepository;
-import br.com.scfmei.repository.UsuarioRepository;
 import br.com.scfmei.service.AssinaturaService;
 import br.com.scfmei.service.MercadoPagoService;
 import com.mercadopago.exceptions.MPApiException;
@@ -17,7 +17,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,30 +42,18 @@ public class AssinaturaController {
     
     @Autowired
     private AssinaturaService assinaturaService;
-    
+
     @Autowired
     private MercadoPagoService mercadoPagoService;
-    
-    @Autowired
-    private UsuarioRepository usuarioRepository;
 
     @Autowired
     private HistoricoPagamentoRepository historicoPagamentoRepository;
 
     /**
-     * Obtém o usuário logado.
-     */
-    private Usuario getUsuarioLogado(Principal principal) {
-        return usuarioRepository.findByUsername(principal.getName())
-            .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-    }
-    
-    /**
      * Página de gerenciamento de assinatura.
      */
     @GetMapping
-    public String paginaAssinatura(Model model, Principal principal) {
-        Usuario usuario = getUsuarioLogado(principal);
+    public String paginaAssinatura(Model model, @CurrentUser Usuario usuario) {
         
         Optional<Assinatura> assinaturaAtiva = 
             assinaturaService.buscarAssinaturaAtiva(usuario);
@@ -86,8 +73,7 @@ public class AssinaturaController {
      * Página de upgrade de plano.
      */
     @GetMapping("/upgrade")
-    public String paginaUpgrade(Model model, Principal principal) {
-        Usuario usuario = getUsuarioLogado(principal);
+    public String paginaUpgrade(Model model, @CurrentUser Usuario usuario) {
         
         // Se já é PRO, redirecionar
         if (usuario.getPlano() == PlanoAssinatura.PRO) {
@@ -106,10 +92,9 @@ public class AssinaturaController {
      * Processar upgrade via checkout do Mercado Pago.
      */
     @PostMapping("/upgrade/checkout")
-    public String processarUpgradeCheckout(Principal principal, 
+    public String processarUpgradeCheckout(@CurrentUser Usuario usuario,
                                           RedirectAttributes redirectAttributes) {
         try {
-            Usuario usuario = getUsuarioLogado(principal);
             
             // Criar preferência de pagamento
             Preference preference = mercadoPagoService.criarPreferenciaPagamento(
@@ -135,9 +120,8 @@ public class AssinaturaController {
      */
     @PostMapping("/upgrade/pix")
     @ResponseBody
-    public String processarUpgradePix(Principal principal) {
+    public String processarUpgradePix(@CurrentUser Usuario usuario) {
         try {
-            Usuario usuario = getUsuarioLogado(principal);
             
             // Criar pagamento PIX
             Payment payment = mercadoPagoService.criarPagamentoPix(
@@ -164,7 +148,7 @@ public class AssinaturaController {
     @GetMapping("/pagamento/sucesso")
     public String pagamentoSucesso(@RequestParam(required = false) String payment_id,
                                   @RequestParam(required = false) String external_reference,
-                                  Principal principal,
+                                  @CurrentUser Usuario usuario,
                                   Model model) {
 
         logger.info("Pagamento aprovado - Payment ID: {} - External Ref: {}",
@@ -176,7 +160,6 @@ public class AssinaturaController {
                 Payment payment = mercadoPagoService.buscarPagamento(Long.parseLong(payment_id));
 
                 if ("approved".equals(payment.getStatus())) {
-                    Usuario usuario = getUsuarioLogado(principal);
 
                     // Processar upgrade
                     assinaturaService.processarUpgrade(
@@ -226,10 +209,9 @@ public class AssinaturaController {
      */
     @PostMapping("/cancelar")
     public String cancelarAssinatura(@RequestParam String motivo,
-                                    Principal principal,
+                                    @CurrentUser Usuario usuario,
                                     RedirectAttributes redirectAttributes) {
         try {
-            Usuario usuario = getUsuarioLogado(principal);
             
             assinaturaService.cancelarAssinatura(usuario, motivo);
             
@@ -249,8 +231,7 @@ public class AssinaturaController {
      * Exibe o histórico de pagamentos do usuário.
      */
     @GetMapping("/historico")
-    public String historicoPagamentos(Principal principal, Model model) {
-        Usuario usuario = getUsuarioLogado(principal);
+    public String historicoPagamentos(@CurrentUser Usuario usuario, Model model) {
 
         List<HistoricoPagamento> historico =
             historicoPagamentoRepository.findByUsuarioOrderByDataPagamentoDesc(usuario);

@@ -1,10 +1,10 @@
 // src/main/java/br/com/scfmei/controller/DashboardRestController.java
 package br.com.scfmei.controller;
 
+import br.com.scfmei.config.security.CurrentUser;
 import br.com.scfmei.domain.ChartData;
 import br.com.scfmei.domain.StatusLancamento;
 import br.com.scfmei.domain.Usuario;
-import br.com.scfmei.repository.UsuarioRepository;
 import br.com.scfmei.service.DashboardService;
 import br.com.scfmei.service.LancamentoService; // Importe para o faturamento mensal
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.security.Principal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.HashMap;
@@ -27,13 +26,7 @@ import java.util.Map;
 public class DashboardRestController {
 
     @Autowired private DashboardService dashboardService;
-    @Autowired private UsuarioRepository usuarioRepository;
     @Autowired private LancamentoService lancamentoService; // Necessário para o faturamento
-
-    private Usuario getUsuarioLogado(Principal principal) {
-        return usuarioRepository.findByUsername(principal.getName())
-                .orElseThrow(() -> new IllegalStateException("Usuário logado não encontrado."));
-    }
 
     @GetMapping("/despesas-por-categoria")
     public ResponseEntity<List<ChartData>> getDespesasPorCategoria(
@@ -43,23 +36,19 @@ public class DashboardRestController {
             @RequestParam(required = false) Long contatoId,
             @RequestParam(required = false) Long categoriaId,
             @RequestParam(required = false) StatusLancamento status,
-            Principal principal) {
-
-        Usuario usuario = getUsuarioLogado(principal);
+            @CurrentUser Usuario usuario) {
         List<ChartData> data = dashboardService.getDespesasPorCategoria(dataInicio, dataFim, contaId, contatoId, categoriaId, status, usuario);
         return ResponseEntity.ok(data);
     }
 
     @GetMapping("/fluxo-caixa-mensal")
-    public ResponseEntity<Map<String, List<?>>> getFluxoDeCaixaMensal(Principal principal) {
-        Usuario usuario = getUsuarioLogado(principal);
+    public ResponseEntity<Map<String, List<?>>> getFluxoDeCaixaMensal(@CurrentUser Usuario usuario) {
         Map<String, List<?>> data = dashboardService.getFluxoDeCaixaUltimos12Meses(usuario);
         return ResponseEntity.ok(data);
     }
 
     @GetMapping("/faturamento-widget")
-    public ResponseEntity<Map<String, BigDecimal>> getDadosWidgetFaturamento(@RequestParam String tipoCalculo, Principal principal) {
-        Usuario usuario = getUsuarioLogado(principal);
+    public ResponseEntity<Map<String, BigDecimal>> getDadosWidgetFaturamento(@RequestParam String tipoCalculo, @CurrentUser Usuario usuario) {
         YearMonth mesAtual = YearMonth.now();
         int anoAtual = mesAtual.getYear();
 

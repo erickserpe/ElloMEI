@@ -1,8 +1,8 @@
 package br.com.scfmei.controller;
 
+import br.com.scfmei.config.security.CurrentUser;
 import br.com.scfmei.domain.*;
 import br.com.scfmei.event.ReportGenerationRequestedEvent;
-import br.com.scfmei.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.security.Principal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,14 +44,6 @@ public class RelatorioController {
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-
-    private Usuario getUsuarioLogado(Principal principal) {
-        return usuarioRepository.findByUsername(principal.getName())
-                .orElseThrow(() -> new IllegalStateException("Usuário logado não encontrado."));
-    }
-
 
     /**
      * Solicita geração de relatório de faturamento dinâmico.
@@ -74,9 +65,7 @@ public class RelatorioController {
             @RequestParam(required = false) Boolean comNotaFiscal,
             @RequestParam(required = false) String descricao,
             @RequestParam(required = false) StatusLancamento status,
-            Principal principal) {
-
-        Usuario usuario = getUsuarioLogado(principal);
+            @CurrentUser Usuario usuario) {
 
         // Publica evento para geração assíncrona do relatório
         ReportGenerationRequestedEvent event = ReportGenerationRequestedEvent.builder()
@@ -124,9 +113,7 @@ public class RelatorioController {
             @RequestParam(required = false) Long categoriaId,
             @RequestParam(required = false) String descricao,
             @RequestParam(required = false) StatusLancamento status,
-            Principal principal) {
-
-        Usuario usuario = getUsuarioLogado(principal);
+            @CurrentUser Usuario usuario) {
 
         // Publica evento para geração assíncrona do relatório
         ReportGenerationRequestedEvent event = ReportGenerationRequestedEvent.builder()
@@ -172,9 +159,7 @@ public class RelatorioController {
             @RequestParam(required = false) Boolean comNotaFiscal,
             @RequestParam(required = false) String descricao,
             @RequestParam(required = false) StatusLancamento status,
-            Principal principal) {
-
-        Usuario usuario = getUsuarioLogado(principal);
+            @CurrentUser Usuario usuario) {
 
         // Publica evento para geração assíncrona do relatório
         ReportGenerationRequestedEvent event = ReportGenerationRequestedEvent.builder()
