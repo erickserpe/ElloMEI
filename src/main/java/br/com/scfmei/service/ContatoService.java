@@ -7,6 +7,8 @@ import br.com.scfmei.repository.ContatoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,12 +22,20 @@ public class ContatoService {
     @Autowired
     private ContatoRepository contatoRepository;
 
+    // Método legado (sem paginação) - mantido para compatibilidade
     @Transactional(readOnly = true)
     @Cacheable(value = "contatosPorUsuario", key = "#usuario.id")
     public List<Contato> buscarTodosPorUsuario(Usuario usuario) {
         // This log will only appear the FIRST time the method is called for a user
         System.out.println("Buscando contatos do banco de dados para o usuário: " + usuario.getId());
         return contatoRepository.findByUsuario(usuario);
+    }
+
+    // Novo método com paginação (sem cache por enquanto)
+    @Transactional(readOnly = true)
+    public Page<Contato> buscarTodosPorUsuario(Usuario usuario, Pageable pageable) {
+        System.out.println("Buscando contatos paginados do banco de dados para o usuário: " + usuario.getId());
+        return contatoRepository.findByUsuario(usuario, pageable);
     }
 
     @Transactional

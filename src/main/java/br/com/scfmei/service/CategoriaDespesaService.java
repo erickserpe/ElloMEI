@@ -6,6 +6,8 @@ import br.com.scfmei.repository.CategoriaDespesaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,12 +20,20 @@ public class CategoriaDespesaService {
     @Autowired
     private CategoriaDespesaRepository categoriaDespesaRepository;
 
+    // Método legado (sem paginação) - mantido para compatibilidade
     @Transactional(readOnly = true)
     @Cacheable(value = "categoriasPorUsuario", key = "#usuario.id")
     public List<CategoriaDespesa> buscarTodasPorUsuario(Usuario usuario) {
         // This log will only appear the FIRST time the method is called for a user
         System.out.println("Buscando categorias do banco de dados para o usuário: " + usuario.getId());
         return categoriaDespesaRepository.findByUsuario(usuario);
+    }
+
+    // Novo método com paginação (sem cache por enquanto)
+    @Transactional(readOnly = true)
+    public Page<CategoriaDespesa> buscarTodasPorUsuario(Usuario usuario, Pageable pageable) {
+        System.out.println("Buscando categorias paginadas do banco de dados para o usuário: " + usuario.getId());
+        return categoriaDespesaRepository.findByUsuario(usuario, pageable);
     }
 
     @Transactional

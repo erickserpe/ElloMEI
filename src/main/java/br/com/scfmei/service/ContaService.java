@@ -6,6 +6,8 @@ import br.com.scfmei.repository.ContaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,12 +21,20 @@ public class ContaService {
     @Autowired
     private ContaRepository contaRepository;
 
+    // Método legado (sem paginação) - mantido para compatibilidade
     @Transactional(readOnly = true)
     @Cacheable(value = "contasPorUsuario", key = "#usuario.id")
     public List<Conta> buscarTodasPorUsuario(Usuario usuario) {
         // This log will only appear the FIRST time the method is called for a user
         System.out.println("Buscando contas do banco de dados para o usuário: " + usuario.getId());
         return contaRepository.findByUsuario(usuario);
+    }
+
+    // Novo método com paginação (sem cache por enquanto)
+    @Transactional(readOnly = true)
+    public Page<Conta> buscarTodasPorUsuario(Usuario usuario, Pageable pageable) {
+        System.out.println("Buscando contas paginadas do banco de dados para o usuário: " + usuario.getId());
+        return contaRepository.findByUsuario(usuario, pageable);
     }
 
     @Transactional

@@ -4,6 +4,9 @@ import br.com.scfmei.domain.*;
 import br.com.scfmei.repository.ComprovanteRepository;
 import br.com.scfmei.repository.LancamentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -174,6 +177,7 @@ public class LancamentoService {
         return lancamentoRepository.findComFiltros(dataInicio, dataFim, contaId, contatoId, tipo, categoriaId, comNotaFiscal, descricao, status, usuario);
     }
 
+    // Método legado (sem paginação) - mantido para compatibilidade
     @Transactional(readOnly = true)
     public List<LancamentoGrupoDTO> buscarComFiltrosAgrupados(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long contatoId, TipoLancamento tipo, Long categoriaId, Boolean comNotaFiscal, String descricao, StatusLancamento status, Usuario usuario) {
         List<Lancamento> lancamentos = lancamentoRepository.findComFiltros(dataInicio, dataFim, contaId, contatoId, tipo, categoriaId, comNotaFiscal, descricao, status, usuario);
@@ -193,6 +197,32 @@ public class LancamentoService {
                     return dateCompare != 0 ? dateCompare : g2.getId().compareTo(g1.getId());
                 })
                 .collect(Collectors.toList());
+    }
+
+    // Novo método com paginação
+    @Transactional(readOnly = true)
+    public Page<LancamentoGrupoDTO> buscarComFiltrosAgrupados(LocalDate dataInicio, LocalDate dataFim, Long contaId, Long contatoId, TipoLancamento tipo, Long categoriaId, Boolean comNotaFiscal, String descricao, StatusLancamento status, Usuario usuario, Pageable pageable) {
+        // Busca os lançamentos paginados
+        Page<Lancamento> lancamentosPage = lancamentoRepository.findComFiltros(dataInicio, dataFim, contaId, contatoId, tipo, categoriaId, comNotaFiscal, descricao, status, usuario, pageable);
+
+        // Agrupa os lançamentos da PÁGINA ATUAL por grupoOperacao (ou por ID se não tiver grupo)
+        Map<String, List<Lancamento>> grupos = lancamentosPage.getContent().stream()
+                .collect(Collectors.groupingBy(l ->
+                    l.getGrupoOperacao() != null ? l.getGrupoOperacao() : l.getId().toString()
+                ));
+
+        // Converte cada grupo em um LancamentoGrupoDTO
+        List<LancamentoGrupoDTO> dtos = grupos.values().stream()
+                .map(this::criarLancamentoGrupoDTO)
+                .sorted((g1, g2) -> {
+                    // Ordena por data decrescente, depois por ID decrescente
+                    int dateCompare = g2.getData().compareTo(g1.getData());
+                    return dateCompare != 0 ? dateCompare : g2.getId().compareTo(g1.getId());
+                })
+                .collect(Collectors.toList());
+
+        // Retorna uma Page com os DTOs agrupados
+        return new PageImpl<>(dtos, pageable, lancamentosPage.getTotalElements());
     }
 
     private LancamentoGrupoDTO criarLancamentoGrupoDTO(List<Lancamento> lancamentosDoGrupo) {
