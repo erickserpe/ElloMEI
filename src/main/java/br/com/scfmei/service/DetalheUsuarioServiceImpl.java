@@ -3,6 +3,7 @@ package br.com.scfmei.service;
 import br.com.scfmei.domain.Usuario;
 import br.com.scfmei.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -10,6 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DetalheUsuarioServiceImpl implements UserDetailsService {
@@ -26,10 +28,14 @@ public class DetalheUsuarioServiceImpl implements UserDetailsService {
 
         Usuario usuario = usuarioOpt.get();
 
-        return User.builder()
-                .username(usuario.getUsername())
-                .password(usuario.getPassword())
-                .roles(usuario.getRoles())
-                .build();
+        // Converte o Set<Role> para List<SimpleGrantedAuthority>
+        // O Spring Security espera objetos GrantedAuthority
+        return new User(
+                usuario.getUsername(),
+                usuario.getPassword(),
+                usuario.getRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority(role.getNome()))
+                        .collect(Collectors.toList())
+        );
     }
 }

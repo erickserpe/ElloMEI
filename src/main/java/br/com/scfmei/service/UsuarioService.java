@@ -1,12 +1,16 @@
 package br.com.scfmei.service;
 
+import br.com.scfmei.domain.Role;
 import br.com.scfmei.domain.Usuario;
 import br.com.scfmei.event.UserRegisteredEvent;
+import br.com.scfmei.repository.RoleRepository;
 import br.com.scfmei.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
 
 /**
  * Serviço responsável pela gestão de usuários.
@@ -24,6 +28,9 @@ public class UsuarioService {
     private UsuarioRepository usuarioRepository;
 
     @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder; // Injetamos o codificador de senhas
 
     @Autowired
@@ -34,7 +41,7 @@ public class UsuarioService {
      *
      * Este método:
      * 1. Criptografa a senha do usuário
-     * 2. Define o papel padrão (USER)
+     * 2. Associa a role padrão ROLE_USER ao usuário
      * 3. Salva o usuário no banco de dados
      * 4. Publica um evento UserRegisteredEvent para notificar outros componentes
      *
@@ -44,8 +51,13 @@ public class UsuarioService {
     public Usuario salvar(Usuario usuario) {
         // Criptografa a senha antes de salvar no banco
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
-        // Define um papel padrão para novos usuários
-        usuario.setRoles("USER");
+
+        // Busca a role ROLE_USER no banco de dados
+        Role userRole = roleRepository.findByNome("ROLE_USER")
+                .orElseThrow(() -> new RuntimeException("Erro: Role ROLE_USER não encontrada no banco de dados."));
+
+        // Associa a role ao usuário
+        usuario.setRoles(Set.of(userRole));
 
         // Salva o usuário no banco de dados
         Usuario novoUsuario = usuarioRepository.save(usuario);

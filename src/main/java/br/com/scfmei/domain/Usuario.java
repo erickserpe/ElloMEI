@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Usuario {
@@ -30,7 +32,13 @@ public class Usuario {
     @CNPJ
     private String cnpj;
 
-    private String roles; // Papéis/Permissões do usuário
+    // Relacionamento ManyToMany com Role
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "usuario_roles",
+            joinColumns = @JoinColumn(name = "usuario_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
+
     private LocalDate dataAberturaMei;
 
     // Plano de Assinatura (SaaS)
@@ -57,8 +65,8 @@ public class Usuario {
     public void setNomeFantasia(String nomeFantasia) { this.nomeFantasia = nomeFantasia; }
     public String getCnpj() { return cnpj; }
     public void setCnpj(String cnpj) { this.cnpj = cnpj; }
-    public String getRoles() { return roles; }
-    public void setRoles(String roles) { this.roles = roles; }
+    public Set<Role> getRoles() { return roles; }
+    public void setRoles(Set<Role> roles) { this.roles = roles; }
     public LocalDate getDataAberturaMei() {
         return dataAberturaMei;
     }
