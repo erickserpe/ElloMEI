@@ -25,8 +25,9 @@ public class SecurityConfig {
         // As regras de filtro
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        // Permitir acesso público à landing page, login, registro e recursos estáticos
+                        // Permitir acesso público à landing page, login, registro, recuperação de senha e recursos estáticos
                         .requestMatchers("/", "/home", "/demo", "/login", "/registro",
+                                        "/recuperar-senha", "/recuperar-senha/**",
                                         "/webjars/**", "/css/**", "/js/**", "/images/**").permitAll()
                         // Todas as outras rotas requerem autenticação
                         .anyRequest().authenticated()
