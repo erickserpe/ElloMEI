@@ -32,6 +32,7 @@ Thumbs.db
 # Docker
 Dockerfile
 docker-compose.yml
+docker-compose.prod.yml
 .dockerignore
 
 # Uploads (will be mounted as volume)
@@ -43,4 +44,26 @@ test-uploads/
 
 # Logs
 *.log
+logs/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Backups
+backups/
+*.sql
+*.sql.gz
+
+# Scripts
+docker-start.sh
+*.sh
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
 
