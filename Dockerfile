@@ -17,15 +17,28 @@ FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
-# Create uploads directory
-RUN mkdir -p /app/uploads
+# Create non-root user for security
+RUN addgroup -S spring && adduser -S spring -G spring
+
+# Create directories
+RUN mkdir -p /app/uploads /var/log/scf-mei && \
+    chown -R spring:spring /app /var/log/scf-mei
 
 # Copy the built JAR from build stage
 COPY --from=build /app/target/*.jar app.jar
 
+# Change ownership of the JAR
+RUN chown spring:spring app.jar
+
+# Switch to non-root user
+USER spring:spring
+
 # Expose port 8080
 EXPOSE 8080
 
-# Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Environment variable for JVM options (can be overridden)
+ENV JAVA_OPTS=""
+
+# Run the application with JAVA_OPTS support
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
 

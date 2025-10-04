@@ -1,0 +1,104 @@
+# ===================================
+# DOCKER COMPOSE - PRODUÇÃO
+# ===================================
+# Este arquivo contém configurações específicas para PRODUÇÃO.
+# 
+# Para usar:
+# docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# IMPORTANTE: Configure o arquivo .env com credenciais de PRODUÇÃO!
+# ===================================
+
+services:
+  # MySQL Database - Configurações de Produção
+  mysql:
+    restart: always  # Sempre reiniciar em caso de falha
+    command: 
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --max_connections=200
+      - --innodb_buffer_pool_size=512M
+      - --innodb_log_file_size=128M
+    environment:
+      # Timezone
+      TZ: America/Sao_Paulo
+    # Não expor porta do MySQL publicamente em produção
+    # Comente a linha abaixo para maior segurança
+    # ports:
+    #   - "3307:3306"
+
+  # Spring Boot Application - Configurações de Produção
+  app:
+    restart: always  # Sempre reiniciar em caso de falha
+    environment:
+      # Forçar perfil de produção
+      SPRING_PROFILES_ACTIVE: prod
+      # JVM Options para produção
+      JAVA_OPTS: >-
+        -Xms512m
+        -Xmx1024m
+        -XX:+UseG1GC
+        -XX:MaxGCPauseMillis=200
+        -XX:+HeapDumpOnOutOfMemoryError
+        -XX:HeapDumpPath=/var/log/scf-mei/
+        -Djava.security.egd=file:/dev/./urandom
+      # Timezone
+      TZ: America/Sao_Paulo
+    # Criar volume para logs
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/var/log/scf-mei
+    # Healthcheck para monitoramento
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+# ===================================
+# VOLUMES ADICIONAIS PARA PRODUÇÃO
+# ===================================
+volumes:
+  # Volume para logs (opcional, se não usar bind mount)
+  # logs_data:
+  #   driver: local
+
+# ===================================
+# NOTAS IMPORTANTES
+# ===================================
+#
+# ANTES DE USAR EM PRODUÇÃO:
+#
+# 1. VARIÁVEIS DE AMBIENTE:
+#    - Configure o arquivo .env com credenciais FORTES
+#    - NUNCA use senhas padrão (5522, root_password, etc.)
+#
+# 2. SSL/HTTPS:
+#    - Configure um reverse proxy (Nginx) com SSL
+#    - Use Let's Encrypt para certificados gratuitos
+#    - Ou use Cloudflare para SSL automático
+#
+# 3. LOGS:
+#    - Crie o diretório: mkdir -p ./logs
+#    - Configure rotação de logs
+#
+# 4. BACKUP:
+#    - Configure backup automático do volume mysql_data
+#    - Teste o restore regularmente
+#
+# 5. MONITORAMENTO:
+#    - Configure alertas para falhas
+#    - Monitore uso de CPU, memória e disco
+#
+# 6. SEGURANÇA:
+#    - Use firewall para bloquear portas desnecessárias
+#    - Mantenha apenas a porta 80/443 aberta (HTTP/HTTPS)
+#    - Bloqueie acesso direto ao MySQL (porta 3307)
+#
+# 7. PERFORMANCE:
+#    - Ajuste os parâmetros do MySQL conforme necessário
+#    - Ajuste a memória da JVM (-Xms/-Xmx) conforme disponível
+#
+# ===================================
+
