@@ -55,8 +55,16 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- Paginação -->
+            <div class="px-3 pb-3">
+                <div th:replace="~{fragments/pagination :: pagination(${contatosPage})}"></div>
+            </div>
         </div>
     </div>
+
+    <!-- Script de paginação -->
+    <script th:replace="~{fragments/pagination :: pagination-script}"></script>
 </div>
 </body>
 </html>
