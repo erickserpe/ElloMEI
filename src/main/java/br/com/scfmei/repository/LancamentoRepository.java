@@ -2,6 +2,8 @@
 package br.com.scfmei.repository;
 
 import br.com.scfmei.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,6 +20,7 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
     List<Lancamento> findByGrupoOperacaoAndUsuario(String grupoOperacao, Usuario usuario);
     List<Lancamento> findByStatusAndUsuarioOrderByDataAsc(StatusLancamento status, Usuario usuario);
 
+    // Busca lançamentos com filtros (sem paginação - legado)
     @Query("SELECT l FROM Lancamento l WHERE " +
             "(:dataInicio IS NULL OR l.data >= :dataInicio) AND " +
             "(:dataFim IS NULL OR l.data <= :dataFim) AND " +
@@ -41,6 +44,33 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
             @Param("descricao") String descricao,
             @Param("status") StatusLancamento status,
             @Param("usuario") Usuario usuario
+    );
+
+    // Busca lançamentos com filtros (com paginação)
+    @Query("SELECT l FROM Lancamento l WHERE " +
+            "(:dataInicio IS NULL OR l.data >= :dataInicio) AND " +
+            "(:dataFim IS NULL OR l.data <= :dataFim) AND " +
+            "(:contaId IS NULL OR l.conta.id = :contaId) AND " +
+            "(:contatoId IS NULL OR l.contato.id = :contatoId) AND " +
+            "(:tipo IS NULL OR l.tipo = :tipo) AND " +
+            "(:categoriaId IS NULL OR l.categoriaDespesa.id = :categoriaId) AND " +
+            "(:comNotaFiscal IS NULL OR l.comNotaFiscal = :comNotaFiscal) AND " +
+            "(:descricao IS NULL OR l.descricao LIKE %:descricao%) AND " +
+            "(:status IS NULL OR l.status = :status) AND " +
+            "l.usuario = :usuario " +
+            "ORDER BY l.data DESC, l.id DESC")
+    Page<Lancamento> findComFiltros(
+            @Param("dataInicio") LocalDate dataInicio,
+            @Param("dataFim") LocalDate dataFim,
+            @Param("contaId") Long contaId,
+            @Param("contatoId") Long contatoId,
+            @Param("tipo") TipoLancamento tipo,
+            @Param("categoriaId") Long categoriaId,
+            @Param("comNotaFiscal") Boolean comNotaFiscal,
+            @Param("descricao") String descricao,
+            @Param("status") StatusLancamento status,
+            @Param("usuario") Usuario usuario,
+            Pageable pageable
     );
 
     @Query("SELECT new br.com.scfmei.domain.ChartData(c.nome, SUM(l.valor)) " +
