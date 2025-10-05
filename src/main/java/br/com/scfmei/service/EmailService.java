@@ -106,8 +106,6 @@ public class EmailService {
         logger.info("Obrigado por ser PRO!");
         logger.info("Equipe SCF-MEI");
         logger.info("========================================");
-        
-        // TODO: Implementar envio real de e-mail
     }
     
     /**
@@ -140,7 +138,6 @@ public class EmailService {
         logger.info("Equipe SCF-MEI");
         logger.info("========================================");
         
-        // TODO: Implementar envio real de e-mail
     }
     
     /**
@@ -167,7 +164,6 @@ public class EmailService {
         logger.info("Equipe SCF-MEI");
         logger.info("========================================");
         
-        // TODO: Implementar envio real de e-mail
     }
     
     /**
@@ -196,7 +192,6 @@ public class EmailService {
         logger.info("Equipe SCF-MEI");
         logger.info("========================================");
         
-        // TODO: Implementar envio real de e-mail
     }
     
     /**
@@ -257,7 +252,6 @@ public class EmailService {
         logger.info("Equipe SCF-MEI");
         logger.info("========================================");
 
-        // TODO: Implementar envio real de e-mail
     }
 
     /**
@@ -284,7 +278,6 @@ public class EmailService {
         logger.info("Equipe SCF-MEI");
         logger.info("========================================");
 
-        // TODO: Implementar envio real de e-mail
     }
 
     /**
@@ -315,7 +308,6 @@ public class EmailService {
         logger.info("Equipe SCF-MEI");
         logger.info("========================================");
 
-        // TODO: Implementar envio real de e-mail
     }
 
     /**

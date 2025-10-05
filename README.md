@@ -12,8 +12,8 @@ Sistema completo de controle financeiro desenvolvido em **Spring Boot** para Mic
 ### Iniciar o Sistema
 
 ```bash
-chmod +x docker-start.sh
-./docker-start.sh
+chmod +x scripts/docker-start.sh
+./scripts/docker-start.sh
 ```
 
 Aguarde a mensagem de sucesso e acesse:
@@ -54,12 +54,27 @@ http://localhost:8080
 
 ---
 
-## 📚 Documentação
+## 📚 Documentação Completa
 
-- **[Guia Rápido](QUICK-START.md)** - Comandos essenciais
-- **[Configuração Docker Completa](DOCKER-SETUP.md)** - Guia detalhado
-- **[Recursos Avançados](ADVANCED-FEATURES.md)** - Backup, variáveis de ambiente, boas práticas
-- **[Relatório de Testes](LIGHTWEIGHT_TESTS_FINAL_REPORT.md)** - Testes implementados
+**Toda a documentação foi organizada na pasta [`docs/`](./docs/)**
+
+### 🚀 Configuração Inicial
+- [Quick Start](./docs/setup/quick-start.md) - Início rápido em 3 passos
+- [Docker Setup](./docs/setup/docker.md) - Configuração completa com Docker
+- [Email Configuration](./docs/setup/email-configuration.md) - Configuração de email
+- [Database Guide](./docs/setup/database.md) - Guia do banco de dados
+
+### ⚙️ Funcionalidades
+- [Payment System](./docs/features/payment-system.md) - Sistema de pagamentos
+- [Monitoring](./docs/features/monitoring.md) - Prometheus + Grafana
+- [Backup](./docs/features/backup.md) - Backup automático
+- [CI/CD](./docs/features/cicd.md) - Pipeline de deploy
+
+### 📖 Guias
+- [Testing Guide](./docs/guides/testing.md) - Guia de testes
+- [Validations](./docs/guides/validations.md) - Validações implementadas
+
+**[📚 Ver documentação completa](./docs/README.md)**
 
 ---
 
@@ -69,33 +84,35 @@ http://localhost:8080
 
 ```bash
 # Ver status
-./docker-start.sh status
+./scripts/docker-start.sh status
 
 # Ver logs em tempo real
-./docker-start.sh logs
+./scripts/docker-start.sh logs
 
 # Reiniciar
-./docker-start.sh restart
+./scripts/docker-start.sh restart
 
 # Parar
-./docker-start.sh stop
+./scripts/docker-start.sh stop
 
 # Limpar tudo
-./docker-start.sh clean
+./scripts/docker-start.sh clean
 ```
 
 ### Backup e Restauração
 
 ```bash
 # Criar backup
-./backup.sh
+./scripts/backup.sh
 
 # Listar backups
-./backup.sh --list
+./scripts/backup.sh --list
 
 # Restaurar backup
-./backup.sh --restore <arquivo>
+./scripts/backup.sh --restore <arquivo>
 ```
+
+**[📜 Ver todos os scripts disponíveis](./scripts/README.md)**
 
 ### Comandos Docker Diretos
 
@@ -262,9 +279,9 @@ Desenvolvido para auxiliar Microempreendedores Individuais (MEI) no controle fin
 
 ## 🆘 Suporte
 
-Encontrou algum problema? 
+Encontrou algum problema?
 
-1. Verifique a [documentação completa](DOCKER-SETUP.md)
+1. Verifique a [documentação completa](./docs/README.md)
 2. Veja os logs: `docker compose logs -f`
 3. Abra uma issue no repositório
 
