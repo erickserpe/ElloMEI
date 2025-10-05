@@ -7,6 +7,7 @@ import br.com.scfmei.domain.Usuario;
 import br.com.scfmei.repository.AssinaturaRepository;
 import br.com.scfmei.repository.UsuarioRepository;
 import br.com.scfmei.service.AssinaturaService;
+import br.com.scfmei.service.EmailService;
 import br.com.scfmei.service.MercadoPagoService;
 import com.mercadopago.resources.payment.Payment;
 import org.slf4j.Logger;
@@ -61,6 +62,9 @@ public class MercadoPagoWebhookController {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private EmailService emailService;
     
     /**
      * Endpoint que recebe notificações do Mercado Pago.
@@ -136,6 +140,8 @@ public class MercadoPagoWebhookController {
             
             if ("approved".equals(status)) {
                 processarPagamentoAprovado(payment, externalReference);
+            } else if ("pending".equals(status)) {
+                processarPagamentoPendente(payment, externalReference);
             } else if ("rejected".equals(status)) {
                 processarPagamentoRecusado(payment, externalReference);
             } else if ("refunded".equals(status)) {
@@ -172,17 +178,31 @@ public class MercadoPagoWebhookController {
                 
                 if (assinaturaExistente.isEmpty()) {
                     // Criar nova assinatura
-                    assinaturaService.processarUpgrade(
-                        usuario, 
-                        plano, 
-                        payment, 
+                    Assinatura assinatura = assinaturaService.processarUpgrade(
+                        usuario,
+                        plano,
+                        payment,
                         FormaPagamento.CARTAO_CREDITO
                     );
-                    
-                    logger.info("Assinatura criada via webhook para usuário: {}", 
+
+                    logger.info("Assinatura criada via webhook para usuário: {}",
                                usuario.getUsername());
+
+                    // Enviar email de pagamento aprovado
+                    try {
+                        emailService.enviarEmailPagamentoAprovado(
+                            usuario,
+                            assinatura,
+                            payment.getId().toString()
+                        );
+                        logger.info("Email de pagamento aprovado enviado para: {}",
+                                   usuario.getUsername());
+                    } catch (Exception e) {
+                        logger.error("Erro ao enviar email de pagamento aprovado: {}",
+                                    e.getMessage());
+                    }
                 } else {
-                    logger.info("Assinatura já existe para este pagamento: {}", 
+                    logger.info("Assinatura já existe para este pagamento: {}",
                                payment.getId());
                 }
             } else {
@@ -192,14 +212,84 @@ public class MercadoPagoWebhookController {
     }
     
     /**
+     * Processa pagamento pendente.
+     */
+    private void processarPagamentoPendente(Payment payment, String externalReference) {
+        logger.info("Pagamento pendente: {} - Aguardando confirmação", payment.getId());
+
+        // Extrair ID do usuário da external reference
+        if (externalReference != null && externalReference.startsWith("USER_")) {
+            String[] parts = externalReference.split("_");
+            Long usuarioId = Long.parseLong(parts[1]);
+
+            Optional<Usuario> usuarioOpt = usuarioRepository.findById(usuarioId);
+
+            if (usuarioOpt.isPresent()) {
+                Usuario usuario = usuarioOpt.get();
+
+                // Buscar assinatura do usuário
+                Optional<Assinatura> assinaturaOpt = assinaturaRepository.findByUsuario(usuario);
+
+                if (assinaturaOpt.isPresent()) {
+                    Assinatura assinatura = assinaturaOpt.get();
+
+                    // Enviar email de pagamento pendente
+                    try {
+                        emailService.enviarEmailPagamentoPendente(
+                            usuario,
+                            assinatura,
+                            payment.getId().toString()
+                        );
+                        logger.info("Email de pagamento pendente enviado para: {}",
+                                   usuario.getUsername());
+                    } catch (Exception e) {
+                        logger.error("Erro ao enviar email de pagamento pendente: {}",
+                                    e.getMessage());
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Processa pagamento recusado.
      */
     private void processarPagamentoRecusado(Payment payment, String externalReference) {
-        logger.warn("Pagamento recusado: {} - Motivo: {}", 
+        logger.warn("Pagamento recusado: {} - Motivo: {}",
                    payment.getId(), payment.getStatusDetail());
-        
-        // TODO: Enviar e-mail notificando falha no pagamento
-        // TODO: Suspender assinatura se for renovação
+
+        // Extrair ID do usuário da external reference
+        if (externalReference != null && externalReference.startsWith("USER_")) {
+            String[] parts = externalReference.split("_");
+            Long usuarioId = Long.parseLong(parts[1]);
+
+            Optional<Usuario> usuarioOpt = usuarioRepository.findById(usuarioId);
+
+            if (usuarioOpt.isPresent()) {
+                Usuario usuario = usuarioOpt.get();
+
+                // Buscar assinatura do usuário
+                Optional<Assinatura> assinaturaOpt = assinaturaRepository.findByUsuario(usuario);
+
+                if (assinaturaOpt.isPresent()) {
+                    Assinatura assinatura = assinaturaOpt.get();
+
+                    // Atualizar motivo da falha
+                    assinatura.setMotivoFalhaPagamento(payment.getStatusDetail());
+                    assinaturaRepository.save(assinatura);
+
+                    // Enviar email de falha de pagamento
+                    try {
+                        emailService.enviarEmailFalhaPagamento(usuario, assinatura);
+                        logger.info("Email de falha de pagamento enviado para: {}",
+                                   usuario.getUsername());
+                    } catch (Exception e) {
+                        logger.error("Erro ao enviar email de falha de pagamento: {}",
+                                    e.getMessage());
+                    }
+                }
+            }
+        }
     }
     
     /**
