@@ -3,13 +3,17 @@ package br.com.scfmei.service;
 import br.com.scfmei.domain.Role;
 import br.com.scfmei.domain.Usuario;
 import br.com.scfmei.event.UserRegisteredEvent;
+import br.com.scfmei.exception.UsuarioDuplicadoException;
 import br.com.scfmei.repository.RoleRepository;
 import br.com.scfmei.repository.UsuarioRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -23,6 +27,8 @@ import java.util.Set;
  */
 @Service
 public class UsuarioService {
+
+    private static final Logger logger = LoggerFactory.getLogger(UsuarioService.class);
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -40,17 +46,29 @@ public class UsuarioService {
      * Salva um novo usuário no sistema.
      *
      * Este método:
-     * 1. Criptografa a senha do usuário
-     * 2. Associa a role padrão ROLE_USER ao usuário
-     * 3. Salva o usuário no banco de dados
-     * 4. Publica um evento UserRegisteredEvent para notificar outros componentes
+     * 1. Valida se username e email são únicos
+     * 2. Criptografa a senha do usuário
+     * 3. Associa a role padrão ROLE_USER ao usuário
+     * 4. Salva o usuário no banco de dados
+     * 5. Publica um evento UserRegisteredEvent para notificar outros componentes
      *
      * @param usuario O usuário a ser salvo
      * @return O usuário salvo com ID gerado
+     * @throws UsuarioDuplicadoException se username ou email já existirem
      */
     public Usuario salvar(Usuario usuario) {
+        logger.info("📝 Iniciando cadastro de novo usuário: {}", usuario.getUsername());
+
+        // Validação 1: Verifica se o username já existe
+        validarUsernameUnico(usuario.getUsername());
+
+        // Validação 2: Verifica se o email já existe
+        validarEmailUnico(usuario.getEmail());
+
         // Criptografa a senha antes de salvar no banco
-        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        String senhaOriginal = usuario.getPassword();
+        usuario.setPassword(passwordEncoder.encode(senhaOriginal));
+        logger.debug("🔒 Senha criptografada com sucesso");
 
         // Busca a role ROLE_USER no banco de dados
         Role userRole = roleRepository.findByNome("ROLE_USER")
@@ -58,15 +76,52 @@ public class UsuarioService {
 
         // Associa a role ao usuário
         usuario.setRoles(Set.of(userRole));
+        logger.debug("👤 Role ROLE_USER associada ao usuário");
 
         // Salva o usuário no banco de dados
         Usuario novoUsuario = usuarioRepository.save(usuario);
+        logger.info("✅ Usuário {} cadastrado com sucesso! ID: {}", novoUsuario.getUsername(), novoUsuario.getId());
 
         // Publica o evento após salvar
         // Isso permite que outros componentes (listeners) reajam ao registro
         // sem que o UsuarioService precise conhecê-los
         eventPublisher.publishEvent(new UserRegisteredEvent(this, novoUsuario));
+        logger.debug("📢 Evento UserRegisteredEvent publicado");
 
         return novoUsuario;
+    }
+
+    /**
+     * Valida se o username é único no sistema.
+     *
+     * @param username Username a ser validado
+     * @throws UsuarioDuplicadoException se o username já existir
+     */
+    private void validarUsernameUnico(String username) {
+        Optional<Usuario> usuarioExistente = usuarioRepository.findByUsername(username);
+        if (usuarioExistente.isPresent()) {
+            logger.warn("⚠️ Tentativa de cadastro com username duplicado: {}", username);
+            throw new UsuarioDuplicadoException(
+                "O nome de usuário '" + username + "' já está em uso. Por favor, escolha outro."
+            );
+        }
+        logger.debug("✅ Username {} está disponível", username);
+    }
+
+    /**
+     * Valida se o email é único no sistema.
+     *
+     * @param email Email a ser validado
+     * @throws UsuarioDuplicadoException se o email já existir
+     */
+    private void validarEmailUnico(String email) {
+        Optional<Usuario> usuarioExistente = usuarioRepository.findByEmail(email);
+        if (usuarioExistente.isPresent()) {
+            logger.warn("⚠️ Tentativa de cadastro com email duplicado: {}", email);
+            throw new UsuarioDuplicadoException(
+                "O email '" + email + "' já está cadastrado. Use outro email ou recupere sua senha."
+            );
+        }
+        logger.debug("✅ Email {} está disponível", email);
     }
 }

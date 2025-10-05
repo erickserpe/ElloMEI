@@ -142,7 +142,34 @@
         .glass-input::placeholder {
             color: rgba(100, 116, 139, 0.7);
         }
-        
+
+        .glass-input.is-invalid {
+            border-color: #dc3545;
+            background: rgba(220, 53, 69, 0.05);
+        }
+
+        .glass-input.is-invalid:focus {
+            border-color: #dc3545;
+            box-shadow:
+                0 0 0 3px rgba(220, 53, 69, 0.1),
+                0 4px 20px rgba(220, 53, 69, 0.2);
+        }
+
+        .invalid-feedback {
+            display: block;
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        .text-muted {
+            color: rgba(100, 116, 139, 0.8);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: block;
+        }
+
         .create-account-btn {
             background: var(--primary-blue);
             border: none;
@@ -274,7 +301,14 @@
                     <h1 class="registration-title">Crie sua Conta no Ello MEI</h1>
                     <p class="registration-subtitle">Comece a organizar as suas finanças em poucos passos. É rápido e seguro.</p>
                 </div>
-                
+
+                <!-- Mensagem de Erro Geral -->
+                <div th:if="${mensagemErro}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <span th:text="${mensagemErro}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
                 <!-- Registration Form -->
                 <form th:action="@{/registro}" method="post" th:object="${usuario}">
                     <!-- Access Details Section -->
@@ -289,18 +323,46 @@
                                 <label for="username" class="form-label">
                                     <i class="bi bi-person"></i>
                                     Usuário (Login)
+                                    <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" class="glass-input" id="username" th:field="*{username}"
-                                       placeholder="Escolha um nome de usuário único" required>
+                                <input type="text"
+                                       class="glass-input"
+                                       th:classappend="${#fields.hasErrors('username')} ? 'is-invalid' : ''"
+                                       id="username"
+                                       th:field="*{username}"
+                                       placeholder="Escolha um nome de usuário único"
+                                       required
+                                       minlength="3"
+                                       maxlength="50">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}" th:errors="*{username}">
+                                    Erro no username
+                                </div>
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Entre 3 e 50 caracteres
+                                </small>
                             </div>
 
                             <div class="form-group">
                                 <label for="email" class="form-label">
                                     <i class="bi bi-envelope"></i>
                                     E-mail
+                                    <span class="text-danger">*</span>
                                 </label>
-                                <input type="email" class="glass-input" id="email" th:field="*{email}"
-                                       placeholder="seu@email.com" required>
+                                <input type="email"
+                                       class="glass-input"
+                                       th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
+                                       id="email"
+                                       th:field="*{email}"
+                                       placeholder="seu@email.com"
+                                       required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">
+                                    Erro no email
+                                </div>
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Usaremos para recuperação de senha e notificações
+                                </small>
                             </div>
                         </div>
 
@@ -309,9 +371,23 @@
                                 <label for="password" class="form-label">
                                     <i class="bi bi-lock"></i>
                                     Senha
+                                    <span class="text-danger">*</span>
                                 </label>
-                                <input type="password" class="glass-input" id="password" th:field="*{password}"
-                                       placeholder="Crie uma senha segura" required>
+                                <input type="password"
+                                       class="glass-input"
+                                       th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''"
+                                       id="password"
+                                       th:field="*{password}"
+                                       placeholder="Crie uma senha segura"
+                                       required
+                                       minlength="8">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">
+                                    Erro na senha
+                                </div>
+                                <small class="text-muted">
+                                    <i class="bi bi-shield-check me-1"></i>
+                                    Mínimo 8 caracteres, com maiúsculas, minúsculas, números e caracteres especiais (!@#$%&*)
+                                </small>
                             </div>
                         </div>
                     </div>

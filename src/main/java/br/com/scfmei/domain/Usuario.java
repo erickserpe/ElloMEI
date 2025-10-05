@@ -2,8 +2,13 @@ package br.com.scfmei.domain;
 
 import br.com.scfmei.validation.anotations.CPF;
 import br.com.scfmei.validation.anotations.CNPJ;
+import br.com.scfmei.validation.anotations.EmailValido;
+import br.com.scfmei.validation.anotations.SenhaForte;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -17,12 +22,19 @@ public class Usuario {
     private Long id;
 
     // Dados de Acesso
-    @Column(unique = true)
+    @NotBlank(message = "O nome de usuário é obrigatório")
+    @Size(min = 3, max = 50, message = "O nome de usuário deve ter entre 3 e 50 caracteres")
+    @Column(unique = true, nullable = false)
     private String username;
 
-    @Column(unique = true)
+    @NotBlank(message = "O email é obrigatório")
+    @Email(message = "Formato de email inválido")
+    @EmailValido(message = "Email inválido ou inexistente")
+    @Column(unique = true, nullable = false)
     private String email;
 
+    @NotBlank(message = "A senha é obrigatória")
+    @SenhaForte(message = "A senha não atende aos requisitos de segurança")
     private String password;
 
     // Dados Pessoais
