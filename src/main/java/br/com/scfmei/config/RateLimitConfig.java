@@ -39,10 +39,21 @@ public class RateLimitConfig {
     /**
      * Configuração do CacheManager com Caffeine.
      * Expira entradas após 1 hora de inatividade.
+     *
+     * Registra todos os caches usados pela aplicação:
+     * - rateLimitCache: Para rate limiting
+     * - categoriasPorUsuario: Cache de categorias por usuário
+     * - contatosPorUsuario: Cache de contatos por usuário
+     * - contasPorUsuario: Cache de contas por usuário
      */
     @Bean
     public CacheManager cacheManager() {
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager("rateLimitCache");
+        CaffeineCacheManager cacheManager = new CaffeineCacheManager(
+            "rateLimitCache",
+            "categoriasPorUsuario",
+            "contatosPorUsuario",
+            "contasPorUsuario"
+        );
         cacheManager.setCaffeine(Caffeine.newBuilder()
                 .expireAfterAccess(1, TimeUnit.HOURS)
                 .maximumSize(10000));

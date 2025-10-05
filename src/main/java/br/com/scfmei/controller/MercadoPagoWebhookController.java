@@ -3,6 +3,7 @@ package br.com.scfmei.controller;
 import br.com.scfmei.domain.Assinatura;
 import br.com.scfmei.domain.FormaPagamento;
 import br.com.scfmei.domain.PlanoAssinatura;
+import br.com.scfmei.domain.StatusAssinatura;
 import br.com.scfmei.domain.Usuario;
 import br.com.scfmei.repository.AssinaturaRepository;
 import br.com.scfmei.repository.UsuarioRepository;
@@ -227,8 +228,11 @@ public class MercadoPagoWebhookController {
             if (usuarioOpt.isPresent()) {
                 Usuario usuario = usuarioOpt.get();
 
-                // Buscar assinatura do usuário
-                Optional<Assinatura> assinaturaOpt = assinaturaRepository.findByUsuario(usuario);
+                // Buscar assinatura ativa do usuário
+                Optional<Assinatura> assinaturaOpt = assinaturaRepository.findByUsuarioAndStatus(
+                    usuario,
+                    StatusAssinatura.ATIVA
+                );
 
                 if (assinaturaOpt.isPresent()) {
                     Assinatura assinatura = assinaturaOpt.get();
@@ -268,8 +272,11 @@ public class MercadoPagoWebhookController {
             if (usuarioOpt.isPresent()) {
                 Usuario usuario = usuarioOpt.get();
 
-                // Buscar assinatura do usuário
-                Optional<Assinatura> assinaturaOpt = assinaturaRepository.findByUsuario(usuario);
+                // Buscar assinatura ativa do usuário
+                Optional<Assinatura> assinaturaOpt = assinaturaRepository.findByUsuarioAndStatus(
+                    usuario,
+                    StatusAssinatura.ATIVA
+                );
 
                 if (assinaturaOpt.isPresent()) {
                     Assinatura assinatura = assinaturaOpt.get();

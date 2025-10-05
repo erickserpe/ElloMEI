@@ -396,7 +396,7 @@ public class EmailService {
                         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                     }
                     .header {
-                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        background: linear-gradient(135deg, #667eea 0%%, #764ba2 100%%);
                         color: white;
                         padding: 30px;
                         text-align: center;
@@ -421,7 +421,7 @@ public class EmailService {
                         display: inline-block;
                         padding: 15px 40px;
                         margin: 20px 0;
-                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        background: linear-gradient(135deg, #667eea 0%%, #764ba2 100%%);
                         color: white;
                         text-decoration: none;
                         border-radius: 5px;
