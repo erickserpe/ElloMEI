@@ -22,7 +22,7 @@ import java.util.Set;
  * Este serviço implementa o padrão de Eventos de Domínio,
  * publicando eventos quando ações importantes ocorrem (ex: novo usuário registrado).
  *
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @Service

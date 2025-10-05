@@ -1,6 +1,6 @@
 package br.com.ellomei;
 
-import static br.com.scfmei.TestHelper.*;
+import static br.com.ellomei.TestHelper.*;
 
 import br.com.ellomei.domain.PlanoAssinatura;
 import br.com.ellomei.domain.Usuario;
@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * 3. Controller retorna HTTP 202 (Accepted) imediatamente
  * 4. Listener processa o evento em background
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @SpringBootTest

@@ -37,7 +37,7 @@ import java.util.List;
  * Documentação oficial:
  * https://www.mercadopago.com.br/developers/pt/docs
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @Service
@@ -82,7 +82,7 @@ public class MercadoPagoService {
         // Criar item (plano)
         PreferenceItemRequest item = PreferenceItemRequest.builder()
             .id(plano.name())
-            .title("Plano " + plano.name() + " - SCF-MEI")
+            .title("Plano " + plano.name() + " - ElloMEI")
             .description("Assinatura mensal do plano " + plano.name())
             .categoryId("services")
             .quantity(1)
@@ -96,7 +96,7 @@ public class MercadoPagoService {
         // Configurar payer (comprador)
         PreferencePayerRequest payer = PreferencePayerRequest.builder()
             .name(usuario.getUsername())
-            .email(usuario.getUsername() + "@scfmei.com.br") // Usar username como email
+            .email(usuario.getUsername() + "@ellomei.com") // Usar username como email
             .build();
         
         // Configurar URLs de retorno
@@ -113,7 +113,7 @@ public class MercadoPagoService {
             .backUrls(backUrls)
             .autoReturn("approved")
             .externalReference("USER_" + usuario.getId() + "_PLAN_" + plano.name())
-            .statementDescriptor("SCF-MEI " + plano.name())
+            .statementDescriptor("ElloMEI " + plano.name())
             .notificationUrl(baseUrl + "/api/webhooks/mercadopago")
             .build();
         
@@ -146,12 +146,12 @@ public class MercadoPagoService {
         PaymentCreateRequest paymentCreateRequest = PaymentCreateRequest.builder()
             .transactionAmount(valor)
             .token(token)
-            .description("Plano " + plano.name() + " - SCF-MEI")
+            .description("Plano " + plano.name() + " - ElloMEI")
             .installments(installments)
             .paymentMethodId("credit_card")
             .payer(
                 PaymentPayerRequest.builder()
-                    .email(usuario.getUsername() + "@scfmei.com.br")
+                    .email(usuario.getUsername() + "@ellomei.com")
                     .firstName(usuario.getUsername())
                     .identification(
                         IdentificationRequest.builder()
@@ -162,7 +162,7 @@ public class MercadoPagoService {
                     .build()
             )
             .externalReference("USER_" + usuario.getId() + "_PLAN_" + plano.name())
-            .statementDescriptor("SCF-MEI")
+            .statementDescriptor("ElloMEI")
             .build();
         
         PaymentClient client = new PaymentClient();
@@ -190,11 +190,11 @@ public class MercadoPagoService {
         
         PaymentCreateRequest paymentCreateRequest = PaymentCreateRequest.builder()
             .transactionAmount(valor)
-            .description("Plano " + plano.name() + " - SCF-MEI")
+            .description("Plano " + plano.name() + " - ElloMEI")
             .paymentMethodId("pix")
             .payer(
                 PaymentPayerRequest.builder()
-                    .email(usuario.getUsername() + "@scfmei.com.br")
+                    .email(usuario.getUsername() + "@ellomei.com")
                     .firstName(usuario.getUsername())
                     .identification(
                         IdentificationRequest.builder()

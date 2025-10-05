@@ -1,4 +1,4 @@
-// src/main/java/br/com/scfmei/domain/Conta.java
+// src/main/java/br/com/ellomei/domain/Conta.java
 package br.com.ellomei.domain;
 
 import jakarta.persistence.*; // Importe o necessário

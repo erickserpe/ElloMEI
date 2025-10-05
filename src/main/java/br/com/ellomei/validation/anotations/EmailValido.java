@@ -12,7 +12,7 @@ import java.lang.annotation.*;
  * - Verifica se o domínio existe (DNS)
  * - Verifica se o domínio tem registros MX (pode receber emails)
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @Documented

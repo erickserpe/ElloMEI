@@ -226,7 +226,7 @@ docker compose restart mysql
 ElloMEI/
 ├── src/
 │   ├── main/
-│   │   ├── java/br/com/scfmei/
+│   │   ├── java/br/com/ellomei/
 │   │   │   ├── controller/
 │   │   │   ├── model/
 │   │   │   ├── repository/

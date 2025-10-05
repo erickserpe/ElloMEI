@@ -16,7 +16,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * - Jobs agendados de renovação de assinaturas
  * - Jobs agendados de expiração de trials
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @Configuration

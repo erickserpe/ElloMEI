@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
  * - Cada listener pode ser testado independentemente
  * - Fácil ativar/desativar funcionalidades (comentar @Component)
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @Component

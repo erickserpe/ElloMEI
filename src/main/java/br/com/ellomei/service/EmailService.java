@@ -28,7 +28,7 @@ import java.time.format.DateTimeFormatter;
  * - Enviar e-mail de recuperação de senha
  * - Enviar e-mail de confirmação de pagamento
  *
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @Service
@@ -42,7 +42,7 @@ public class EmailService {
     @Value("${spring.mail.username:noreply@ellomei.com}")
     private String remetente;
 
-    @Value("${spring.mail.properties.mail.smtp.from:SCF-MEI - Sistema de Controle Financeiro}")
+    @Value("${spring.mail.properties.mail.smtp.from:ElloMEI - Sistema de Controle Financeiro}")
     private String nomeRemetente;
 
     @Value("${app.base-url:http://localhost:8080}")
@@ -56,13 +56,13 @@ public class EmailService {
     public void enviarEmailBoasVindas(Usuario usuario) {
         if (mailSender == null) {
             logger.warn("JavaMailSender não configurado. Email de boas-vindas não será enviado.");
-            logEmailMock("BOAS-VINDAS", usuario.getEmail(), "Bem-vindo ao SCF-MEI!");
+            logEmailMock("BOAS-VINDAS", usuario.getEmail(), "Bem-vindo ao ElloMEI!");
             return;
         }
 
         try {
             String destinatario = usuario.getEmail();
-            String assunto = "🎉 Bem-vindo ao SCF-MEI!";
+            String assunto = "🎉 Bem-vindo ao ElloMEI!";
             String nomeUsuario = usuario.getNomeCompleto() != null ? usuario.getNomeCompleto() : usuario.getUsername();
 
             String corpo = construirEmailBoasVindas(nomeUsuario);
@@ -104,7 +104,7 @@ public class EmailService {
         logger.info("Acesse agora: {}/dashboard", baseUrl);
         logger.info("");
         logger.info("Obrigado por ser PRO!");
-        logger.info("Equipe SCF-MEI");
+        logger.info("Equipe ElloMEI");
         logger.info("========================================");
     }
     
@@ -135,7 +135,7 @@ public class EmailService {
         logger.info("Se mudar de ideia, você pode fazer upgrade novamente:");
         logger.info("{}/assinatura/upgrade", baseUrl);
         logger.info("");
-        logger.info("Equipe SCF-MEI");
+        logger.info("Equipe ElloMEI");
         logger.info("========================================");
         
     }
@@ -161,7 +161,7 @@ public class EmailService {
         logger.info("");
         logger.info("Fazer upgrade: {}/assinatura/upgrade", baseUrl);
         logger.info("");
-        logger.info("Equipe SCF-MEI");
+        logger.info("Equipe ElloMEI");
         logger.info("========================================");
         
     }
@@ -189,7 +189,7 @@ public class EmailService {
         logger.info("");
         logger.info("Fazer upgrade: {}/assinatura/upgrade", baseUrl);
         logger.info("");
-        logger.info("Equipe SCF-MEI");
+        logger.info("Equipe ElloMEI");
         logger.info("========================================");
         
     }
@@ -206,7 +206,7 @@ public class EmailService {
 
         try {
             String destinatario = usuario.getEmail();
-            String assunto = "❌ Falha no Pagamento - SCF-MEI";
+            String assunto = "❌ Falha no Pagamento - ElloMEI";
             String nomeUsuario = usuario.getNomeCompleto() != null ? usuario.getNomeCompleto() : usuario.getUsername();
 
             String corpo = construirEmailFalhaPagamento(nomeUsuario, assinatura);
@@ -249,7 +249,7 @@ public class EmailService {
         logger.info("Atualize seus dados de pagamento:");
         logger.info("{}/assinatura", baseUrl);
         logger.info("");
-        logger.info("Equipe SCF-MEI");
+        logger.info("Equipe ElloMEI");
         logger.info("========================================");
 
     }
@@ -275,7 +275,7 @@ public class EmailService {
         logger.info("");
         logger.info("Obrigado por continuar conosco!");
         logger.info("");
-        logger.info("Equipe SCF-MEI");
+        logger.info("Equipe ElloMEI");
         logger.info("========================================");
 
     }
@@ -305,7 +305,7 @@ public class EmailService {
         logger.info("");
         logger.info("Se precisar de ajuda, entre em contato conosco.");
         logger.info("");
-        logger.info("Equipe SCF-MEI");
+        logger.info("Equipe ElloMEI");
         logger.info("========================================");
 
     }
@@ -486,7 +486,7 @@ public class EmailService {
 
         try {
             String destinatario = usuario.getEmail();
-            String assunto = "✅ Pagamento Aprovado - SCF-MEI";
+            String assunto = "✅ Pagamento Aprovado - ElloMEI";
             String nomeUsuario = usuario.getNomeCompleto() != null ? usuario.getNomeCompleto() : usuario.getUsername();
 
             String corpo = construirEmailPagamentoAprovado(nomeUsuario, assinatura, transacaoId);
@@ -512,7 +512,7 @@ public class EmailService {
 
         try {
             String destinatario = usuario.getEmail();
-            String assunto = "⏳ Pagamento Pendente - SCF-MEI";
+            String assunto = "⏳ Pagamento Pendente - ElloMEI";
             String nomeUsuario = usuario.getNomeCompleto() != null ? usuario.getNomeCompleto() : usuario.getUsername();
 
             String corpo = construirEmailPagamentoPendente(nomeUsuario, assinatura, transacaoId);
@@ -605,11 +605,11 @@ public class EmailService {
             <body>
                 <div class="container">
                     <div class="header">
-                        <h1>🎉 Bem-vindo ao SCF-MEI!</h1>
+                        <h1>🎉 Bem-vindo ao ElloMEI!</h1>
                     </div>
                     <div class="content">
                         <h2>Olá, %s!</h2>
-                        <p>Seja bem-vindo ao <strong>SCF-MEI - Sistema de Controle Financeiro para MEI</strong>!</p>
+                        <p>Seja bem-vindo ao <strong>ElloMEI - Sistema de Controle Financeiro para MEI</strong>!</p>
                         <p>Estamos muito felizes em tê-lo conosco. Sua conta foi criada com sucesso e você já pode começar a usar todos os recursos.</p>
 
                         <div class="features">
@@ -637,7 +637,7 @@ public class EmailService {
                         <p>Se tiver alguma dúvida, estamos aqui para ajudar!</p>
                     </div>
                     <div class="footer">
-                        <p>© 2024 SCF-MEI - Sistema de Controle Financeiro para MEI</p>
+                        <p>© 2024 ElloMEI - Sistema de Controle Financeiro para MEI</p>
                         <p>Este é um email automático, por favor não responda.</p>
                     </div>
                 </div>
@@ -781,7 +781,7 @@ public class EmailService {
                         <p>Obrigado por ser PRO! 🎉</p>
                     </div>
                     <div class="footer">
-                        <p>© 2024 SCF-MEI - Sistema de Controle Financeiro para MEI</p>
+                        <p>© 2024 ElloMEI - Sistema de Controle Financeiro para MEI</p>
                         <p>Este é um email automático, por favor não responda.</p>
                     </div>
                 </div>
@@ -930,7 +930,7 @@ public class EmailService {
                         <p>Se tiver alguma dúvida, entre em contato conosco.</p>
                     </div>
                     <div class="footer">
-                        <p>© 2024 SCF-MEI - Sistema de Controle Financeiro para MEI</p>
+                        <p>© 2024 ElloMEI - Sistema de Controle Financeiro para MEI</p>
                         <p>Este é um email automático, por favor não responda.</p>
                     </div>
                 </div>
@@ -1080,7 +1080,7 @@ public class EmailService {
                         <p>Se precisar de ajuda, entre em contato conosco.</p>
                     </div>
                     <div class="footer">
-                        <p>© 2024 SCF-MEI - Sistema de Controle Financeiro para MEI</p>
+                        <p>© 2024 ElloMEI - Sistema de Controle Financeiro para MEI</p>
                         <p>Este é um email automático, por favor não responda.</p>
                     </div>
                 </div>

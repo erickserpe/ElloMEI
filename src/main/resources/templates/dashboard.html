@@ -248,7 +248,7 @@
                         </label>
                         <select id="status" name="status" class="form-select">
                             <option value="">Todos os status</option>
-                            <option th:each="s : ${T(br.com.scfmei.domain.StatusLancamento).values()}"
+                            <option th:each="s : ${T(br.com.ellomei.domain.StatusLancamento).values()}"
                                     th:value="${s}" th:text="${s.descricao}" th:selected="${s == statusSel}"></option>
                         </select>
                     </div>

@@ -1,6 +1,6 @@
 package br.com.ellomei;
 
-import static br.com.scfmei.TestHelper.*;
+import static br.com.ellomei.TestHelper.*;
 
 import br.com.ellomei.domain.Conta;
 import br.com.ellomei.domain.Usuario;
@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * 
  * Se este teste falhar, o sistema NÃO É SEGURO para produção.
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @SpringBootTest

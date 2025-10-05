@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
  * 2. Verificação de existência do domínio (DNS)
  * 3. Verificação de registros MX (capacidade de receber emails)
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 public class EmailValidoValidator implements ConstraintValidator<EmailValido, String> {

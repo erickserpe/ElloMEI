@@ -22,7 +22,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
  * 
  * Retorna HTTP 429 (Too Many Requests) quando o limite é excedido.
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  */
 @Component
 public class RateLimitInterceptor implements HandlerInterceptor {

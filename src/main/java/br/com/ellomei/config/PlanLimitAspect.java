@@ -25,7 +25,7 @@ import java.time.YearMonth;
  * Plano FREE: Máximo de 20 lançamentos (grupos de operação) por mês
  * Plano PRO: Sem limites
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @Aspect
@@ -48,7 +48,7 @@ public class PlanLimitAspect {
      * @param form O formulário de lançamento sendo salvo
      * @throws PlanLimitExceededException Se o usuário FREE excedeu o limite de 20 lançamentos mensais
      */
-    @Before("execution(* br.com.scfmei.service.LancamentoService.salvarOuAtualizarOperacao(..)) && args(form, ..)")
+    @Before("execution(* br.com.ellomei.service.LancamentoService.salvarOuAtualizarOperacao(..)) && args(form, ..)")
     public void checkLancamentoLimit(LancamentoFormDTO form) {
         // Se tem grupoOperacao preenchido, é uma edição, não conta para o limite
         if (form.getGrupoOperacao() != null && !form.getGrupoOperacao().isBlank()) {

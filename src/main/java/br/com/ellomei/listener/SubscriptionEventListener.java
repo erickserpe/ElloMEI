@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
  * - Registro em sistema de auditoria
  * - Envio de pesquisa NPS (Net Promoter Score)
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @Component

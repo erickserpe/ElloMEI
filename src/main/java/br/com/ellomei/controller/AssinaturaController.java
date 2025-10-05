@@ -31,7 +31,7 @@ import java.util.Optional;
  * - GET /assinatura/pagamento/sucesso - Callback de sucesso
  * - GET /assinatura/pagamento/falha - Callback de falha
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @Controller

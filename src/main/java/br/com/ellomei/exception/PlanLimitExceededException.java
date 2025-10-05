@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * Esta exceção é usada principalmente para o plano FREE, que tem limite de 20 lançamentos mensais.
  * Quando lançada, retorna HTTP 403 (Forbidden) para o cliente.
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @ResponseStatus(HttpStatus.FORBIDDEN)

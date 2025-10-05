@@ -13,7 +13,7 @@ package br.com.ellomei.domain;
  * - PIX: payment_method_id = "pix"
  * - BOLETO: payment_method_id = "bolbradesco"
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 public enum FormaPagamento {

@@ -64,8 +64,8 @@ Para desenvolvimento local, use um certificado auto-assinado.
 
 📝 Configurações:
    - Arquivo: keystore.p12
-   - Senha: scfmei2025
-   - Alias: scfmei
+   - Senha: ellomei2025
+   - Alias: ellomei
    - Validade: 365 dias
    - Domínio: localhost
 
@@ -93,13 +93,13 @@ SSL_PORT=8443
 SSL_KEYSTORE_PATH=keystore.p12
 
 # Senha do keystore
-SSL_KEYSTORE_PASSWORD=scfmei2025
+SSL_KEYSTORE_PASSWORD=ellomei2025
 
 # Tipo do keystore
 SSL_KEYSTORE_TYPE=PKCS12
 
 # Alias da chave
-SSL_KEY_ALIAS=scfmei
+SSL_KEY_ALIAS=ellomei
 ```
 
 ---
@@ -253,7 +253,7 @@ sudo openssl pkcs12 -export \
   -in /etc/letsencrypt/live/seudominio.com.br/fullchain.pem \
   -inkey /etc/letsencrypt/live/seudominio.com.br/privkey.pem \
   -out /app/ssl/certificate.p12 \
-  -name scfmei \
+  -name ellomei \
   -passout pass:SUA_SENHA_FORTE_AQUI
 ```
 
@@ -265,7 +265,7 @@ SSL_PORT=8443
 SSL_KEYSTORE_PATH=/app/ssl/certificate.p12
 SSL_KEYSTORE_PASSWORD=SUA_SENHA_FORTE_AQUI
 SSL_KEYSTORE_TYPE=PKCS12
-SSL_KEY_ALIAS=scfmei
+SSL_KEY_ALIAS=ellomei
 ```
 
 #### **4. Renovação Automática**
@@ -279,7 +279,7 @@ openssl pkcs12 -export \
   -in /etc/letsencrypt/live/seudominio.com.br/fullchain.pem \
   -inkey /etc/letsencrypt/live/seudominio.com.br/privkey.pem \
   -out /app/ssl/certificate.p12 \
-  -name scfmei \
+  -name ellomei \
   -passout pass:SUA_SENHA_FORTE_AQUI
 systemctl restart ellomei
 ```
@@ -310,13 +310,13 @@ SSL_PORT=8443
 SSL_KEYSTORE_PATH=keystore.p12
 
 # Senha do keystore
-SSL_KEYSTORE_PASSWORD=scfmei2025
+SSL_KEYSTORE_PASSWORD=ellomei2025
 
 # Tipo do keystore (PKCS12 ou JKS)
 SSL_KEYSTORE_TYPE=PKCS12
 
 # Alias da chave
-SSL_KEY_ALIAS=scfmei
+SSL_KEY_ALIAS=ellomei
 ```
 
 ### **Atualizar APP_BASE_URL**
@@ -396,7 +396,7 @@ Caused by: java.io.IOException: keystore password was incorrect
 # Verificar senha no .env
 grep SSL_KEYSTORE_PASSWORD .env
 
-# Deve ser: scfmei2025 (ou a senha que você definiu)
+# Deve ser: ellomei2025 (ou a senha que você definiu)
 ```
 
 ---

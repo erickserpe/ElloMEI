@@ -1,4 +1,4 @@
-// src/main/java/br/com/scfmei/repository/ContatoRepository.java
+// src/main/java/br/com/ellomei/repository/ContatoRepository.java
 package br.com.ellomei.repository;
 
 import br.com.ellomei.domain.Contato;

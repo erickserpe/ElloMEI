@@ -1,6 +1,6 @@
 package br.com.ellomei;
 
-import static br.com.scfmei.TestHelper.*;
+import static br.com.ellomei.TestHelper.*;
 
 import br.com.ellomei.domain.*;
 import br.com.ellomei.repository.AssinaturaRepository;
@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * 5. Expiração de trial
  * 6. Suspensão por falta de pagamento
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @SpringBootTest

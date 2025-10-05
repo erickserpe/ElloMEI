@@ -1,4 +1,4 @@
-// src/main/java/br/com/scfmei/domain/Contato.java
+// src/main/java/br/com/ellomei/domain/Contato.java
 package br.com.ellomei.domain;
 
 import br.com.ellomei.validation.anotations.CPF;

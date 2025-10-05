@@ -1,4 +1,4 @@
-// src/main/java/br/com/scfmei/domain/Lancamento.java
+// src/main/java/br/com/ellomei/domain/Lancamento.java
 package br.com.ellomei.domain;
 
 import jakarta.persistence.*;

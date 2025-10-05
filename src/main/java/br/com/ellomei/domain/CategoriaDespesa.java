@@ -1,4 +1,4 @@
-// src/main/java/br/com/scfmei/domain/CategoriaDespesa.java
+// src/main/java/br/com/ellomei/domain/CategoriaDespesa.java
 package br.com.ellomei.domain;
 
 import jakarta.persistence.*;

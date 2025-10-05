@@ -20,7 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 /**
  * Testes unitários para a classe ContaService.
  * 
- * Esta é a primeira classe de teste da aplicação SCF-MEI, focando na validação
+ * Esta é a primeira classe de teste da aplicação ElloMEI, focando na validação
  * da lógica de negócio principal do ContaService, especificamente o método salvar().
  * 
  * Os testes verificam:

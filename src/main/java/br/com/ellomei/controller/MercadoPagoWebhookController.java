@@ -40,7 +40,7 @@ import java.util.Optional;
  * Documentação:
  * https://www.mercadopago.com.br/developers/pt/docs/your-integrations/notifications/webhooks
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @RestController

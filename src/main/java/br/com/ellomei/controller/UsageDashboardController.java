@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * - GET /uso - Página do dashboard de uso
  * - GET /api/uso/metricas - API JSON com métricas de uso
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @Controller

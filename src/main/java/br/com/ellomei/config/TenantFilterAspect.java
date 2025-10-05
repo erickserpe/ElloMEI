@@ -20,7 +20,7 @@ import jakarta.persistence.PersistenceContext;
  * Este aspecto garante que cada usuário veja apenas seus próprios dados,
  * aplicando o filtro Hibernate com o ID do usuário autenticado.
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @Aspect
@@ -40,10 +40,10 @@ public class TenantFilterAspect {
      * garantindo que todas as queries do Hibernate incluam automaticamente
      * a condição WHERE usuario_id = :tenantId.
      * 
-     * Pointcut: execution(* br.com.scfmei.controller.*.*(..))
+     * Pointcut: execution(* br.com.ellomei.controller.*.*(..))
      * - Intercepta todos os métodos de todos os controllers
      */
-    @Before("execution(* br.com.scfmei.controller.*.*(..))")
+    @Before("execution(* br.com.ellomei.controller.*.*(..))")
     public void activateTenantFilter() {
         final Session session = entityManager.unwrap(Session.class);
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

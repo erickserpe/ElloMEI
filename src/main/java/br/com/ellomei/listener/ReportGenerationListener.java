@@ -50,7 +50,7 @@ import java.util.concurrent.CompletableFuture;
  * - Implementar retry automático em caso de falha
  * - Adicionar métricas de tempo de geração
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @Component

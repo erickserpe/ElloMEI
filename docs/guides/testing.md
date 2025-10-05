@@ -175,14 +175,14 @@ Acesse: http://localhost:8080/registro
 
 #### Teste 4.3: Email Gmail válido
 - **Username:** `teste_gmail`
-- **Email:** `teste_scfmei@gmail.com`
+- **Email:** `teste_ellomei@gmail.com`
 - **Password:** `S3nh@F0rt3!`
 - **Resultado Esperado:** ✅ Cadastro realizado com sucesso
 - **Motivo:** Gmail tem registros MX válidos
 
 #### Teste 4.4: Email Outlook válido
 - **Username:** `teste_outlook`
-- **Email:** `teste_scfmei@outlook.com`
+- **Email:** `teste_ellomei@outlook.com`
 - **Password:** `S3nh@F0rt3!`
 - **Resultado Esperado:** ✅ Cadastro realizado com sucesso
 - **Motivo:** Outlook tem registros MX válidos

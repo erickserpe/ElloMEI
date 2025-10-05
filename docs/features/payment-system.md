@@ -297,9 +297,9 @@ mvn test -Dtest=PaymentIntegrationTest
 ```bash
 MERCADOPAGO_ACCESS_TOKEN=APP-PRODUCTION-TOKEN
 MERCADOPAGO_PUBLIC_KEY=APP-PRODUCTION-PUBLIC-KEY
-APP_BASE_URL=https://scfmei.com.br
-SPRING_DATASOURCE_URL=jdbc:mysql://production-db:3306/scfmei
-SPRING_DATASOURCE_USERNAME=scfmei_user
+APP_BASE_URL=https://ellomei.com
+SPRING_DATASOURCE_URL=jdbc:mysql://production-db:3306/ellomei
+SPRING_DATASOURCE_USERNAME=ellomei_user
 SPRING_DATASOURCE_PASSWORD=senha-segura
 ```
 

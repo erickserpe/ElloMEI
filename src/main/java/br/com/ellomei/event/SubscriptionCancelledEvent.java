@@ -15,7 +15,7 @@ import org.springframework.context.ApplicationEvent;
  * - Notificações para equipe de retenção
  * - Auditoria
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 public class SubscriptionCancelledEvent extends ApplicationEvent {

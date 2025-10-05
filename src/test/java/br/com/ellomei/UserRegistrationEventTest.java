@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * especificamente que o evento UserRegisteredEvent é publicado quando um novo usuário
  * é criado.
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @SpringBootTest

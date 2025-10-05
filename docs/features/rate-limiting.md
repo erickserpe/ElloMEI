@@ -251,7 +251,7 @@ Content-Type: application/json
 
 ### **Ajustar Limites:**
 
-Edite `src/main/java/br/com/scfmei/config/RateLimitConfig.java`:
+Edite `src/main/java/br/com/ellomei/config/RateLimitConfig.java`:
 
 ```java
 // Login: 10 tentativas por minuto
@@ -277,7 +277,7 @@ private Bucket createApiBucket() {
 
 ### **Adicionar Novos Endpoints:**
 
-Edite `src/main/java/br/com/scfmei/interceptor/RateLimitInterceptor.java`:
+Edite `src/main/java/br/com/ellomei/interceptor/RateLimitInterceptor.java`:
 
 ```java
 private boolean shouldApplyRateLimit(String uri, String method) {

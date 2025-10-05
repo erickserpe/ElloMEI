@@ -13,7 +13,7 @@ package br.com.ellomei.domain;
  * Fluxo típico:
  * TRIAL → ATIVA → (SUSPENSA) → CANCELADA/EXPIRADA
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 public enum StatusAssinatura {

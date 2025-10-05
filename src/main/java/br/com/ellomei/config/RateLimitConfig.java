@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  * - API Geral: 100 requisições por minuto por usuário
  * - Recuperação de senha: 3 tentativas por hora por IP
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  */
 @Configuration
 @EnableCaching

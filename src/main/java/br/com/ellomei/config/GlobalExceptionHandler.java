@@ -20,7 +20,7 @@ import java.util.Map;
  * - Separação de concerns (lógica de negócio vs tratamento de erros)
  * - Facilita manutenção e adição de novos handlers
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @ControllerAdvice

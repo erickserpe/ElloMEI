@@ -1,4 +1,4 @@
-// src/main/java/br/com/scfmei/controller/ContaController.java
+// src/main/java/br/com/ellomei/controller/ContaController.java
 package br.com.ellomei.controller;
 
 import br.com.ellomei.config.security.CurrentUser;

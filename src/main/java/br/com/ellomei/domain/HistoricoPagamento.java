@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * Armazena todos os pagamentos realizados (aprovados, recusados, reembolsados)
  * para fins de auditoria e transparência.
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @Entity

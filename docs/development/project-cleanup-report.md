@@ -164,7 +164,7 @@ ElloMEI/
 
 ### TODOs Obsoletos Removidos
 
-**Arquivo:** `src/main/java/br/com/scfmei/service/EmailService.java`
+**Arquivo:** `src/main/java/br/com/ellomei/service/EmailService.java`
 
 - ❌ Removidos 7 comentários `// TODO: Implementar envio real de e-mail`
 - ✅ Motivo: Funcionalidade já implementada e funcional

@@ -15,7 +15,7 @@ import java.math.RoundingMode;
  * - Dias restantes no mês
  * - Alertas de proximidade do limite
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 public class UsageMetricsDTO {

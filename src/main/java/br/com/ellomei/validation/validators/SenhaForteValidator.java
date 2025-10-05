@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
  * - Complexidade (maiúsculas, minúsculas, números, caracteres especiais)
  * - Lista negra de senhas comuns
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 public class SenhaForteValidator implements ConstraintValidator<SenhaForte, String> {

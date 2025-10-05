@@ -16,7 +16,7 @@ import java.lang.annotation.*;
  * - Pelo menos 1 caractere especial (!@#$%&*)
  * - Não permitir senhas comuns (123456, password, etc)
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @Documented

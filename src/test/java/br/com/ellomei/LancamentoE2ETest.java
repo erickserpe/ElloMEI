@@ -1,6 +1,6 @@
 package br.com.ellomei;
 
-import static br.com.scfmei.TestHelper.*;
+import static br.com.ellomei.TestHelper.*;
 
 import br.com.ellomei.domain.Conta;
 import br.com.ellomei.domain.Usuario;

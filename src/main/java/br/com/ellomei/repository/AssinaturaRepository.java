@@ -21,7 +21,7 @@ import java.util.Optional;
  * - Buscar assinaturas que precisam ser renovadas
  * - Buscar assinaturas suspensas/expiradas
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @Repository

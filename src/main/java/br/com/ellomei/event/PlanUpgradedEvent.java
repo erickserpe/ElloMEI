@@ -23,7 +23,7 @@ import org.springframework.context.ApplicationEvent;
  * 4. Evento PlanUpgradedEvent é publicado
  * 5. Listeners reagem ao evento (e-mail, métricas, etc.)
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 public class PlanUpgradedEvent extends ApplicationEvent {

@@ -31,7 +31,7 @@ import java.util.Optional;
  * - Renovar assinaturas automaticamente
  * - Gerenciar status de assinaturas
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @Service

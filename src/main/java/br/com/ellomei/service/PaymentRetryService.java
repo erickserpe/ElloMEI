@@ -25,7 +25,7 @@ import java.util.List;
  * - Suspensão automática após múltiplas falhas
  * - Logs detalhados de tentativas
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @Service

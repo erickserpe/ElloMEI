@@ -1,4 +1,4 @@
-# 🔧 Scripts Utilitários - SCF-MEI
+# 🔧 Scripts Utilitários - ElloMEI
 
 Scripts auxiliares para gerenciamento e manutenção do sistema.
 

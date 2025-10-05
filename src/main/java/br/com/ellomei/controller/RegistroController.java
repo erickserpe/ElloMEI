@@ -25,7 +25,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  * - Validação de email real (DNS/MX)
  * - Validação de duplicidade (username e email)
  *
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @Controller

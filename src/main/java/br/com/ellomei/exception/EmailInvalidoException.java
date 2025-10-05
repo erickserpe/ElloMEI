@@ -4,7 +4,7 @@ package br.com.ellomei.exception;
  * Exception lançada quando um email não passa nas validações
  * de formato, domínio ou registros MX.
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 public class EmailInvalidoException extends RuntimeException {

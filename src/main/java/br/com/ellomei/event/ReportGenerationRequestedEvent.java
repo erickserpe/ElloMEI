@@ -28,7 +28,7 @@ import java.util.Map;
  * 4. Listener processa o evento em background
  * 5. PDF é gerado e salvo (futuramente: notificação ao usuário)
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 public class ReportGenerationRequestedEvent extends ApplicationEvent {

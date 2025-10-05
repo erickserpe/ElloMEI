@@ -22,7 +22,7 @@ import org.springframework.context.ApplicationEvent;
  * - Enviar notificações push
  * - Integrar com sistemas externos (CRM, analytics, etc.)
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 public class UserRegisteredEvent extends ApplicationEvent {

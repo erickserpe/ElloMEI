@@ -1,4 +1,4 @@
-// src/main/java/br/com/scfmei/repository/LancamentoRepository.java
+// src/main/java/br/com/ellomei/repository/LancamentoRepository.java
 package br.com.ellomei.repository;
 
 import br.com.ellomei.domain.*;
@@ -73,7 +73,7 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
             Pageable pageable
     );
 
-    @Query("SELECT new br.com.scfmei.domain.ChartData(c.nome, SUM(l.valor)) " +
+    @Query("SELECT new br.com.ellomei.domain.ChartData(c.nome, SUM(l.valor)) " +
             "FROM Lancamento l JOIN l.categoriaDespesa c " +
             "WHERE l.tipo = 'SAIDA' " +
             "AND (:status IS NULL OR l.status = :status) " +

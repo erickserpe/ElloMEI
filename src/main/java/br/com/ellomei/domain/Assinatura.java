@@ -27,7 +27,7 @@ import java.time.LocalDateTime;
  * - idPagamentoExterno: ID da subscription no Mercado Pago
  * - idClienteExterno: ID do customer no Mercado Pago
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @Entity

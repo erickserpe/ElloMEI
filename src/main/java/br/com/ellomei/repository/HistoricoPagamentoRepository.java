@@ -15,7 +15,7 @@ import java.util.Optional;
 /**
  * Repositório para a entidade HistoricoPagamento.
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @Repository

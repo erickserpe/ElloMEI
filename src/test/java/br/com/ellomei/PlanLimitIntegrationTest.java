@@ -1,6 +1,6 @@
 package br.com.ellomei;
 
-import static br.com.scfmei.TestHelper.*;
+import static br.com.ellomei.TestHelper.*;
 
 import br.com.ellomei.domain.*;
 import br.com.ellomei.exception.PlanLimitExceededException;
@@ -44,7 +44,7 @@ import static org.hamcrest.Matchers.containsString;
  * 
  * Se este teste falhar, significa que os limites de plano não estão sendo aplicados.
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @SpringBootTest

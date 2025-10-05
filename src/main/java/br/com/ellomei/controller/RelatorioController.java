@@ -34,7 +34,7 @@ import java.util.Map;
  * - Resiliência (falhas não afetam resposta HTTP)
  * - Flexibilidade (múltiplos listeners podem reagir)
  *
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @Controller

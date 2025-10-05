@@ -20,7 +20,7 @@ import java.time.temporal.ChronoUnit;
  * - Gerar alertas de proximidade do limite
  * - Fornecer dados para o dashboard de uso
  * 
- * @author SCF-MEI Team
+ * @author ElloMEI Team
  * @since 1.0.0
  */
 @Service

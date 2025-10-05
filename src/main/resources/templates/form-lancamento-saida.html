@@ -62,7 +62,7 @@
                         </label>
                         <select class="form-select" id="status" th:field="*{status}" required>
                             <option value="">Selecione o status</option>
-                            <option th:each="statusOpt : ${T(br.com.scfmei.domain.StatusLancamento).getExpenseStatuses()}"
+                            <option th:each="statusOpt : ${T(br.com.ellomei.domain.StatusLancamento).getExpenseStatuses()}"
                                     th:value="${statusOpt}" th:text="${statusOpt.descricao}"></option>
                         </select>
                     </div>

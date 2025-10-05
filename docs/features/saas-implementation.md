@@ -81,7 +81,7 @@
 
 ### **Domínio (Domain)**
 ```
-src/main/java/br/com/scfmei/domain/
+src/main/java/br/com/ellomei/domain/
 ├── PlanoAssinatura.java (enum)
 ├── StatusAssinatura.java (enum)
 ├── FormaPagamento.java (enum)
@@ -90,13 +90,13 @@ src/main/java/br/com/scfmei/domain/
 
 ### **Repositórios (Repository)**
 ```
-src/main/java/br/com/scfmei/repository/
+src/main/java/br/com/ellomei/repository/
 └── AssinaturaRepository.java
 ```
 
 ### **Serviços (Service)**
 ```
-src/main/java/br/com/scfmei/service/
+src/main/java/br/com/ellomei/service/
 ├── AssinaturaService.java
 ├── MercadoPagoService.java
 ├── UsageMetricsService.java
@@ -105,7 +105,7 @@ src/main/java/br/com/scfmei/service/
 
 ### **Controllers**
 ```
-src/main/java/br/com/scfmei/controller/
+src/main/java/br/com/ellomei/controller/
 ├── AssinaturaController.java
 ├── MercadoPagoWebhookController.java
 └── UsageDashboardController.java
@@ -113,7 +113,7 @@ src/main/java/br/com/scfmei/controller/
 
 ### **Configuração (Config)**
 ```
-src/main/java/br/com/scfmei/config/
+src/main/java/br/com/ellomei/config/
 ├── TenantFilterAspect.java
 ├── PlanLimitAspect.java
 ├── GlobalExceptionHandler.java
@@ -122,7 +122,7 @@ src/main/java/br/com/scfmei/config/
 
 ### **Eventos (Events)**
 ```
-src/main/java/br/com/scfmei/event/
+src/main/java/br/com/ellomei/event/
 ├── UserRegisteredEvent.java
 ├── PlanUpgradedEvent.java
 ├── SubscriptionCancelledEvent.java
@@ -131,7 +131,7 @@ src/main/java/br/com/scfmei/event/
 
 ### **Listeners**
 ```
-src/main/java/br/com/scfmei/listener/
+src/main/java/br/com/ellomei/listener/
 ├── UserRegistrationListener.java
 ├── SubscriptionEventListener.java
 └── ReportGenerationListener.java
@@ -139,13 +139,13 @@ src/main/java/br/com/scfmei/listener/
 
 ### **Exceções (Exceptions)**
 ```
-src/main/java/br/com/scfmei/exception/
+src/main/java/br/com/ellomei/exception/
 └── PlanLimitExceededException.java
 ```
 
 ### **DTOs**
 ```
-src/main/java/br/com/scfmei/dto/
+src/main/java/br/com/ellomei/dto/
 └── UsageMetricsDTO.java
 ```
 
@@ -161,7 +161,7 @@ src/main/resources/templates/
 
 ### **Testes**
 ```
-src/test/java/br/com/scfmei/
+src/test/java/br/com/ellomei/
 ├── PaymentIntegrationTest.java (5 testes)
 ├── MultiTenancyIntegrationTest.java (2 testes)
 ├── PlanLimitIntegrationTest.java (5 testes)

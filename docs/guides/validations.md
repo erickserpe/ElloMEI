@@ -27,8 +27,8 @@ Este documento descreve todas as validações implementadas no sistema de cadast
 ### 📝 Implementação
 
 **Arquivos Criados:**
-- `src/main/java/br/com/scfmei/validation/anotations/SenhaForte.java`
-- `src/main/java/br/com/scfmei/validation/validators/SenhaForteValidator.java`
+- `src/main/java/br/com/ellomei/validation/anotations/SenhaForte.java`
+- `src/main/java/br/com/ellomei/validation/validators/SenhaForteValidator.java`
 
 **Senhas Bloqueadas:**
 ```
@@ -70,9 +70,9 @@ dragon, master, sunshine, princess, football, iloveyou
 ### 📝 Implementação
 
 **Arquivos Modificados:**
-- `src/main/java/br/com/scfmei/domain/Usuario.java` - Adicionadas anotações `@NotBlank`, `@Size`
-- `src/main/java/br/com/scfmei/service/UsuarioService.java` - Método `validarUsernameUnico()`
-- `src/main/java/br/com/scfmei/exception/UsuarioDuplicadoException.java` - Exception customizada
+- `src/main/java/br/com/ellomei/domain/Usuario.java` - Adicionadas anotações `@NotBlank`, `@Size`
+- `src/main/java/br/com/ellomei/service/UsuarioService.java` - Método `validarUsernameUnico()`
+- `src/main/java/br/com/ellomei/exception/UsuarioDuplicadoException.java` - Exception customizada
 
 **Validações:**
 ```java
@@ -107,8 +107,8 @@ private String username;
 ### 📝 Implementação
 
 **Arquivos Modificados:**
-- `src/main/java/br/com/scfmei/domain/Usuario.java` - Adicionadas anotações `@NotBlank`, `@Email`
-- `src/main/java/br/com/scfmei/service/UsuarioService.java` - Método `validarEmailUnico()`
+- `src/main/java/br/com/ellomei/domain/Usuario.java` - Adicionadas anotações `@NotBlank`, `@Email`
+- `src/main/java/br/com/ellomei/service/UsuarioService.java` - Método `validarEmailUnico()`
 
 **Validações:**
 ```java
@@ -135,8 +135,8 @@ private String email;
 ### 📝 Implementação
 
 **Arquivos Criados:**
-- `src/main/java/br/com/scfmei/validation/anotations/EmailValido.java`
-- `src/main/java/br/com/scfmei/validation/validators/EmailValidoValidator.java`
+- `src/main/java/br/com/ellomei/validation/anotations/EmailValido.java`
+- `src/main/java/br/com/ellomei/validation/validators/EmailValidoValidator.java`
 
 **Processo de Validação:**
 1. **Formato:** Valida com regex RFC 5322
@@ -173,9 +173,9 @@ private String email;
 ### 📝 Implementação
 
 **Arquivos Verificados/Corrigidos:**
-- `src/main/java/br/com/scfmei/service/EmailService.java` - Todos os métodos usando `usuario.getEmail()`
-- `src/main/java/br/com/scfmei/listener/UserRegistrationListener.java` - Listener assíncrono
-- `src/main/java/br/com/scfmei/controller/RecuperarSenhaController.java` - Mensagem de confirmação
+- `src/main/java/br/com/ellomei/service/EmailService.java` - Todos os métodos usando `usuario.getEmail()`
+- `src/main/java/br/com/ellomei/listener/UserRegistrationListener.java` - Listener assíncrono
+- `src/main/java/br/com/ellomei/controller/RecuperarSenhaController.java` - Mensagem de confirmação
 
 ### 🎨 Templates HTML
 
@@ -218,7 +218,7 @@ logger.error("❌ Erro ao enviar email: {}", e.getMessage(), e);
 **Arquivos Modificados:**
 - `src/main/resources/templates/registro.html` - Adicionados alerts e validações
 - `src/main/resources/templates/recuperar-senha/solicitar.html` - Mensagem de confirmação
-- `src/main/java/br/com/scfmei/controller/RegistroController.java` - Tratamento de erros
+- `src/main/java/br/com/ellomei/controller/RegistroController.java` - Tratamento de erros
 
 **CSS Adicionado:**
 ```css
@@ -254,7 +254,7 @@ logger.error("❌ Erro ao enviar email: {}", e.getMessage(), e);
 ### 📁 Estrutura de Arquivos
 
 ```
-src/main/java/br/com/scfmei/
+src/main/java/br/com/ellomei/
 ├── validation/
 │   ├── anotations/
 │   │   ├── SenhaForte.java          ✅ NOVO

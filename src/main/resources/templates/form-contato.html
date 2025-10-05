@@ -34,7 +34,7 @@
                         </label>
                         <select class="form-select" id="tipoContato" th:field="*{tipoContato}" required>
                             <option value="">Selecione o tipo</option>
-                            <option th:each="tipoOpt : ${T(br.com.scfmei.domain.TipoContato).values()}"
+                            <option th:each="tipoOpt : ${T(br.com.ellomei.domain.TipoContato).values()}"
                                     th:value="${tipoOpt}" th:text="${tipoOpt.descricao}"></option>
                         </select>
                     </div>
