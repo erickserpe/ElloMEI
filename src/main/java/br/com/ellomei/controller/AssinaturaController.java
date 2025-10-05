@@ -95,50 +95,115 @@ public class AssinaturaController {
     public String processarUpgradeCheckout(@CurrentUser Usuario usuario,
                                           RedirectAttributes redirectAttributes) {
         try {
-            
+
             // Criar preferência de pagamento
             Preference preference = mercadoPagoService.criarPreferenciaPagamento(
                 usuario, PlanoAssinatura.PRO
             );
-            
-            logger.info("Preferência criada: {} - Redirecionando para checkout", 
+
+            logger.info("Preferência criada: {} - Redirecionando para checkout",
                        preference.getId());
-            
+
             // Redirecionar para checkout do Mercado Pago
             return "redirect:" + preference.getInitPoint();
-            
-        } catch (MPException | MPApiException e) {
-            logger.error("Erro ao criar preferência de pagamento: {}", e.getMessage());
-            redirectAttributes.addFlashAttribute("erro", 
+
+        } catch (MPApiException e) {
+            logger.error("Erro da API do Mercado Pago ao criar preferência:");
+            logger.error("  Status Code: {}", e.getStatusCode());
+            logger.error("  Message: {}", e.getMessage());
+
+            // Extrair conteúdo detalhado da resposta
+            String responseContent = "N/A";
+            if (e.getApiResponse() != null) {
+                logger.error("  API Response Object: {}", e.getApiResponse());
+                if (e.getApiResponse().getContent() != null) {
+                    responseContent = e.getApiResponse().getContent();
+                    logger.error("  API Response Content: {}", responseContent);
+                }
+            }
+
+            logger.error("  Cause: {}", e.getCause());
+            logger.error("Stack trace:", e);
+
+            String errorMsg = "Erro ao processar pagamento";
+            if (!responseContent.equals("N/A")) {
+                errorMsg += ": " + responseContent;
+            }
+
+            redirectAttributes.addFlashAttribute("erro", errorMsg);
+            return "redirect:/assinatura/upgrade";
+        } catch (MPException e) {
+            logger.error("Erro ao criar preferência de pagamento: {}", e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("erro",
                 "Erro ao processar pagamento. Tente novamente.");
             return "redirect:/assinatura/upgrade";
         }
     }
-    
+
     /**
      * Processar upgrade via PIX.
      */
     @PostMapping("/upgrade/pix")
-    @ResponseBody
-    public String processarUpgradePix(@CurrentUser Usuario usuario) {
+    public String processarUpgradePix(@CurrentUser Usuario usuario,
+                                      Model model,
+                                      RedirectAttributes redirectAttributes) {
         try {
-            
+
             // Criar pagamento PIX
             Payment payment = mercadoPagoService.criarPagamentoPix(
                 usuario, PlanoAssinatura.PRO
             );
-            
-            logger.info("Pagamento PIX criado: {} - Status: {}", 
+
+            logger.info("Pagamento PIX criado: {} - Status: {}",
                        payment.getId(), payment.getStatus());
-            
-            // Retornar QR Code e dados do PIX
-            return payment.getPointOfInteraction()
+
+            // Extrair dados do PIX
+            String qrCode = payment.getPointOfInteraction()
                 .getTransactionData()
                 .getQrCode();
-            
-        } catch (MPException | MPApiException e) {
-            logger.error("Erro ao criar pagamento PIX: {}", e.getMessage());
-            return "ERRO";
+
+            String qrCodeBase64 = payment.getPointOfInteraction()
+                .getTransactionData()
+                .getQrCodeBase64();
+
+            // Adicionar ao modelo
+            model.addAttribute("paymentId", payment.getId());
+            model.addAttribute("qrCode", qrCode);
+            model.addAttribute("qrCodeBase64", qrCodeBase64);
+            model.addAttribute("valor", "29.90");
+
+            return "assinatura/pix";
+
+        } catch (MPApiException e) {
+            logger.error("Erro da API do Mercado Pago ao criar PIX:");
+            logger.error("  Status Code: {}", e.getStatusCode());
+            logger.error("  Message: {}", e.getMessage());
+
+            // Extrair conteúdo detalhado da resposta
+            String responseContent = "N/A";
+            if (e.getApiResponse() != null) {
+                logger.error("  API Response Object: {}", e.getApiResponse());
+                if (e.getApiResponse().getContent() != null) {
+                    responseContent = e.getApiResponse().getContent();
+                    logger.error("  API Response Content: {}", responseContent);
+                }
+            }
+
+            logger.error("  Cause: {}", e.getCause());
+            logger.error("Stack trace:", e);
+
+            String errorMsg = "Erro ao gerar PIX";
+            if (!responseContent.equals("N/A")) {
+                errorMsg += ": " + responseContent;
+            }
+
+            redirectAttributes.addFlashAttribute("erro", errorMsg);
+            return "redirect:/assinatura/upgrade";
+        } catch (MPException e) {
+            logger.error("Erro ao criar pagamento PIX: {}", e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("erro",
+                "Erro ao gerar PIX. Tente novamente.");
+            return "redirect:/assinatura/upgrade";
         }
     }
     

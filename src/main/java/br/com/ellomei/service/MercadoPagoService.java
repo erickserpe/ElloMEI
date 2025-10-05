@@ -99,26 +99,39 @@ public class MercadoPagoService {
         
         // Configurar payer (comprador)
         PreferencePayerRequest payer = PreferencePayerRequest.builder()
-            .name(usuario.getUsername())
-            .email(usuario.getUsername() + "@ellomei.com") // Usar username como email
+            .name(usuario.getNomeCompleto() != null ? usuario.getNomeCompleto() : usuario.getUsername())
+            .email(usuario.getEmail()) // Usar email real do usuário
             .build();
         
         // Configurar URLs de retorno
+        String successUrl = baseUrl + "/assinatura/pagamento/sucesso";
+        String failureUrl = baseUrl + "/assinatura/pagamento/falha";
+        String pendingUrl = baseUrl + "/assinatura/pagamento/pendente";
+        String notificationUrl = baseUrl + "/api/webhooks/mercadopago";
+
+        logger.info("Configurando URLs de retorno:");
+        logger.info("  Base URL: {}", baseUrl);
+        logger.info("  Success URL: {}", successUrl);
+        logger.info("  Failure URL: {}", failureUrl);
+        logger.info("  Pending URL: {}", pendingUrl);
+        logger.info("  Notification URL: {}", notificationUrl);
+
         PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
-            .success(baseUrl + "/assinatura/pagamento/sucesso")
-            .failure(baseUrl + "/assinatura/pagamento/falha")
-            .pending(baseUrl + "/assinatura/pagamento/pendente")
+            .success(successUrl)
+            .failure(failureUrl)
+            .pending(pendingUrl)
             .build();
-        
+
         // Criar preferência
         PreferenceRequest preferenceRequest = PreferenceRequest.builder()
             .items(items)
             .payer(payer)
             .backUrls(backUrls)
-            .autoReturn("approved")
+            // Removido autoReturn para evitar erro de validação
+            // .autoReturn("approved")
             .externalReference("USER_" + usuario.getId() + "_PLAN_" + plano.name())
             .statementDescriptor("ElloMEI " + plano.name())
-            .notificationUrl(baseUrl + "/api/webhooks/mercadopago")
+            .notificationUrl(notificationUrl)
             .build();
         
         PreferenceClient client = new PreferenceClient();
@@ -155,8 +168,8 @@ public class MercadoPagoService {
             .paymentMethodId("credit_card")
             .payer(
                 PaymentPayerRequest.builder()
-                    .email(usuario.getUsername() + "@ellomei.com")
-                    .firstName(usuario.getUsername())
+                    .email(usuario.getEmail())
+                    .firstName(usuario.getNomeCompleto() != null ? usuario.getNomeCompleto() : usuario.getUsername())
                     .identification(
                         IdentificationRequest.builder()
                             .type("CPF")
@@ -198,8 +211,8 @@ public class MercadoPagoService {
             .paymentMethodId("pix")
             .payer(
                 PaymentPayerRequest.builder()
-                    .email(usuario.getUsername() + "@ellomei.com")
-                    .firstName(usuario.getUsername())
+                    .email(usuario.getEmail())
+                    .firstName(usuario.getNomeCompleto() != null ? usuario.getNomeCompleto() : usuario.getUsername())
                     .identification(
                         IdentificationRequest.builder()
                             .type("CPF")

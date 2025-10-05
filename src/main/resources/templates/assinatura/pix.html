@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento PIX - ElloMEI</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css}">
+    <style>
+        .pix-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .qr-code-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .qr-code-image {
+            max-width: 300px;
+            margin: 20px auto;
+            border: 3px solid #0d6efd;
+            border-radius: 10px;
+            padding: 10px;
+            background: white;
+        }
+        .pix-code {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            word-break: break-all;
+            font-size: 0.9rem;
+            margin: 20px 0;
+        }
+        .copy-button {
+            cursor: pointer;
+        }
+        .status-checking {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="pix-container">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h1 class="display-5">
+                    <i class="bi bi-qr-code text-success"></i>
+                    Pagamento via PIX
+                </h1>
+                <p class="lead text-muted">
+                    Escaneie o QR Code ou copie o código PIX
+                </p>
+            </div>
+
+            <!-- QR Code Box -->
+            <div class="qr-code-box mb-4">
+                <!-- Valor -->
+                <div class="mb-4">
+                    <h2 class="text-success mb-0">R$ <span th:text="${valor}">29,90</span></h2>
+                    <p class="text-muted">Plano PRO - Mensal</p>
+                </div>
+
+                <!-- QR Code Image -->
+                <div class="qr-code-image">
+                    <img th:src="'data:image/png;base64,' + ${qrCodeBase64}" 
+                         alt="QR Code PIX" 
+                         class="img-fluid">
+                </div>
+
+                <!-- Instruções -->
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Como pagar:</strong>
+                    <ol class="text-start mt-2 mb-0">
+                        <li>Abra o app do seu banco</li>
+                        <li>Escolha a opção PIX</li>
+                        <li>Escaneie o QR Code acima</li>
+                        <li>Confirme o pagamento</li>
+                    </ol>
+                </div>
+
+                <!-- Código PIX Copia e Cola -->
+                <div class="mt-4">
+                    <h5>Ou copie o código PIX:</h5>
+                    <div class="pix-code" id="pixCode" th:text="${qrCode}">
+                        <!-- Código PIX aqui -->
+                    </div>
+                    <button class="btn btn-primary copy-button" onclick="copiarCodigo()">
+                        <i class="bi bi-clipboard"></i>
+                        Copiar Código PIX
+                    </button>
+                    <div id="copySuccess" class="alert alert-success mt-2" style="display: none;">
+                        <i class="bi bi-check-circle"></i>
+                        Código copiado com sucesso!
+                    </div>
+                </div>
+
+                <!-- Status do Pagamento -->
+                <div class="mt-4 p-3 bg-light rounded">
+                    <div class="status-checking">
+                        <i class="bi bi-hourglass-split text-warning"></i>
+                        <strong>Aguardando pagamento...</strong>
+                    </div>
+                    <p class="text-muted small mb-0 mt-2">
+                        Assim que o pagamento for confirmado, você será redirecionado automaticamente.
+                    </p>
+                </div>
+
+                <!-- ID do Pagamento (para debug) -->
+                <div class="mt-3">
+                    <small class="text-muted">
+                        ID do Pagamento: <span th:text="${paymentId}"></span>
+                    </small>
+                </div>
+            </div>
+
+            <!-- Informações Adicionais -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-shield-check text-success"></i>
+                        Pagamento Seguro
+                    </h5>
+                    <p class="card-text">
+                        Este pagamento é processado de forma segura pelo Mercado Pago.
+                        Seus dados estão protegidos e criptografados.
+                    </p>
+                    <ul class="list-unstyled mb-0">
+                        <li><i class="bi bi-check-circle text-success"></i> Pagamento instantâneo</li>
+                        <li><i class="bi bi-check-circle text-success"></i> Confirmação automática</li>
+                        <li><i class="bi bi-check-circle text-success"></i> Sem taxas adicionais</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="text-center">
+                <a th:href="@{/assinatura/upgrade}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i>
+                    Voltar
+                </a>
+                <a th:href="@{/dashboard}" class="btn btn-outline-primary">
+                    <i class="bi bi-house"></i>
+                    Ir para Dashboard
+                </a>
+            </div>
+
+            <!-- Aviso de Expiração -->
+            <div class="alert alert-warning mt-4">
+                <i class="bi bi-clock"></i>
+                <strong>Atenção:</strong> Este código PIX expira em 30 minutos.
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+    <script>
+        // Função para copiar o código PIX
+        function copiarCodigo() {
+            const pixCode = document.getElementById('pixCode').textContent;
+            navigator.clipboard.writeText(pixCode).then(function() {
+                // Mostrar mensagem de sucesso
+                const successMsg = document.getElementById('copySuccess');
+                successMsg.style.display = 'block';
+                
+                // Esconder após 3 segundos
+                setTimeout(function() {
+                    successMsg.style.display = 'none';
+                }, 3000);
+            }).catch(function(err) {
+                console.error('Erro ao copiar:', err);
+                alert('Erro ao copiar código. Tente selecionar e copiar manualmente.');
+            });
+        }
+
+        // Verificar status do pagamento a cada 5 segundos
+        const paymentId = '[[${paymentId}]]';
+        
+        function verificarPagamento() {
+            fetch('/api/pagamento/status/' + paymentId)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'approved') {
+                        // Pagamento aprovado - redirecionar
+                        window.location.href = '/assinatura/pagamento/sucesso?payment_id=' + paymentId;
+                    } else if (data.status === 'rejected' || data.status === 'cancelled') {
+                        // Pagamento rejeitado/cancelado
+                        window.location.href = '/assinatura/pagamento/falha?payment_id=' + paymentId;
+                    }
+                    // Se ainda está pending, continua verificando
+                })
+                .catch(error => {
+                    console.error('Erro ao verificar pagamento:', error);
+                });
+        }
+
+        // Verificar a cada 5 segundos
+        setInterval(verificarPagamento, 5000);
+        
+        // Verificar imediatamente ao carregar
+        verificarPagamento();
+    </script>
+</body>
+</html>
+
