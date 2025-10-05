@@ -1,4 +1,4 @@
-# 🛡️ RATE LIMITING - SCF-MEI
+# 🛡️ RATE LIMITING - ElloMEI
 
 Este documento explica o sistema de rate limiting implementado para proteger a aplicação contra abuso e ataques.
 

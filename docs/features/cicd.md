@@ -1,6 +1,6 @@
 # 🔄 CI/CD - INTEGRAÇÃO E DEPLOY CONTÍNUO
 
-Este documento explica o pipeline de CI/CD do SCF-MEI usando GitHub Actions.
+Este documento explica o pipeline de CI/CD do ElloMEI usando GitHub Actions.
 
 ---
 
@@ -17,7 +17,7 @@ Este documento explica o pipeline de CI/CD do SCF-MEI usando GitHub Actions.
 
 ## 🤔 **VISÃO GERAL**
 
-O SCF-MEI usa **GitHub Actions** para automação de CI/CD:
+O ElloMEI usa **GitHub Actions** para automação de CI/CD:
 
 **CI (Continuous Integration):**
 - ✅ Build automático
@@ -73,8 +73,8 @@ O SCF-MEI usa **GitHub Actions** para automação de CI/CD:
 
 **Imagem gerada:**
 ```
-ghcr.io/<seu-usuario>/scf-mei:latest
-ghcr.io/<seu-usuario>/scf-mei:v1.0.0
+ghcr.io/<seu-usuario>/ellomei:latest
+ghcr.io/<seu-usuario>/ellomei:v1.0.0
 ```
 
 ---
@@ -146,7 +146,7 @@ git push origin main
 
 4. **Imagem disponível para deploy:**
 ```bash
-docker pull ghcr.io/<seu-usuario>/scf-mei:latest
+docker pull ghcr.io/<seu-usuario>/ellomei:latest
 ```
 
 ---
@@ -201,7 +201,7 @@ SONAR_HOST_URL=https://sonarcloud.io
 echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
 
 # Pull da imagem
-docker pull ghcr.io/<seu-usuario>/scf-mei:latest
+docker pull ghcr.io/<seu-usuario>/ellomei:latest
 ```
 
 ---
@@ -227,7 +227,7 @@ services:
     #   dockerfile: Dockerfile
     
     # Usar imagem do registry
-    image: ghcr.io/<seu-usuario>/scf-mei:latest
+    image: ghcr.io/<seu-usuario>/ellomei:latest
 ```
 
 ---
@@ -300,7 +300,7 @@ ERROR: failed to solve: process "/bin/sh -c mvn clean package" did not complete 
 **Solução:**
 1. Testar build Docker localmente:
 ```bash
-docker build -t scf-mei-test .
+docker build -t ellomei-test .
 ```
 
 2. Verificar logs de erro
@@ -322,7 +322,7 @@ echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
 ```
 
 2. Verificar se imagem existe:
-   - Acessar: https://github.com/<seu-usuario>/scf-mei/pkgs/container/scf-mei
+   - Acessar: https://github.com/<seu-usuario>/ellomei/pkgs/container/ellomei
 
 3. Verificar permissões do package
 
@@ -363,7 +363,7 @@ echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
 ## 🎉 **RESUMO**
 
 **Ver status dos workflows:**
-- Acessar: https://github.com/<seu-usuario>/scf-mei/actions
+- Acessar: https://github.com/<seu-usuario>/ellomei/actions
 
 **Executar workflow manualmente:**
 1. Ir em "Actions"

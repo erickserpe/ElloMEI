@@ -26,10 +26,10 @@ fi
 BACKUP_DIR="${BACKUP_DIR:-./backups}"
 
 # Nome do container MySQL
-MYSQL_CONTAINER="${MYSQL_CONTAINER_NAME:-scf-mei-mysql}"
+MYSQL_CONTAINER="${MYSQL_CONTAINER_NAME:-ellomei-mysql}"
 
 # Credenciais do banco
-DB_NAME="${MYSQL_DATABASE:-scf_mei_db}"
+DB_NAME="${MYSQL_DATABASE:-ellomei_db}"
 DB_USER="${MYSQL_USER:-scf_user}"
 DB_PASSWORD="${MYSQL_PASSWORD}"
 
@@ -53,7 +53,7 @@ list_backups() {
     log "================================================"
     
     local count=0
-    find "$BACKUP_DIR" -name "scf_mei_backup_*.sql.gz" -type f -printf "%T@ %p\n" | \
+    find "$BACKUP_DIR" -name "ellomei_backup_*.sql.gz" -type f -printf "%T@ %p\n" | \
     sort -rn | \
     while read timestamp filepath; do
         ((count++))
@@ -70,14 +70,14 @@ list_backups() {
     log "================================================"
     log ""
     log "Uso: ./restore-database.sh <arquivo_backup.sql.gz>"
-    log "Exemplo: ./restore-database.sh backups/scf_mei_backup_20250104_020000.sql.gz"
+    log "Exemplo: ./restore-database.sh backups/ellomei_backup_20250104_020000.sql.gz"
 }
 
 # ===================================
 # VALIDAÇÕES
 # ===================================
 
-log "🔄 Iniciando restore do banco de dados SCF-MEI"
+log "🔄 Iniciando restore do banco de dados ElloMEI"
 log "================================================"
 
 # Se nenhum arquivo foi especificado, listar backups

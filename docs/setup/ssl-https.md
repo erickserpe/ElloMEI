@@ -1,6 +1,6 @@
 # 🔒 SSL/HTTPS - CONFIGURAÇÃO COMPLETA
 
-Este documento explica como configurar SSL/HTTPS no SCF-MEI para desenvolvimento e produção.
+Este documento explica como configurar SSL/HTTPS no ElloMEI para desenvolvimento e produção.
 
 ---
 
@@ -59,7 +59,7 @@ Para desenvolvimento local, use um certificado auto-assinado.
 
 **Saída esperada:**
 ```
-🔐 Gerando Certificado SSL Auto-Assinado para SCF-MEI
+🔐 Gerando Certificado SSL Auto-Assinado para ElloMEI
 ======================================================
 
 📝 Configurações:
@@ -165,7 +165,7 @@ sudo certbot --nginx -d seudominio.com.br -d www.seudominio.com.br
 
 #### **3. Configurar Nginx**
 
-Edite `/etc/nginx/sites-available/scf-mei`:
+Edite `/etc/nginx/sites-available/ellomei`:
 
 ```nginx
 server {
@@ -212,7 +212,7 @@ server {
 
 ```bash
 # Criar link simbólico
-sudo ln -s /etc/nginx/sites-available/scf-mei /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/ellomei /etc/nginx/sites-enabled/
 
 # Testar configuração
 sudo nginx -t
@@ -281,7 +281,7 @@ openssl pkcs12 -export \
   -out /app/ssl/certificate.p12 \
   -name scfmei \
   -passout pass:SUA_SENHA_FORTE_AQUI
-systemctl restart scf-mei
+systemctl restart ellomei
 ```
 
 Adicionar ao cron:

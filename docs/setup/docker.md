@@ -1,4 +1,4 @@
-# 🐳 SCF-MEI - Configuração Completa com Docker
+# 🐳 ElloMEI - Configuração Completa com Docker
 
 ## 🎯 Tudo Rodando em Docker!
 
@@ -56,11 +56,11 @@ docker compose logs -f
 ## 📦 O que será criado?
 
 ### Containers:
-- **scf-mei-mysql**: Banco de dados MySQL 8.0
-- **scf-mei-app**: Aplicação Spring Boot
+- **ellomei-mysql**: Banco de dados MySQL 8.0
+- **ellomei-app**: Aplicação Spring Boot
 
 ### Rede:
-- **scf-mei-network**: Rede bridge para comunicação entre containers
+- **ellomei-network**: Rede bridge para comunicação entre containers
 
 ### Volumes:
 - **mysql_data**: Dados persistentes do MySQL
@@ -125,23 +125,23 @@ docker compose up -d
 
 ```bash
 # Acessar shell do container
-docker exec -it scf-mei-app sh
+docker exec -it ellomei-app sh
 
 # Ver logs em tempo real
-docker logs -f scf-mei-app
+docker logs -f ellomei-app
 ```
 
 ### MySQL
 
 ```bash
 # Acessar MySQL CLI
-docker exec -it scf-mei-mysql mysql -u scf_user -p5522 scf_mei_db
+docker exec -it ellomei-mysql mysql -u scf_user -p5522 ellomei_db
 
 # Executar comando SQL direto
-docker exec -it scf-mei-mysql mysql -u scf_user -p5522 scf_mei_db -e "SHOW TABLES;"
+docker exec -it ellomei-mysql mysql -u scf_user -p5522 ellomei_db -e "SHOW TABLES;"
 
 # Ver índices
-docker exec -it scf-mei-mysql mysql -u scf_user -p5522 scf_mei_db -e "SHOW INDEX FROM lancamento;"
+docker exec -it ellomei-mysql mysql -u scf_user -p5522 ellomei_db -e "SHOW INDEX FROM lancamento;"
 ```
 
 ---
@@ -152,17 +152,17 @@ docker exec -it scf-mei-mysql mysql -u scf_user -p5522 scf_mei_db -e "SHOW INDEX
 
 ```bash
 # Backup completo
-docker exec scf-mei-mysql mysqldump -u scf_user -p5522 scf_mei_db > backup.sql
+docker exec ellomei-mysql mysqldump -u scf_user -p5522 ellomei_db > backup.sql
 
 # Backup com data
-docker exec scf-mei-mysql mysqldump -u scf_user -p5522 scf_mei_db > backup_$(date +%Y%m%d_%H%M%S).sql
+docker exec ellomei-mysql mysqldump -u scf_user -p5522 ellomei_db > backup_$(date +%Y%m%d_%H%M%S).sql
 ```
 
 ### Restaurar
 
 ```bash
 # Restaurar backup
-docker exec -i scf-mei-mysql mysql -u scf_user -p5522 scf_mei_db < backup.sql
+docker exec -i ellomei-mysql mysql -u scf_user -p5522 ellomei_db < backup.sql
 ```
 
 ### Limpar Dados
@@ -172,7 +172,7 @@ docker exec -i scf-mei-mysql mysql -u scf_user -p5522 scf_mei_db < backup.sql
 docker compose down
 
 # Remover volume do MySQL (CUIDADO: apaga todos os dados!)
-docker volume rm scf-mei_mysql_data
+docker volume rm ellomei_mysql_data
 
 # Iniciar novamente (banco vazio)
 docker compose up -d
@@ -226,7 +226,7 @@ services:
 
 ```bash
 # Verificar rede
-docker network inspect scf-mei_scf-mei-network
+docker network inspect ellomei_ellomei-network
 
 # Testar conexão do container da app
 docker compose exec app ping mysql
@@ -239,7 +239,7 @@ docker compose exec app ping mysql
 docker compose down -v
 
 # Remover imagens
-docker rmi scf-mei-scf-mei-app
+docker rmi ellomei-ellomei-app
 docker rmi mysql:8.0
 
 # Limpar cache do Docker
@@ -260,7 +260,7 @@ docker system prune -a
 docker stats
 
 # Apenas containers do projeto
-docker stats scf-mei-mysql scf-mei-app
+docker stats ellomei-mysql ellomei-app
 ```
 
 ### Ver espaço em disco
@@ -325,7 +325,7 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 ### Construir imagem otimizada
 
 ```bash
-docker build -t scf-mei:latest .
+docker build -t ellomei:latest .
 ```
 
 ### Executar em produção

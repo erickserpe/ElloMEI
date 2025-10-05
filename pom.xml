@@ -7,11 +7,11 @@
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.5.5</version>
         <relativePath/> </parent>
-    <groupId>br.com.scfmei</groupId>
-    <artifactId>SCF-MEI</artifactId>
+    <groupId>br.com.ellomei</groupId>
+    <artifactId>ElloMEI</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>SCF-MEI</name>
-    <description>SCF-MEI</description>
+    <name>ElloMEI</name>
+    <description>ElloMEI - Sistema de Controle Financeiro para MEI</description>
     <url/>
     <licenses>
         <license/>

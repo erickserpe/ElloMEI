@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ========================================
-# SCF-MEI - Docker Environment Manager
+# ElloMEI - Docker Environment Manager
 # ========================================
 #
 # Uso:
@@ -44,7 +44,7 @@ check_docker() {
 }
 
 start_environment() {
-    print_header "🐳 SCF-MEI - Iniciando Ambiente Docker"
+    print_header "🐳 ElloMEI - Iniciando Ambiente Docker"
     echo "======================================"
     echo ""
 
@@ -84,7 +84,7 @@ start_environment() {
     sleep 15
 
     # Check if containers are running
-    if docker ps | grep -q scf-mei-mysql && docker ps | grep -q scf-mei-app; then
+    if docker ps | grep -q ellomei-mysql && docker ps | grep -q ellomei-app; then
         echo ""
         echo "================================================"
         print_success "AMBIENTE DOCKER CONFIGURADO COM SUCESSO!"
@@ -168,7 +168,7 @@ clean_environment() {
     docker compose down -v
 
     print_info "Removendo imagens..."
-    docker rmi scf-mei-app 2>/dev/null || true
+    docker rmi ellomei-app 2>/dev/null || true
 
     print_info "Limpando sistema Docker..."
     docker system prune -f
@@ -200,7 +200,7 @@ show_help_commands() {
 }
 
 show_help() {
-    echo "SCF-MEI - Docker Environment Manager"
+    echo "ElloMEI - Docker Environment Manager"
     echo ""
     echo "Uso: ./docker-start.sh [comando]"
     echo ""

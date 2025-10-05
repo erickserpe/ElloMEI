@@ -1,0 +1,78 @@
+// src/main/java/br/com/scfmei/service/ContatoService.java
+package br.com.ellomei.service;
+
+import br.com.ellomei.domain.Contato;
+import br.com.ellomei.domain.Usuario;
+import br.com.ellomei.repository.ContatoRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class ContatoService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ContatoService.class);
+
+    @Autowired
+    private ContatoRepository contatoRepository;
+
+    // Método legado (sem paginação) - mantido para compatibilidade
+    @Transactional(readOnly = true)
+    @Cacheable(value = "contatosPorUsuario", key = "#usuario.id")
+    public List<Contato> buscarTodosPorUsuario(Usuario usuario) {
+        // This log will only appear the FIRST time the method is called for a user
+        logger.debug("Buscando contatos do banco de dados para o usuário: {}", usuario.getId());
+        return contatoRepository.findByUsuario(usuario);
+    }
+
+    // Novo método com paginação (sem cache por enquanto)
+    @Transactional(readOnly = true)
+    public Page<Contato> buscarTodosPorUsuario(Usuario usuario, Pageable pageable) {
+        logger.debug("Buscando contatos paginados do banco de dados para o usuário: {}", usuario.getId());
+        return contatoRepository.findByUsuario(usuario, pageable);
+    }
+
+    @Transactional
+    @CacheEvict(value = "contatosPorUsuario", key = "#usuario.id")
+    public Contato salvar(Contato contato, Usuario usuario) {
+        contato.setUsuario(usuario); // Associa o contato ao usuário logado
+        logger.debug("Cache de contatos invalidado para o usuário: {}", usuario.getId());
+        return contatoRepository.save(contato);
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@customSecurityService.isContatoOwner(#id)")
+    public Optional<Contato> buscarPorId(Long id) {
+        return contatoRepository.findById(id);
+    }
+
+    @Transactional
+    @PreAuthorize("@customSecurityService.isContatoOwner(#id)")
+    public void excluirPorId(Long id) {
+        // First, get the contact to obtain the user for cache eviction
+        Optional<Contato> contato = contatoRepository.findById(id);
+        if (contato.isPresent()) {
+            Long usuarioId = contato.get().getUsuario().getId();
+            contatoRepository.deleteById(id);
+            // Manually evict cache after deletion
+            evictContatoCache(usuarioId);
+        } else {
+            contatoRepository.deleteById(id);
+        }
+    }
+
+    @CacheEvict(value = "contatosPorUsuario", key = "#usuarioId")
+    public void evictContatoCache(Long usuarioId) {
+        logger.debug("Cache de contatos invalidado para o usuário: {}", usuarioId);
+    }
+}

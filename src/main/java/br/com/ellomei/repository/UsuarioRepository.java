@@ -1,0 +1,13 @@
+package br.com.ellomei.repository;
+
+import br.com.ellomei.domain.Usuario;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
+
+public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+    // Método para o Spring Security encontrar um usuário pelo seu nome de login
+    Optional<Usuario> findByUsername(String username);
+
+    // Método para encontrar usuário por email (recuperação de senha, etc)
+    Optional<Usuario> findByEmail(String email);
+}

@@ -32,7 +32,7 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: root_password
-          MYSQL_DATABASE: scf_mei_test
+          MYSQL_DATABASE: ellomei_test
           MYSQL_USER: scf_user
           MYSQL_PASSWORD: test_password
         ports:
@@ -88,7 +88,7 @@ jobs:
           # Variáveis de ambiente para testes
           SPRING_PROFILES_ACTIVE: test
           DB_HOST: localhost
-          MYSQL_DATABASE: scf_mei_test
+          MYSQL_DATABASE: ellomei_test
           MYSQL_USER: scf_user
           MYSQL_PASSWORD: test_password
           MERCADOPAGO_ACCESS_TOKEN: TEST-fake-token

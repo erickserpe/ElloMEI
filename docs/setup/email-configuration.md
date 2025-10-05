@@ -1,6 +1,6 @@
 # 📧 Configuração de Email - Google Workspace
 
-Este guia mostra como configurar o envio de emails usando **Google Workspace** (Gmail Corporativo) no SCF-MEI.
+Este guia mostra como configurar o envio de emails usando **Google Workspace** (Gmail Corporativo) no ElloMEI.
 
 ---
 
@@ -33,7 +33,7 @@ Este guia mostra como configurar o envio de emails usando **Google Workspace** (
 2. Faça login com sua conta do **Google Workspace**
 3. Se pedir para habilitar verificação em 2 etapas, faça isso primeiro
 4. Clique em **"Selecionar app"** → **"Outro (nome personalizado)"**
-5. Digite: `SCF-MEI Email Service`
+5. Digite: `ElloMEI Email Service`
 6. Clique em **"Gerar"**
 7. **COPIE A SENHA** (16 caracteres)
 
@@ -48,7 +48,7 @@ abcdefghijklmnop     ← Como você deve usar (SEM espaços)
 ### **PASSO 2: Editar o arquivo `.env`**
 
 ```bash
-cd /home/es_luan/IdeaProjects/SCF-MEI
+cd /home/es_luan/IdeaProjects/ElloMEI
 nano .env
 ```
 
@@ -100,7 +100,7 @@ Se ainda não tiver habilitado:
 1. Acesse: https://myaccount.google.com/apppasswords
 2. Faça login com sua conta do Google Workspace
 3. Clique em **"Selecionar app"** → **"Outro (nome personalizado)"**
-4. Digite: `SCF-MEI Email Service`
+4. Digite: `ElloMEI Email Service`
 5. Clique em **"Gerar"**
 6. **COPIE A SENHA** (16 caracteres sem espaços)
 
@@ -184,7 +184,7 @@ APP_BASE_URL=https://seudominio.com.br
 ```bash
 MAIL_USERNAME=noreply@seudominio.com.br
 MAIL_PASSWORD=abcdefghijklmnop
-MAIL_FROM_NAME=SCF-MEI - Sistema de Controle Financeiro
+MAIL_FROM_NAME=ElloMEI - Sistema de Controle Financeiro
 APP_BASE_URL=https://seudominio.com.br
 ```
 
@@ -199,7 +199,7 @@ APP_BASE_URL=https://seudominio.com.br
 ```bash
 MAIL_USERNAME=seuemail@gmail.com
 MAIL_PASSWORD=abcdefghijklmnop
-MAIL_FROM_NAME=SCF-MEI Dev
+MAIL_FROM_NAME=ElloMEI Dev
 APP_BASE_URL=http://localhost:8080
 ```
 

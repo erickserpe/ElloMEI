@@ -1,4 +1,4 @@
-# 🧪 GUIA DE TESTES - VALIDAÇÕES SCF-MEI
+# 🧪 GUIA DE TESTES - VALIDAÇÕES ElloMEI
 
 ## 🎯 Objetivo
 
@@ -17,7 +17,7 @@ curl -s http://localhost:8080/actuator/health
 
 **Se não estiver rodando:**
 ```bash
-cd /home/es_luan/IdeaProjects/SCF-MEI
+cd /home/es_luan/IdeaProjects/ElloMEI
 docker compose up -d
 sleep 30
 ```
@@ -347,7 +347,7 @@ Marque cada teste conforme for realizando:
 
 **Solução:**
 ```bash
-cd /home/es_luan/IdeaProjects/SCF-MEI
+cd /home/es_luan/IdeaProjects/ElloMEI
 docker compose down
 docker compose build app
 docker compose up -d

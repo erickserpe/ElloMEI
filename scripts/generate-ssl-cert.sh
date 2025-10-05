@@ -13,14 +13,14 @@
 
 set -e
 
-echo "🔐 Gerando Certificado SSL Auto-Assinado para SCF-MEI"
+echo "🔐 Gerando Certificado SSL Auto-Assinado para ElloMEI"
 echo "======================================================"
 echo ""
 
 # Configurações
 KEYSTORE_FILE="keystore.p12"
-KEYSTORE_PASSWORD="scfmei2025"
-ALIAS="scfmei"
+KEYSTORE_PASSWORD="ellomei2025"
+ALIAS="ellomei"
 VALIDITY_DAYS=365
 DOMAIN="localhost"
 
@@ -61,8 +61,8 @@ keytool -genkeypair \
     -validity "$VALIDITY_DAYS" \
     -storepass "$KEYSTORE_PASSWORD" \
     -keypass "$KEYSTORE_PASSWORD" \
-    -dname "CN=$DOMAIN, OU=SCF-MEI, O=SCF-MEI, L=Sao Paulo, ST=SP, C=BR" \
-    -ext "SAN=dns:localhost,dns:scf-mei-app,ip:127.0.0.1"
+    -dname "CN=$DOMAIN, OU=ElloMEI, O=ElloMEI, L=Sao Paulo, ST=SP, C=BR" \
+    -ext "SAN=dns:localhost,dns:ellomei-app,ip:127.0.0.1"
 
 if [ $? -eq 0 ]; then
     echo ""

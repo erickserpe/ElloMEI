@@ -1,7 +1,7 @@
 # ===================================
 # Prometheus Configuration
 # ===================================
-# Configuração do Prometheus para coletar métricas do SCF-MEI
+# Configuração do Prometheus para coletar métricas do ElloMEI
 # ===================================
 
 global:
@@ -16,7 +16,7 @@ global:
   
   # Labels externos (adicionados a todas as métricas)
   external_labels:
-    monitor: 'scf-mei-monitor'
+    monitor: 'ellomei-monitor'
     environment: 'development'
 
 # ===================================
@@ -34,15 +34,15 @@ scrape_configs:
           application: 'monitoring'
 
   # -----------------------------------
-  # SCF-MEI Application
+  # ElloMEI Application
   # -----------------------------------
-  - job_name: 'scf-mei-app'
+  - job_name: 'ellomei-app'
     metrics_path: '/actuator/prometheus'
     scrape_interval: 10s
     static_configs:
-      - targets: ['scf-mei-app:8080']
+      - targets: ['ellomei-app:8080']
         labels:
-          service: 'scf-mei'
+          service: 'ellomei'
           application: 'backend'
           environment: 'development'
     
@@ -50,7 +50,7 @@ scrape_configs:
     relabel_configs:
       - source_labels: [__address__]
         target_label: instance
-        replacement: 'scf-mei-app'
+        replacement: 'ellomei-app'
 
   # -----------------------------------
   # MySQL (via mysqld_exporter - opcional)

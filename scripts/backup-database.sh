@@ -28,10 +28,10 @@ fi
 BACKUP_DIR="${BACKUP_DIR:-./backups}"
 
 # Nome do container MySQL
-MYSQL_CONTAINER="${MYSQL_CONTAINER_NAME:-scf-mei-mysql}"
+MYSQL_CONTAINER="${MYSQL_CONTAINER_NAME:-ellomei-mysql}"
 
 # Credenciais do banco
-DB_NAME="${MYSQL_DATABASE:-scf_mei_db}"
+DB_NAME="${MYSQL_DATABASE:-ellomei_db}"
 DB_USER="${MYSQL_USER:-scf_user}"
 DB_PASSWORD="${MYSQL_PASSWORD}"
 
@@ -43,7 +43,7 @@ TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 DATE=$(date +"%Y-%m-%d %H:%M:%S")
 
 # Nome do arquivo de backup
-BACKUP_FILE="scf_mei_backup_${TIMESTAMP}.sql"
+BACKUP_FILE="ellomei_backup_${TIMESTAMP}.sql"
 BACKUP_FILE_GZ="${BACKUP_FILE}.gz"
 
 # ===================================
@@ -62,7 +62,7 @@ error() {
 # VALIDAÇÕES
 # ===================================
 
-log "🗄️  Iniciando backup do banco de dados SCF-MEI"
+log "🗄️  Iniciando backup do banco de dados ElloMEI"
 log "================================================"
 
 # Verificar se Docker está rodando
@@ -143,7 +143,7 @@ log "🔄 Executando rotação de backups..."
 log "   Retenção: $RETENTION_DAYS dias"
 
 # Contar backups antes da rotação
-BACKUPS_BEFORE=$(find "$BACKUP_DIR" -name "scf_mei_backup_*.sql.gz" | wc -l)
+BACKUPS_BEFORE=$(find "$BACKUP_DIR" -name "ellomei_backup_*.sql.gz" | wc -l)
 
 # Remover backups antigos
 DELETED_COUNT=0
@@ -153,10 +153,10 @@ while IFS= read -r old_backup; do
         rm -f "$old_backup"
         ((DELETED_COUNT++))
     fi
-done < <(find "$BACKUP_DIR" -name "scf_mei_backup_*.sql.gz" -type f -mtime +$RETENTION_DAYS)
+done < <(find "$BACKUP_DIR" -name "ellomei_backup_*.sql.gz" -type f -mtime +$RETENTION_DAYS)
 
 # Contar backups após rotação
-BACKUPS_AFTER=$(find "$BACKUP_DIR" -name "scf_mei_backup_*.sql.gz" | wc -l)
+BACKUPS_AFTER=$(find "$BACKUP_DIR" -name "ellomei_backup_*.sql.gz" | wc -l)
 
 if [ $DELETED_COUNT -gt 0 ]; then
     log "✅ Rotação concluída: $DELETED_COUNT backup(s) removido(s)"
@@ -175,7 +175,7 @@ log "📋 Backups disponíveis:"
 log "================================================"
 
 if [ $BACKUPS_AFTER -gt 0 ]; then
-    find "$BACKUP_DIR" -name "scf_mei_backup_*.sql.gz" -type f -printf "%T@ %p\n" | \
+    find "$BACKUP_DIR" -name "ellomei_backup_*.sql.gz" -type f -printf "%T@ %p\n" | \
     sort -rn | \
     while read timestamp filepath; do
         filename=$(basename "$filepath")

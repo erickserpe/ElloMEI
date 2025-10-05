@@ -17,7 +17,7 @@
 ## 📁 Estrutura Final do Projeto
 
 ```
-SCF-MEI/
+ElloMEI/
 ├── docs/                          # 📚 Documentação (NOVA)
 │   ├── README.md                  # Índice principal da documentação
 │   ├── setup/                     # Configuração inicial
@@ -186,7 +186,7 @@ Todos os controllers, services, repositories e entities estão sendo utilizados:
 
 Estes são aceitáveis pois:
 - `import org.springframework.web.bind.annotation.*` - Padrão Spring
-- `import br.com.scfmei.domain.*` - Pacote interno
+- `import br.com.ellomei.domain.*` - Pacote interno
 - Não causam problemas de performance ou ambiguidade
 
 ---

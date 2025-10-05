@@ -2,7 +2,7 @@
 
 ## 🎯 **Resumo Executivo**
 
-Implementamos uma **cobertura de testes essencial e leve** para a aplicação SCF-MEI, focando apenas nos componentes mais críticos sem sobrecarregar o sistema.
+Implementamos uma **cobertura de testes essencial e leve** para a aplicação ElloMEI, focando apenas nos componentes mais críticos sem sobrecarregar o sistema.
 
 ## 📊 **Resultados dos Testes Leves**
 
@@ -127,7 +127,7 @@ mvn test -Dtest=ScfMeiApplicationTests
 - **Testes E2E**: Para validação completa (já implementado)
 - **CI/CD**: Integração com pipeline de desenvolvimento
 
-**A aplicação SCF-MEI agora possui uma base sólida de testes leves que garante qualidade sem comprometer a performance do desenvolvimento!** ✨
+**A aplicação ElloMEI agora possui uma base sólida de testes leves que garante qualidade sem comprometer a performance do desenvolvimento!** ✨
 
 ---
 

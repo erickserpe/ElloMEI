@@ -1,4 +1,4 @@
-# 🗄️ SCF-MEI - Guia do Banco de Dados
+# 🗄️ ElloMEI - Guia do Banco de Dados
 
 **Como funciona o armazenamento de dados com Docker**
 
@@ -26,7 +26,7 @@ volumes:
 ### Localização Física
 
 ```
-/var/lib/docker/volumes/scf-mei_mysql_data/_data
+/var/lib/docker/volumes/ellomei_mysql_data/_data
 ```
 
 Este diretório contém **TODOS os dados do MySQL**, incluindo:
@@ -56,13 +56,13 @@ Seu banco de dados tem **6 tabelas**:
 
 ```bash
 # Listar todas as tabelas
-docker exec scf-mei-mysql mysql -u scf_user -p5522 scf_mei_db -e "SHOW TABLES;"
+docker exec ellomei-mysql mysql -u scf_user -p5522 ellomei_db -e "SHOW TABLES;"
 
 # Ver estrutura de uma tabela
-docker exec scf-mei-mysql mysql -u scf_user -p5522 scf_mei_db -e "DESCRIBE lancamento;"
+docker exec ellomei-mysql mysql -u scf_user -p5522 ellomei_db -e "DESCRIBE lancamento;"
 
 # Contar registros
-docker exec scf-mei-mysql mysql -u scf_user -p5522 scf_mei_db -e "SELECT COUNT(*) FROM lancamento;"
+docker exec ellomei-mysql mysql -u scf_user -p5522 ellomei_db -e "SELECT COUNT(*) FROM lancamento;"
 ```
 
 ---
@@ -105,7 +105,7 @@ docker compose down -v
 # ❌ Flag -v remove volumes!
 
 # Remover volume manualmente
-docker volume rm scf-mei_mysql_data
+docker volume rm ellomei_mysql_data
 # ❌ Remove o volume com os dados!
 ```
 
@@ -119,13 +119,13 @@ Vamos fazer um teste prático:
 
 ```bash
 # Inserir um registro de teste
-docker exec scf-mei-mysql mysql -u scf_user -p5522 scf_mei_db -e "
+docker exec ellomei-mysql mysql -u scf_user -p5522 ellomei_db -e "
 INSERT INTO categoria_despesa (nome, descricao) 
 VALUES ('TESTE_PERSISTENCIA', 'Teste de persistência de dados');
 "
 
 # Verificar que foi criado
-docker exec scf-mei-mysql mysql -u scf_user -p5522 scf_mei_db -e "
+docker exec ellomei-mysql mysql -u scf_user -p5522 ellomei_db -e "
 SELECT * FROM categoria_despesa WHERE nome = 'TESTE_PERSISTENCIA';
 "
 ```
@@ -145,7 +145,7 @@ SELECT * FROM categoria_despesa WHERE nome = 'TESTE_PERSISTENCIA';
 ### Passo 4: Verificar se o dado ainda existe
 
 ```bash
-docker exec scf-mei-mysql mysql -u scf_user -p5522 scf_mei_db -e "
+docker exec ellomei-mysql mysql -u scf_user -p5522 ellomei_db -e "
 SELECT * FROM categoria_despesa WHERE nome = 'TESTE_PERSISTENCIA';
 "
 ```
@@ -155,7 +155,7 @@ SELECT * FROM categoria_despesa WHERE nome = 'TESTE_PERSISTENCIA';
 ### Passo 5: Limpar o teste
 
 ```bash
-docker exec scf-mei-mysql mysql -u scf_user -p5522 scf_mei_db -e "
+docker exec ellomei-mysql mysql -u scf_user -p5522 ellomei_db -e "
 DELETE FROM categoria_despesa WHERE nome = 'TESTE_PERSISTENCIA';
 "
 ```
@@ -179,7 +179,7 @@ Mesmo com volumes persistentes, é importante fazer backups para:
 ./backup.sh
 
 # Resultado:
-# ✅ Arquivo criado: backups/scf_mei_backup_20251003_143022.sql.gz
+# ✅ Arquivo criado: backups/ellomei_backup_20251003_143022.sql.gz
 ```
 
 ### Como restaurar backup
@@ -189,7 +189,7 @@ Mesmo com volumes persistentes, é importante fazer backups para:
 ./backup.sh --list
 
 # Restaurar um backup específico
-./backup.sh --restore scf_mei_backup_20251003_143022.sql.gz
+./backup.sh --restore ellomei_backup_20251003_143022.sql.gz
 ```
 
 ---
@@ -200,12 +200,12 @@ Mesmo com volumes persistentes, é importante fazer backups para:
 
 ```bash
 # Tamanho total do banco
-docker exec scf-mei-mysql mysql -u scf_user -p5522 scf_mei_db -e "
+docker exec ellomei-mysql mysql -u scf_user -p5522 ellomei_db -e "
 SELECT 
     table_schema AS 'Database',
     ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS 'Size (MB)'
 FROM information_schema.tables
-WHERE table_schema = 'scf_mei_db'
+WHERE table_schema = 'ellomei_db'
 GROUP BY table_schema;
 "
 ```
@@ -213,13 +213,13 @@ GROUP BY table_schema;
 ### Ver tamanho de cada tabela
 
 ```bash
-docker exec scf-mei-mysql mysql -u scf_user -p5522 scf_mei_db -e "
+docker exec ellomei-mysql mysql -u scf_user -p5522 ellomei_db -e "
 SELECT 
     table_name AS 'Table',
     ROUND(((data_length + index_length) / 1024 / 1024), 2) AS 'Size (MB)',
     table_rows AS 'Rows'
 FROM information_schema.tables
-WHERE table_schema = 'scf_mei_db'
+WHERE table_schema = 'ellomei_db'
 ORDER BY (data_length + index_length) DESC;
 "
 ```
@@ -228,7 +228,7 @@ ORDER BY (data_length + index_length) DESC;
 
 ```bash
 # Contar registros em todas as tabelas
-docker exec scf-mei-mysql mysql -u scf_user -p5522 scf_mei_db -e "
+docker exec ellomei-mysql mysql -u scf_user -p5522 ellomei_db -e "
 SELECT 'usuario' AS tabela, COUNT(*) AS total FROM usuario
 UNION ALL
 SELECT 'conta', COUNT(*) FROM conta
@@ -251,7 +251,7 @@ SELECT 'comprovante', COUNT(*) FROM comprovante;
 
 ```bash
 # Acessar MySQL interativo
-docker exec -it scf-mei-mysql mysql -u scf_user -p5522 scf_mei_db
+docker exec -it ellomei-mysql mysql -u scf_user -p5522 ellomei_db
 
 # Agora você pode executar SQL diretamente:
 mysql> SHOW TABLES;
@@ -266,14 +266,14 @@ mysql> exit;
 - **Porta:** `3307` (porta externa)
 - **Usuário:** `scf_user`
 - **Senha:** `5522`
-- **Database:** `scf_mei_db`
+- **Database:** `ellomei_db`
 
 ### Via aplicação Spring Boot
 
 A aplicação se conecta automaticamente usando as configurações do `application.properties`:
 
 ```properties
-spring.datasource.url=jdbc:mysql://${DB_HOST:mysql}:3306/scf_mei_db
+spring.datasource.url=jdbc:mysql://${DB_HOST:mysql}:3306/ellomei_db
 spring.datasource.username=scf_user
 spring.datasource.password=5522
 ```
@@ -292,7 +292,7 @@ spring.datasource.password=5522
 
 # Backup automático (cron)
 # Adicionar ao crontab:
-0 2 * * * cd /caminho/para/SCF-MEI && ./backup.sh
+0 2 * * * cd /caminho/para/ElloMEI && ./backup.sh
 ```
 
 #### 2. Testar restauração
@@ -306,10 +306,10 @@ spring.datasource.password=5522
 
 ```bash
 # Copiar backups para outro local
-cp -r backups/ /mnt/backup_externo/scf-mei/
+cp -r backups/ /mnt/backup_externo/ellomei/
 
 # Ou enviar para nuvem
-# rsync -av backups/ usuario@servidor:/backups/scf-mei/
+# rsync -av backups/ usuario@servidor:/backups/ellomei/
 ```
 
 #### 4. Alterar senhas em produção
@@ -332,18 +332,18 @@ MYSQL_ROOT_PASSWORD=outra_senha_forte_456!@#
 ./backup.sh
 
 # 2. Copiar backup para novo computador
-scp backups/scf_mei_backup_*.sql.gz usuario@novo-pc:/tmp/
+scp backups/ellomei_backup_*.sql.gz usuario@novo-pc:/tmp/
 
 # No computador novo:
 # 1. Clonar repositório
-git clone https://github.com/erickserpe/SCF-MEI.git
-cd SCF-MEI
+git clone https://github.com/erickserpe/ElloMEI.git
+cd ElloMEI
 
 # 2. Iniciar ambiente
 ./docker-start.sh
 
 # 3. Restaurar backup
-./backup.sh --restore /tmp/scf_mei_backup_*.sql.gz
+./backup.sh --restore /tmp/ellomei_backup_*.sql.gz
 
 # 4. Reiniciar aplicação
 ./docker-start.sh restart
@@ -358,7 +358,7 @@ Além do banco de dados, a aplicação também guarda arquivos enviados:
 ### Localização
 
 ```
-/home/es_luan/IdeaProjects/SCF-MEI/uploads/
+/home/es_luan/IdeaProjects/ElloMEI/uploads/
 ```
 
 ### Persistência
@@ -403,7 +403,7 @@ tar -xzf uploads_backup_20251003_143022.tar.gz
 Apenas quando você **explicitamente remove o volume**:
 - `./docker-start.sh clean`
 - `docker compose down -v`
-- `docker volume rm scf-mei_mysql_data`
+- `docker volume rm ellomei_mysql_data`
 
 ### Como garantir que nunca vou perder dados?
 1. Fazer backups regulares: `./backup.sh`
@@ -423,7 +423,7 @@ Apenas quando você **explicitamente remove o volume**:
 ## 📝 **RESUMO**
 
 ✅ **Dados são guardados permanentemente** em volume Docker  
-✅ **Localização:** `/var/lib/docker/volumes/scf-mei_mysql_data/_data`  
+✅ **Localização:** `/var/lib/docker/volumes/ellomei_mysql_data/_data`  
 ✅ **6 tabelas** criadas automaticamente pelo Hibernate  
 ✅ **Persistem** ao parar/reiniciar containers  
 ✅ **Backup fácil** com `./backup.sh`  

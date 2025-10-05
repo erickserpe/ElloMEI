@@ -1,4 +1,4 @@
-# 💰 SCF-MEI - Sistema de Controle Financeiro para MEI
+# 💰 ElloMEI - Sistema de Controle Financeiro para MEI
 
 Sistema completo de controle financeiro desenvolvido em **Spring Boot** para Microempreendedores Individuais (MEI).
 
@@ -124,7 +124,7 @@ docker compose ps
 docker compose logs -f app
 
 # Acessar MySQL
-docker exec -it scf-mei-mysql mysql -u scf_user -p5522 scf_mei_db
+docker exec -it ellomei-mysql mysql -u scf_user -p5522 ellomei_db
 
 # Parar tudo
 docker compose down
@@ -150,7 +150,7 @@ docker compose down
 - **3307** - MySQL (externa)
 
 ### Credenciais MySQL
-- **Database**: `scf_mei_db`
+- **Database**: `ellomei_db`
 - **Usuário**: `scf_user`
 - **Senha**: `5522`
 - **Root Password**: `root_password`
@@ -182,7 +182,7 @@ Se precisar fazer build fora do Docker:
 mvn clean package -DskipTests
 
 # Rodar localmente (requer Java 17 e MySQL)
-java -jar target/SCF-MEI-0.0.1-SNAPSHOT.jar
+java -jar target/ElloMEI-0.0.1-SNAPSHOT.jar
 ```
 
 ---
@@ -223,7 +223,7 @@ docker compose restart mysql
 
 ### Estrutura do Projeto
 ```
-SCF-MEI/
+ElloMEI/
 ├── src/
 │   ├── main/
 │   │   ├── java/br/com/scfmei/

@@ -1,6 +1,6 @@
 # 💾 BACKUP AUTOMÁTICO DO BANCO DE DADOS
 
-Este documento explica como fazer backup e restore do banco de dados MySQL do SCF-MEI.
+Este documento explica como fazer backup e restore do banco de dados MySQL do ElloMEI.
 
 ---
 
@@ -17,7 +17,7 @@ Este documento explica como fazer backup e restore do banco de dados MySQL do SC
 
 ## 🤔 **VISÃO GERAL**
 
-O SCF-MEI inclui scripts para backup e restore automático do MySQL:
+O ElloMEI inclui scripts para backup e restore automático do MySQL:
 
 **Recursos:**
 - ✅ Backup completo do banco de dados
@@ -29,9 +29,9 @@ O SCF-MEI inclui scripts para backup e restore automático do MySQL:
 **Localização dos backups:**
 ```
 ./backups/
-├── scf_mei_backup_20250104_020000.sql.gz
-├── scf_mei_backup_20250103_020000.sql.gz
-└── scf_mei_backup_20250102_020000.sql.gz
+├── ellomei_backup_20250104_020000.sql.gz
+├── ellomei_backup_20250103_020000.sql.gz
+└── ellomei_backup_20250102_020000.sql.gz
 ```
 
 ---
@@ -46,15 +46,15 @@ O SCF-MEI inclui scripts para backup e restore automático do MySQL:
 
 **Saída esperada:**
 ```
-[2025-01-04 14:30:00] 🗄️  Iniciando backup do banco de dados SCF-MEI
+[2025-01-04 14:30:00] 🗄️  Iniciando backup do banco de dados ElloMEI
 ================================================
 [2025-01-04 14:30:01] 💾 Criando backup do banco de dados...
-   Database: scf_mei_db
-   Container: scf-mei-mysql
-   Arquivo: scf_mei_backup_20250104_143000.sql.gz
+   Database: ellomei_db
+   Container: ellomei-mysql
+   Arquivo: ellomei_backup_20250104_143000.sql.gz
 [2025-01-04 14:30:05] ✅ Backup criado com sucesso!
    Tamanho: 2.3M
-   Localização: ./backups/scf_mei_backup_20250104_143000.sql.gz
+   Localização: ./backups/ellomei_backup_20250104_143000.sql.gz
 
 [2025-01-04 14:30:05] 🔄 Executando rotação de backups...
    Retenção: 7 dias
@@ -63,9 +63,9 @@ O SCF-MEI inclui scripts para backup e restore automático do MySQL:
 
 [2025-01-04 14:30:05] 📋 Backups disponíveis:
 ================================================
-   scf_mei_backup_20250104_143000.sql.gz (2.3M) - 2025-01-04 14:30:00
-   scf_mei_backup_20250103_020000.sql.gz (2.1M) - 2025-01-03 02:00:00
-   scf_mei_backup_20250102_020000.sql.gz (2.0M) - 2025-01-02 02:00:00
+   ellomei_backup_20250104_143000.sql.gz (2.3M) - 2025-01-04 14:30:00
+   ellomei_backup_20250103_020000.sql.gz (2.1M) - 2025-01-03 02:00:00
+   ellomei_backup_20250102_020000.sql.gz (2.0M) - 2025-01-02 02:00:00
 
 ================================================
 ✅ BACKUP CONCLUÍDO COM SUCESSO!
@@ -81,7 +81,7 @@ O SCF-MEI inclui scripts para backup e restore automático do MySQL:
 ls -lh backups/
 
 # Ver conteúdo do backup (sem descompactar)
-gunzip -c backups/scf_mei_backup_20250104_143000.sql.gz | head -20
+gunzip -c backups/ellomei_backup_20250104_143000.sql.gz | head -20
 ```
 
 ---
@@ -100,7 +100,7 @@ crontab -e
 
 ```bash
 # Backup diário às 2h da manhã
-0 2 * * * cd /caminho/para/SCF-MEI && ./backup-database.sh >> /var/log/scf-mei-backup.log 2>&1
+0 2 * * * cd /caminho/para/ElloMEI && ./backup-database.sh >> /var/log/ellomei-backup.log 2>&1
 ```
 
 **Exemplos de agendamento:**
@@ -126,7 +126,7 @@ crontab -e
 crontab -l
 
 # Ver logs do cron
-tail -f /var/log/scf-mei-backup.log
+tail -f /var/log/ellomei-backup.log
 ```
 
 ---
@@ -135,30 +135,30 @@ tail -f /var/log/scf-mei-backup.log
 
 #### **1. Criar service:**
 
-Criar arquivo `/etc/systemd/system/scf-mei-backup.service`:
+Criar arquivo `/etc/systemd/system/ellomei-backup.service`:
 
 ```ini
 [Unit]
-Description=SCF-MEI Database Backup
+Description=ElloMEI Database Backup
 After=docker.service
 
 [Service]
 Type=oneshot
 User=seu-usuario
-WorkingDirectory=/caminho/para/SCF-MEI
-ExecStart=/caminho/para/SCF-MEI/backup-database.sh
+WorkingDirectory=/caminho/para/ElloMEI
+ExecStart=/caminho/para/ElloMEI/backup-database.sh
 StandardOutput=journal
 StandardError=journal
 ```
 
 #### **2. Criar timer:**
 
-Criar arquivo `/etc/systemd/system/scf-mei-backup.timer`:
+Criar arquivo `/etc/systemd/system/ellomei-backup.timer`:
 
 ```ini
 [Unit]
-Description=SCF-MEI Database Backup Timer
-Requires=scf-mei-backup.service
+Description=ElloMEI Database Backup Timer
+Requires=ellomei-backup.service
 
 [Timer]
 OnCalendar=daily
@@ -176,16 +176,16 @@ WantedBy=timers.target
 sudo systemctl daemon-reload
 
 # Ativar timer
-sudo systemctl enable scf-mei-backup.timer
+sudo systemctl enable ellomei-backup.timer
 
 # Iniciar timer
-sudo systemctl start scf-mei-backup.timer
+sudo systemctl start ellomei-backup.timer
 
 # Verificar status
-sudo systemctl status scf-mei-backup.timer
+sudo systemctl status ellomei-backup.timer
 
 # Ver próxima execução
-systemctl list-timers scf-mei-backup.timer
+systemctl list-timers ellomei-backup.timer
 ```
 
 ---
@@ -198,7 +198,7 @@ Adicionar serviço de backup ao `docker-compose.yml`:
 services:
   backup:
     image: alpine:latest
-    container_name: scf-mei-backup
+    container_name: ellomei-backup
     restart: unless-stopped
     volumes:
       - ./backups:/backups
@@ -213,7 +213,7 @@ services:
     depends_on:
       - mysql
     networks:
-      - scf-mei-network
+      - ellomei-network
 ```
 
 ---
@@ -228,17 +228,17 @@ services:
 
 **Saída:**
 ```
-[2025-01-04 15:00:00] 🔄 Iniciando restore do banco de dados SCF-MEI
+[2025-01-04 15:00:00] 🔄 Iniciando restore do banco de dados ElloMEI
 ================================================
 [2025-01-04 15:00:00] 📋 Backups disponíveis em ./backups:
 ================================================
-   1. scf_mei_backup_20250104_143000.sql.gz (2.3M) - 2025-01-04 14:30:00
-   2. scf_mei_backup_20250103_020000.sql.gz (2.1M) - 2025-01-03 02:00:00
-   3. scf_mei_backup_20250102_020000.sql.gz (2.0M) - 2025-01-02 02:00:00
+   1. ellomei_backup_20250104_143000.sql.gz (2.3M) - 2025-01-04 14:30:00
+   2. ellomei_backup_20250103_020000.sql.gz (2.1M) - 2025-01-03 02:00:00
+   3. ellomei_backup_20250102_020000.sql.gz (2.0M) - 2025-01-02 02:00:00
 ================================================
 
 Uso: ./restore-database.sh <arquivo_backup.sql.gz>
-Exemplo: ./restore-database.sh backups/scf_mei_backup_20250104_143000.sql.gz
+Exemplo: ./restore-database.sh backups/ellomei_backup_20250104_143000.sql.gz
 ```
 
 ---
@@ -246,20 +246,20 @@ Exemplo: ./restore-database.sh backups/scf_mei_backup_20250104_143000.sql.gz
 ### **PASSO 2: Executar Restore**
 
 ```bash
-./restore-database.sh backups/scf_mei_backup_20250104_143000.sql.gz
+./restore-database.sh backups/ellomei_backup_20250104_143000.sql.gz
 ```
 
 **Saída:**
 ```
-[2025-01-04 15:01:00] 🔄 Iniciando restore do banco de dados SCF-MEI
+[2025-01-04 15:01:00] 🔄 Iniciando restore do banco de dados ElloMEI
 ================================================
 
 ⚠️  ATENÇÃO: Esta operação irá SOBRESCREVER o banco de dados atual!
 
-   Arquivo: scf_mei_backup_20250104_143000.sql.gz
+   Arquivo: ellomei_backup_20250104_143000.sql.gz
    Tamanho: 2.3M
-   Database: scf_mei_db
-   Container: scf-mei-mysql
+   Database: ellomei_db
+   Container: ellomei-mysql
 
    Deseja continuar? (digite 'SIM' para confirmar): SIM
 
@@ -272,8 +272,8 @@ Exemplo: ./restore-database.sh backups/scf_mei_backup_20250104_143000.sql.gz
 ================================================
 ✅ RESTORE CONCLUÍDO COM SUCESSO!
 ================================================
-   Arquivo: scf_mei_backup_20250104_143000.sql.gz
-   Database: scf_mei_db
+   Arquivo: ellomei_backup_20250104_143000.sql.gz
+   Database: ellomei_db
    Tabelas: 11
 ================================================
 
@@ -313,13 +313,13 @@ Envie backups para armazenamento externo:
 
 ```bash
 # AWS S3
-aws s3 sync ./backups/ s3://meu-bucket/scf-mei-backups/
+aws s3 sync ./backups/ s3://meu-bucket/ellomei-backups/
 
 # Google Cloud Storage
-gsutil rsync -r ./backups/ gs://meu-bucket/scf-mei-backups/
+gsutil rsync -r ./backups/ gs://meu-bucket/ellomei-backups/
 
 # Rsync para servidor remoto
-rsync -avz ./backups/ usuario@servidor:/backups/scf-mei/
+rsync -avz ./backups/ usuario@servidor:/backups/ellomei/
 ```
 
 ---
@@ -331,7 +331,7 @@ rsync -avz ./backups/ usuario@servidor:/backups/scf-mei/
 ./backup-database.sh
 
 # Restaurar em ambiente de teste
-./restore-database.sh backups/scf_mei_backup_XXXXXXXX_XXXXXX.sql.gz
+./restore-database.sh backups/ellomei_backup_XXXXXXXX_XXXXXX.sql.gz
 
 # Verificar se aplicação funciona
 curl http://localhost:8080/actuator/health
@@ -350,7 +350,7 @@ Criar script de monitoramento:
 BACKUP_DIR="./backups"
 MAX_AGE_HOURS=26  # 26 horas (backup diário às 2h)
 
-LATEST_BACKUP=$(find "$BACKUP_DIR" -name "scf_mei_backup_*.sql.gz" -type f -printf "%T@ %p\n" | sort -rn | head -1 | cut -d' ' -f2)
+LATEST_BACKUP=$(find "$BACKUP_DIR" -name "ellomei_backup_*.sql.gz" -type f -printf "%T@ %p\n" | sort -rn | head -1 | cut -d' ' -f2)
 
 if [ -z "$LATEST_BACKUP" ]; then
     echo "ERRO: Nenhum backup encontrado!"
@@ -401,12 +401,12 @@ echo "MYSQL_PASSWORD=sua-senha" >> .env
 **Solução:**
 ```bash
 # Verificar tamanho do banco
-docker exec scf-mei-mysql mysql -u scf_user -p -e "
+docker exec ellomei-mysql mysql -u scf_user -p -e "
 SELECT 
     table_schema AS 'Database',
     ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS 'Size (MB)'
 FROM information_schema.tables
-WHERE table_schema = 'scf_mei_db'
+WHERE table_schema = 'ellomei_db'
 GROUP BY table_schema;"
 
 # Limpar dados antigos se necessário
@@ -443,13 +443,13 @@ GROUP BY table_schema;"
 
 **Restaurar backup:**
 ```bash
-./restore-database.sh backups/scf_mei_backup_XXXXXXXX_XXXXXX.sql.gz
+./restore-database.sh backups/ellomei_backup_XXXXXXXX_XXXXXX.sql.gz
 ```
 
 **Agendar backup diário (cron):**
 ```bash
 crontab -e
-# Adicionar: 0 2 * * * cd /caminho/para/SCF-MEI && ./backup-database.sh
+# Adicionar: 0 2 * * * cd /caminho/para/ElloMEI && ./backup-database.sh
 ```
 
 ---

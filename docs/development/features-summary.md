@@ -1,4 +1,4 @@
-# 🎉 SCF-MEI - Resumo de Novos Recursos
+# 🎉 ElloMEI - Resumo de Novos Recursos
 
 **Data**: 2025-10-03  
 **Status**: ✅ Concluído
@@ -364,7 +364,7 @@ nano .env  # Editar conforme necessário
 
 ## 🎉 Conclusão
 
-O projeto SCF-MEI agora possui:
+O projeto ElloMEI agora possui:
 
 ✅ **Ambiente Docker 100% funcional**  
 ✅ **Sistema de backup profissional**  

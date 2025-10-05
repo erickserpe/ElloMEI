@@ -1,4 +1,4 @@
-# 💳 Guia do Sistema de Pagamentos - SCF-MEI
+# 💳 Guia do Sistema de Pagamentos - ElloMEI
 
 ## 📋 Índice
 1. [Visão Geral](#visão-geral)
@@ -16,7 +16,7 @@
 
 ## 🎯 Visão Geral
 
-O SCF-MEI implementa um sistema completo de assinaturas SaaS com integração ao **Mercado Pago**.
+O ElloMEI implementa um sistema completo de assinaturas SaaS com integração ao **Mercado Pago**.
 
 ### Funcionalidades Implementadas:
 - ✅ Planos FREE e PRO
@@ -356,5 +356,5 @@ Para dúvidas sobre o sistema de pagamentos:
 
 ---
 
-**Desenvolvido pela Equipe SCF-MEI** 🚀
+**Desenvolvido pela Equipe ElloMEI** 🚀
 

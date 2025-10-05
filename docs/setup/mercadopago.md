@@ -10,7 +10,7 @@ Este documento explica como configurar as credenciais do Mercado Pago para desen
 2. [Criar Conta no Mercado Pago](#-criar-conta-no-mercado-pago)
 3. [Obter Credenciais de Teste](#-obter-credenciais-de-teste)
 4. [Obter Credenciais de Produção](#-obter-credenciais-de-produção)
-5. [Configurar no SCF-MEI](#-configurar-no-scf-mei)
+5. [Configurar no ElloMEI](#-configurar-no-ellomei)
 6. [Configurar Webhooks](#-configurar-webhooks)
 7. [Testar Integração](#-testar-integração)
 8. [Troubleshooting](#-troubleshooting)
@@ -19,7 +19,7 @@ Este documento explica como configurar as credenciais do Mercado Pago para desen
 
 ## 🤔 **VISÃO GERAL**
 
-O SCF-MEI usa o Mercado Pago para processar pagamentos de assinaturas (Plano PRO).
+O ElloMEI usa o Mercado Pago para processar pagamentos de assinaturas (Plano PRO).
 
 **Credenciais necessárias:**
 - **Access Token**: Token de acesso para API
@@ -76,7 +76,7 @@ Credenciais de teste permitem testar a integração sem processar pagamentos rea
 
 1. Clique em "Criar aplicação"
 2. Preencha:
-   - **Nome**: SCF-MEI (ou o nome que preferir)
+   - **Nome**: ElloMEI (ou o nome que preferir)
    - **Descrição**: Sistema de Controle Financeiro para MEI
    - **Modelo de integração**: Pagamentos online
    - **Produto**: Checkout Pro
@@ -169,7 +169,7 @@ Access Token: APP_USR-1234567890123456-123456-abcdef1234567890abcdef1234567890-1
 
 ---
 
-## ⚙️ **CONFIGURAR NO SCF-MEI**
+## ⚙️ **CONFIGURAR NO ElloMEI**
 
 ### **DESENVOLVIMENTO (Credenciais de Teste)**
 

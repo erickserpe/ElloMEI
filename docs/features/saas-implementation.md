@@ -1,4 +1,4 @@
-# 🚀 Resumo da Implementação SaaS - SCF-MEI
+# 🚀 Resumo da Implementação SaaS - ElloMEI
 
 ## 📊 Status Geral
 
@@ -320,7 +320,7 @@ src/test/java/br/com/scfmei/
 
 ## 🎉 Conclusão
 
-**O SCF-MEI está 100% pronto para operar como um SaaS multi-tenant!**
+**O ElloMEI está 100% pronto para operar como um SaaS multi-tenant!**
 
 Todos os componentes essenciais foram implementados, testados e documentados. O sistema está preparado para:
 
@@ -335,5 +335,5 @@ Todos os componentes essenciais foram implementados, testados e documentados. O 
 
 ---
 
-**Desenvolvido com ❤️ pela Equipe SCF-MEI**
+**Desenvolvido com ❤️ pela Equipe ElloMEI**
 

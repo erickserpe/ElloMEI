@@ -1,6 +1,6 @@
 # 📊 MONITORAMENTO - PROMETHEUS + GRAFANA
 
-Este documento explica como configurar e usar o monitoramento do SCF-MEI com Prometheus e Grafana.
+Este documento explica como configurar e usar o monitoramento do ElloMEI com Prometheus e Grafana.
 
 ---
 
@@ -18,7 +18,7 @@ Este documento explica como configurar e usar o monitoramento do SCF-MEI com Pro
 
 ## 🤔 **VISÃO GERAL**
 
-O SCF-MEI usa uma stack de monitoramento moderna:
+O ElloMEI usa uma stack de monitoramento moderna:
 
 - **Spring Boot Actuator**: Expõe métricas da aplicação
 - **Micrometer**: Biblioteca de métricas (formato Prometheus)
@@ -39,7 +39,7 @@ O SCF-MEI usa uma stack de monitoramento moderna:
 
 ```
 ┌─────────────────┐
-│   SCF-MEI App   │
+│   ElloMEI App   │
 │  (Spring Boot)  │
 │                 │
 │  /actuator/     │
@@ -86,10 +86,10 @@ docker compose -f docker-compose.yml -f docker-compose.monitoring.yml up -d
 ```
 
 **Serviços iniciados:**
-- `scf-mei-app` (porta 8080)
-- `scf-mei-mysql` (porta 3306)
-- `scf-mei-prometheus` (porta 9090)
-- `scf-mei-grafana` (porta 3000)
+- `ellomei-app` (porta 8080)
+- `ellomei-mysql` (porta 3306)
+- `ellomei-prometheus` (porta 9090)
+- `ellomei-grafana` (porta 3000)
 
 ---
 
@@ -109,10 +109,10 @@ docker compose logs grafana
 **Saída esperada:**
 ```
 NAME                  STATUS    PORTS
-scf-mei-app           Up        0.0.0.0:8080->8080/tcp
-scf-mei-mysql         Up        0.0.0.0:3306->3306/tcp
-scf-mei-prometheus    Up        0.0.0.0:9090->9090/tcp
-scf-mei-grafana       Up        0.0.0.0:3000->3000/tcp
+ellomei-app           Up        0.0.0.0:8080->8080/tcp
+ellomei-mysql         Up        0.0.0.0:3306->3306/tcp
+ellomei-prometheus    Up        0.0.0.0:9090->9090/tcp
+ellomei-grafana       Up        0.0.0.0:3000->3000/tcp
 ```
 
 ---
@@ -154,7 +154,7 @@ hikaricp_connections_active
 **⚠️ IMPORTANTE:** Altere a senha no primeiro login!
 
 **Dashboards disponíveis:**
-1. **SCF-MEI Overview** - Visão geral da aplicação
+1. **ElloMEI Overview** - Visão geral da aplicação
    - Uptime
    - Taxa de requisições HTTP
    - Uso de memória JVM
@@ -241,7 +241,7 @@ Crie o arquivo `monitoring/prometheus/rules/alerts.yml`:
 
 ```yaml
 groups:
-  - name: scf-mei-alerts
+  - name: ellomei-alerts
     interval: 30s
     rules:
       # Alerta: Memória heap > 90%
@@ -251,7 +251,7 @@ groups:
         for: 5m
         labels:
           severity: warning
-          service: scf-mei
+          service: ellomei
         annotations:
           summary: "Uso de memória alto"
           description: "Memória heap está em {{ $value | humanizePercentage }}"
@@ -263,21 +263,21 @@ groups:
         for: 2m
         labels:
           severity: critical
-          service: scf-mei
+          service: ellomei
         annotations:
           summary: "Taxa de erros alta"
           description: "{{ $value }} erros por segundo"
       
       # Alerta: Aplicação down
       - alert: ApplicationDown
-        expr: up{job="scf-mei-app"} == 0
+        expr: up{job="ellomei-app"} == 0
         for: 1m
         labels:
           severity: critical
-          service: scf-mei
+          service: ellomei
         annotations:
           summary: "Aplicação fora do ar"
-          description: "SCF-MEI não está respondendo"
+          description: "ElloMEI não está respondendo"
 ```
 
 **Ativar alertas:**
@@ -310,7 +310,7 @@ curl http://localhost:8080/actuator/prometheus
 
 2. Prometheus consegue acessar a aplicação:
 ```bash
-docker compose logs prometheus | grep "scf-mei-app"
+docker compose logs prometheus | grep "ellomei-app"
 ```
 
 3. Verificar targets no Prometheus:
@@ -392,7 +392,7 @@ Reiniciar aplicação:
 - [ ] Prometheus rodando (http://localhost:9090)
 - [ ] Grafana rodando (http://localhost:3000)
 - [ ] Métricas sendo coletadas
-- [ ] Dashboard "SCF-MEI Overview" funcionando
+- [ ] Dashboard "ElloMEI Overview" funcionando
 - [ ] Senha do Grafana alterada
 
 ### **Produção:**

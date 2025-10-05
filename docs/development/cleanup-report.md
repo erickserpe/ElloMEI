@@ -69,7 +69,7 @@
 ## 📁 Estrutura Final do Projeto
 
 ```
-SCF-MEI/
+ElloMEI/
 ├── 📄 README.md                          ⭐ NOVO - Documentação principal
 ├── 📄 QUICK-START.md                     ✅ Guia rápido
 ├── 📄 DOCKER-SETUP.md                    ✅ Guia completo Docker

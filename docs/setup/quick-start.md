@@ -1,4 +1,4 @@
-# 🚀 SCF-MEI - Guia Rápido Docker
+# 🚀 ElloMEI - Guia Rápido Docker
 
 ## ⚡ Início em 3 Passos
 
@@ -63,7 +63,7 @@ docker compose restart
 
 ```bash
 # Via Docker
-docker exec -it scf-mei-mysql mysql -u scf_user -p5522 scf_mei_db
+docker exec -it ellomei-mysql mysql -u scf_user -p5522 ellomei_db
 
 # Comandos úteis SQL
 SHOW TABLES;
@@ -124,11 +124,11 @@ ports:
 ## 📊 Informações do Ambiente
 
 ### Containers
-- **scf-mei-mysql**: MySQL 8.0 (porta 3306)
-- **scf-mei-app**: Spring Boot (porta 8080)
+- **ellomei-mysql**: MySQL 8.0 (porta 3306)
+- **ellomei-app**: Spring Boot (porta 8080)
 
 ### Credenciais MySQL
-- **Database**: scf_mei_db
+- **Database**: ellomei_db
 - **Usuário**: scf_user
 - **Senha**: 5522
 - **Root Password**: root_password

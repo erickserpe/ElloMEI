@@ -7,9 +7,9 @@
 apiVersion: 1
 
 providers:
-  - name: 'SCF-MEI Dashboards'
+  - name: 'ElloMEI Dashboards'
     orgId: 1
-    folder: 'SCF-MEI'
+    folder: 'ElloMEI'
     type: file
     disableDeletion: false
     updateIntervalSeconds: 10

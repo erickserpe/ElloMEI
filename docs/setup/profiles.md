@@ -1,6 +1,6 @@
-# 🔧 SPRING PROFILES - SCF-MEI
+# 🔧 SPRING PROFILES - ElloMEI
 
-Este documento explica como usar os diferentes perfis (profiles) do Spring Boot na aplicação SCF-MEI.
+Este documento explica como usar os diferentes perfis (profiles) do Spring Boot na aplicação ElloMEI.
 
 ---
 
@@ -107,7 +107,7 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 
 # Produção
-java -jar -Dspring.profiles.active=prod target/SCF-MEI-0.0.1-SNAPSHOT.jar
+java -jar -Dspring.profiles.active=prod target/ElloMEI-0.0.1-SNAPSHOT.jar
 ```
 
 ---
@@ -170,7 +170,7 @@ docker compose logs app | grep "profile"
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 spring.flyway.enabled=false
-logging.level.br.com.scfmei=DEBUG
+logging.level.br.com.ellomei=DEBUG
 ````
 </augment_code_snippet>
 
@@ -181,7 +181,7 @@ logging.level.br.com.scfmei=DEBUG
 spring.jpa.hibernate.ddl-auto=validate
 spring.jpa.show-sql=false
 spring.flyway.enabled=true
-logging.level.br.com.scfmei=INFO
+logging.level.br.com.ellomei=INFO
 ````
 </augment_code_snippet>
 
@@ -275,7 +275,7 @@ mkdir -p ./logs
 chmod 755 ./logs
 
 # Verificar permissões no Docker
-docker exec scf-mei-app ls -la /var/log/scf-mei
+docker exec ellomei-app ls -la /var/log/ellomei
 ```
 
 ---

@@ -66,7 +66,7 @@
       "pluginVersion": "10.2.2",
       "targets": [
         {
-          "expr": "process_uptime_seconds{application=\"SCF-MEI\"}",
+          "expr": "process_uptime_seconds{application=\"ElloMEI\"}",
           "refId": "A"
         }
       ],
@@ -142,7 +142,7 @@
       "pluginVersion": "10.2.2",
       "targets": [
         {
-          "expr": "rate(http_server_requests_seconds_count{application=\"SCF-MEI\"}[1m])",
+          "expr": "rate(http_server_requests_seconds_count{application=\"ElloMEI\"}[1m])",
           "legendFormat": "{{uri}} - {{method}}",
           "refId": "A"
         }
@@ -219,7 +219,7 @@
       "pluginVersion": "10.2.2",
       "targets": [
         {
-          "expr": "jvm_memory_used_bytes{application=\"SCF-MEI\"}",
+          "expr": "jvm_memory_used_bytes{application=\"ElloMEI\"}",
           "legendFormat": "{{area}} - {{id}}",
           "refId": "A"
         }
@@ -296,12 +296,12 @@
       "pluginVersion": "10.2.2",
       "targets": [
         {
-          "expr": "hikaricp_connections_active{application=\"SCF-MEI\"}",
+          "expr": "hikaricp_connections_active{application=\"ElloMEI\"}",
           "legendFormat": "Active Connections",
           "refId": "A"
         },
         {
-          "expr": "hikaricp_connections_idle{application=\"SCF-MEI\"}",
+          "expr": "hikaricp_connections_idle{application=\"ElloMEI\"}",
           "legendFormat": "Idle Connections",
           "refId": "B"
         }
@@ -313,7 +313,7 @@
   "refresh": "5s",
   "schemaVersion": 27,
   "style": "dark",
-  "tags": ["scf-mei", "spring-boot"],
+  "tags": ["ellomei", "spring-boot"],
   "templating": {
     "list": []
   },
@@ -323,8 +323,8 @@
   },
   "timepicker": {},
   "timezone": "America/Sao_Paulo",
-  "title": "SCF-MEI Overview",
-  "uid": "scf-mei-overview",
+  "title": "ElloMEI Overview",
+  "uid": "ellomei-overview",
   "version": 1
 }
 

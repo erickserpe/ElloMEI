@@ -40,14 +40,14 @@ services:
         -XX:+UseG1GC
         -XX:MaxGCPauseMillis=200
         -XX:+HeapDumpOnOutOfMemoryError
-        -XX:HeapDumpPath=/var/log/scf-mei/
+        -XX:HeapDumpPath=/var/log/ellomei/
         -Djava.security.egd=file:/dev/./urandom
       # Timezone
       TZ: America/Sao_Paulo
     # Criar volume para logs
     volumes:
       - ./uploads:/app/uploads
-      - ./logs:/var/log/scf-mei
+      - ./logs:/var/log/ellomei
     # Healthcheck para monitoramento
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]

@@ -1,4 +1,4 @@
-# 📚 Documentação do SCF-MEI
+# 📚 Documentação do ElloMEI
 
 Bem-vindo à documentação completa do **Sistema de Controle Financeiro para MEI**.
 
@@ -58,7 +58,7 @@ Documentação para desenvolvedores.
 1. **Clone o repositório**
    ```bash
    git clone <repository-url>
-   cd SCF-MEI
+   cd ElloMEI
    ```
 
 2. **Configure o ambiente**
@@ -81,7 +81,7 @@ Documentação para desenvolvedores.
 ## 📊 Estrutura do Projeto
 
 ```
-SCF-MEI/
+ElloMEI/
 ├── docs/                          # 📚 Documentação
 │   ├── setup/                     # Configuração inicial
 │   ├── features/                  # Funcionalidades

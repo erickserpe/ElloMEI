@@ -1,8 +1,8 @@
-# ✅ VALIDAÇÕES IMPLEMENTADAS - SCF-MEI
+# ✅ VALIDAÇÕES IMPLEMENTADAS - ElloMEI
 
 ## 📋 Resumo Executivo
 
-Este documento descreve todas as validações implementadas no sistema de cadastro, login e envio de e-mails do SCF-MEI.
+Este documento descreve todas as validações implementadas no sistema de cadastro, login e envio de e-mails do ElloMEI.
 
 **Data de Implementação:** 05/10/2025  
 **Versão:** 1.0.0  

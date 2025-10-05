@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ========================================
-# SCF-MEI - Script de Backup do Banco de Dados
+# ElloMEI - Script de Backup do Banco de Dados
 # ========================================
 #
 # Este script cria backups automáticos do banco de dados MySQL
@@ -28,17 +28,17 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configurações do banco
-MYSQL_CONTAINER="scf-mei-mysql"
+MYSQL_CONTAINER="ellomei-mysql"
 MYSQL_USER="scf_user"
 MYSQL_PASSWORD="5522"
-MYSQL_DATABASE="scf_mei_db"
+MYSQL_DATABASE="ellomei_db"
 MYSQL_ROOT_PASSWORD="root_password"
 
 # Configurações de backup
 BACKUP_DIR="./backups"
 BACKUP_RETENTION_DAYS=7
 DATE_FORMAT=$(date +"%Y%m%d_%H%M%S")
-BACKUP_FILE="scf_mei_backup_${DATE_FORMAT}.sql"
+BACKUP_FILE="ellomei_backup_${DATE_FORMAT}.sql"
 
 # ========================================
 # FUNÇÕES AUXILIARES
@@ -219,7 +219,7 @@ list_backups() {
             filename=$(basename "$file")
             filesize=$(du -h "$file" | cut -f1)
             # Extrair data do nome do arquivo
-            if [[ $filename =~ scf_mei_backup_([0-9]{8})_([0-9]{6}) ]]; then
+            if [[ $filename =~ ellomei_backup_([0-9]{8})_([0-9]{6}) ]]; then
                 date_part="${BASH_REMATCH[1]}"
                 time_part="${BASH_REMATCH[2]}"
                 formatted_date="${date_part:6:2}/${date_part:4:2}/${date_part:0:4} ${time_part:0:2}:${time_part:2:2}:${time_part:4:2}"
@@ -245,9 +245,9 @@ clean_old_backups() {
     fi
     
     # Encontrar e remover backups antigos
-    find "$BACKUP_DIR" -name "scf_mei_backup_*.sql.gz" -type f -mtime +$BACKUP_RETENTION_DAYS -delete
+    find "$BACKUP_DIR" -name "ellomei_backup_*.sql.gz" -type f -mtime +$BACKUP_RETENTION_DAYS -delete
     
-    removed=$(find "$BACKUP_DIR" -name "scf_mei_backup_*.sql.gz" -type f -mtime +$BACKUP_RETENTION_DAYS 2>/dev/null | wc -l)
+    removed=$(find "$BACKUP_DIR" -name "ellomei_backup_*.sql.gz" -type f -mtime +$BACKUP_RETENTION_DAYS 2>/dev/null | wc -l)
     
     if [ $removed -gt 0 ]; then
         print_success "Removidos $removed backup(s) antigo(s)"
@@ -261,7 +261,7 @@ clean_old_backups() {
 # ========================================
 
 show_help() {
-    echo "SCF-MEI - Script de Backup do Banco de Dados"
+    echo "ElloMEI - Script de Backup do Banco de Dados"
     echo ""
     echo "Uso:"
     echo "  ./backup.sh                    Criar backup completo"
@@ -272,7 +272,7 @@ show_help() {
     echo ""
     echo "Exemplos:"
     echo "  ./backup.sh"
-    echo "  ./backup.sh --restore scf_mei_backup_20251003_120000.sql.gz"
+    echo "  ./backup.sh --restore ellomei_backup_20251003_120000.sql.gz"
     echo "  ./backup.sh --list"
     echo ""
 }

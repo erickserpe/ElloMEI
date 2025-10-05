@@ -1,4 +1,4 @@
-# 🐳 OTIMIZAÇÕES DO DOCKER - SCF-MEI
+# 🐳 OTIMIZAÇÕES DO DOCKER - ElloMEI
 
 Este documento explica todas as otimizações implementadas no Dockerfile para produção.
 
@@ -279,13 +279,13 @@ docker compose build --progress=plain
 ### **Verificar Tamanho da Imagem:**
 
 ```bash
-docker images scf-mei-app
+docker images ellomei-app
 ```
 
 **Saída esperada:**
 ```
 REPOSITORY    TAG       SIZE
-scf-mei-app   latest    ~180MB
+ellomei-app   latest    ~180MB
 ```
 
 ---
@@ -294,7 +294,7 @@ scf-mei-app   latest    ~180MB
 
 ```bash
 # Verificar que a aplicação roda como 'spring'
-docker exec scf-mei-app whoami
+docker exec ellomei-app whoami
 ```
 
 **Saída esperada:**
@@ -308,7 +308,7 @@ spring
 
 ```bash
 # Ver status do healthcheck
-docker inspect scf-mei-app | grep -A 10 Health
+docker inspect ellomei-app | grep -A 10 Health
 ```
 
 **Saída esperada:**
@@ -334,7 +334,7 @@ services:
 
 **Na linha de comando:**
 ```bash
-docker run -e JAVA_OPTS="-Xms1g -Xmx2g" scf-mei-app
+docker run -e JAVA_OPTS="-Xms1g -Xmx2g" ellomei-app
 ```
 
 ---
@@ -373,7 +373,7 @@ environment:
 ### **Ver uso de memória:**
 
 ```bash
-docker stats scf-mei-app
+docker stats ellomei-app
 ```
 
 ### **Ver logs da JVM:**
@@ -385,7 +385,7 @@ docker compose logs app | grep -i "heap\|gc"
 ### **Ver healthcheck logs:**
 
 ```bash
-docker inspect scf-mei-app --format='{{json .State.Health}}' | jq
+docker inspect ellomei-app --format='{{json .State.Health}}' | jq
 ```
 
 ---

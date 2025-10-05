@@ -1,4 +1,4 @@
-# 🚀 SCF-MEI - Recursos Avançados
+# 🚀 ElloMEI - Recursos Avançados
 
 Este documento descreve os recursos avançados adicionados ao projeto.
 
@@ -120,7 +120,7 @@ Resultado:
 ```
 ✅ Backup criado com sucesso!
 ℹ️  Tamanho: 2.3M
-ℹ️  Localização: ./backups/scf_mei_backup_20251003_143022.sql.gz
+ℹ️  Localização: ./backups/ellomei_backup_20251003_143022.sql.gz
 ```
 
 #### Listar Backups
@@ -132,8 +132,8 @@ Resultado:
 ```
 Data/Hora          Tamanho    Arquivo
 --------------------------------------------------------
-03/10/2025 14:30:22  2.3M    scf_mei_backup_20251003_143022.sql.gz
-02/10/2025 10:15:45  2.1M    scf_mei_backup_20251002_101545.sql.gz
+03/10/2025 14:30:22  2.3M    ellomei_backup_20251003_143022.sql.gz
+02/10/2025 10:15:45  2.1M    ellomei_backup_20251002_101545.sql.gz
 
 ℹ️  Total de backups: 2
 ℹ️  Espaço total: 4.4M
@@ -141,7 +141,7 @@ Data/Hora          Tamanho    Arquivo
 
 #### Restaurar Backup
 ```bash
-./backup.sh --restore scf_mei_backup_20251003_143022.sql.gz
+./backup.sh --restore ellomei_backup_20251003_143022.sql.gz
 ```
 
 ⚠️ **ATENÇÃO**: Isso irá substituir o banco de dados atual!
@@ -198,7 +198,7 @@ nano .env
 
 #### MySQL
 ```bash
-MYSQL_DATABASE=scf_mei_db
+MYSQL_DATABASE=ellomei_db
 MYSQL_USER=scf_user
 MYSQL_PASSWORD=5522
 MYSQL_ROOT_PASSWORD=root_password
@@ -237,7 +237,7 @@ Para usar as variáveis do `.env`, atualize o `docker-compose.yml`:
 services:
   mysql:
     environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-scf_mei_db}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-ellomei_db}
       MYSQL_USER: ${MYSQL_USER:-scf_user}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-5522}
 ```
@@ -408,17 +408,17 @@ docker compose ps
 docker compose logs mysql
 
 # Tentar manualmente
-docker exec scf-mei-mysql mysqldump -u root -proot_password scf_mei_db > backup_manual.sql
+docker exec ellomei-mysql mysqldump -u root -proot_password ellomei_db > backup_manual.sql
 ```
 
 ### Restauração Falha
 
 ```bash
 # Verificar arquivo de backup
-gunzip -t backups/scf_mei_backup_*.sql.gz
+gunzip -t backups/ellomei_backup_*.sql.gz
 
 # Restaurar manualmente
-gunzip -c backups/scf_mei_backup_*.sql.gz | docker exec -i scf-mei-mysql mysql -u root -proot_password
+gunzip -c backups/ellomei_backup_*.sql.gz | docker exec -i ellomei-mysql mysql -u root -proot_password
 ```
 
 ### Variáveis de Ambiente Não Funcionam
@@ -461,7 +461,7 @@ docker compose up -d
 crontab -e
 
 # Adicionar linha para backup diário às 2h da manhã
-0 2 * * * cd /caminho/para/SCF-MEI && ./backup.sh >> /var/log/scf-mei-backup.log 2>&1
+0 2 * * * cd /caminho/para/ElloMEI && ./backup.sh >> /var/log/ellomei-backup.log 2>&1
 ```
 
 ---

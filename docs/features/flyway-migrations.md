@@ -1,4 +1,4 @@
-# 🦅 FLYWAY MIGRATIONS - SCF-MEI
+# 🦅 FLYWAY MIGRATIONS - ElloMEI
 
 Este documento explica o sistema de migrações de banco de dados usando Flyway.
 
@@ -156,7 +156,7 @@ V11__drop_old_table.sql
 
 ### **V1__initial_schema.sql**
 
-**Descrição:** Cria o schema inicial completo do SCF-MEI.
+**Descrição:** Cria o schema inicial completo do ElloMEI.
 
 **Tabelas criadas:**
 - `usuario` - Usuários do sistema (MEIs)
@@ -212,7 +212,7 @@ touch src/main/resources/db/migration/V2__add_phone_to_usuario.sql
 -- Flyway Migration V2: Add Phone to Usuario
 -- ===================================
 -- Descrição: Adiciona coluna de telefone à tabela usuario
--- Autor: SCF-MEI Team
+-- Autor: ElloMEI Team
 -- Data: 2025-10-04
 -- ===================================
 
@@ -246,11 +246,11 @@ docker compose logs app | grep Flyway
 **Saída esperada:**
 ```
 Flyway Community Edition 10.x.x by Redgate
-Database: jdbc:mysql://mysql:3306/scf_mei_db (MySQL 8.0)
+Database: jdbc:mysql://mysql:3306/ellomei_db (MySQL 8.0)
 Successfully validated 2 migrations (execution time 00:00.012s)
-Current version of schema `scf_mei_db`: 1
-Migrating schema `scf_mei_db` to version "2 - add phone to usuario"
-Successfully applied 1 migration to schema `scf_mei_db`, now at version v2 (execution time 00:00.045s)
+Current version of schema `ellomei_db`: 1
+Migrating schema `ellomei_db` to version "2 - add phone to usuario"
+Successfully applied 1 migration to schema `ellomei_db`, now at version v2 (execution time 00:00.045s)
 ```
 
 ---
@@ -259,7 +259,7 @@ Successfully applied 1 migration to schema `scf_mei_db`, now at version v2 (exec
 
 ```bash
 # Conectar ao MySQL
-docker exec -it scf-mei-mysql mysql -u scf_user -p5522 scf_mei_db
+docker exec -it ellomei-mysql mysql -u scf_user -p5522 ellomei_db
 
 # Verificar coluna
 DESCRIBE usuario;
@@ -322,7 +322,7 @@ spring.flyway.validate-on-migrate=true
 
 # Placeholder substitution (usar variáveis)
 spring.flyway.placeholder-replacement=true
-spring.flyway.placeholders.tablespace=scf_mei_tablespace
+spring.flyway.placeholders.tablespace=ellomei_tablespace
 ```
 
 ---
