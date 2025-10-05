@@ -47,7 +47,21 @@
                             <h3 class="fw-bold mb-2">Recuperar Senha</h3>
                             <p class="text-muted">Digite seu email para receber instruções de recuperação</p>
                         </div>
-                        
+
+                        <!-- Mensagem de Sucesso -->
+                        <div th:if="${mensagemSucesso}" class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            <span th:text="${mensagemSucesso}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+
+                        <!-- Mensagem de Erro -->
+                        <div th:if="${mensagemErro}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <span th:text="${mensagemErro}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+
                         <form th:action="@{/recuperar-senha/solicitar}" method="post">
                             <div class="mb-4">
                                 <label for="email" class="form-label">

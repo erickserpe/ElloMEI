@@ -69,8 +69,8 @@ public class RecuperarSenhaController {
         // Isso evita que atacantes descubram quais emails estão cadastrados
         if (usuarioOpt.isEmpty()) {
             redirectAttributes.addFlashAttribute("mensagemSucesso",
-                "Se o email estiver cadastrado, você receberá instruções para redefinir sua senha.");
-            return "redirect:/login";
+                "📧 Instruções enviadas! Se o email <strong>" + email + "</strong> estiver cadastrado, você receberá um link para redefinir sua senha. Verifique sua caixa de entrada e spam.");
+            return "redirect:/recuperar-senha";
         }
 
         Usuario usuario = usuarioOpt.get();
@@ -89,16 +89,17 @@ public class RecuperarSenhaController {
                 usuario.getNomeCompleto() != null ? usuario.getNomeCompleto() : usuario.getUsername(),
                 tokenString
             );
+            logger.info("✅ Email de recuperação enviado para: {}", email);
         } catch (Exception e) {
             // Se falhar ao enviar email, ainda mostra mensagem de sucesso por segurança
             // mas loga o erro
-            logger.error("Erro ao enviar email de recuperação para {}: {}", email, e.getMessage(), e);
+            logger.error("❌ Erro ao enviar email de recuperação para {}: {}", email, e.getMessage(), e);
         }
 
         redirectAttributes.addFlashAttribute("mensagemSucesso",
-            "Se o email estiver cadastrado, você receberá instruções para redefinir sua senha.");
+            "📧 Instruções enviadas! Enviamos um link de recuperação para <strong>" + email + "</strong>. Verifique sua caixa de entrada e spam.");
 
-        return "redirect:/login";
+        return "redirect:/recuperar-senha";
     }
 
     /**

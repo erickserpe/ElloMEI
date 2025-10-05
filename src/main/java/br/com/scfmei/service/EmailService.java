@@ -56,12 +56,12 @@ public class EmailService {
     public void enviarEmailBoasVindas(Usuario usuario) {
         if (mailSender == null) {
             logger.warn("JavaMailSender não configurado. Email de boas-vindas não será enviado.");
-            logEmailMock("BOAS-VINDAS", usuario.getUsername() + "@scfmei.com.br", "Bem-vindo ao SCF-MEI!");
+            logEmailMock("BOAS-VINDAS", usuario.getEmail(), "Bem-vindo ao SCF-MEI!");
             return;
         }
 
         try {
-            String destinatario = usuario.getUsername() + "@scfmei.com.br";
+            String destinatario = usuario.getEmail();
             String assunto = "🎉 Bem-vindo ao SCF-MEI!";
             String nomeUsuario = usuario.getNomeCompleto() != null ? usuario.getNomeCompleto() : usuario.getUsername();
 
@@ -205,12 +205,12 @@ public class EmailService {
     public void enviarEmailFalhaPagamento(Usuario usuario, Assinatura assinatura) {
         if (mailSender == null) {
             logger.warn("JavaMailSender não configurado. Email de falha de pagamento não será enviado.");
-            logEmailMock("FALHA DE PAGAMENTO", usuario.getUsername() + "@scfmei.com.br", "Falha no Pagamento");
+            logEmailMock("FALHA DE PAGAMENTO", usuario.getEmail(), "Falha no Pagamento");
             return;
         }
 
         try {
-            String destinatario = usuario.getUsername() + "@scfmei.com.br";
+            String destinatario = usuario.getEmail();
             String assunto = "❌ Falha no Pagamento - SCF-MEI";
             String nomeUsuario = usuario.getNomeCompleto() != null ? usuario.getNomeCompleto() : usuario.getUsername();
 
@@ -488,12 +488,12 @@ public class EmailService {
     public void enviarEmailPagamentoAprovado(Usuario usuario, Assinatura assinatura, String transacaoId) {
         if (mailSender == null) {
             logger.warn("JavaMailSender não configurado. Email de pagamento aprovado não será enviado.");
-            logEmailMock("PAGAMENTO APROVADO", usuario.getUsername() + "@scfmei.com.br", "Pagamento Aprovado!");
+            logEmailMock("PAGAMENTO APROVADO", usuario.getEmail(), "Pagamento Aprovado!");
             return;
         }
 
         try {
-            String destinatario = usuario.getUsername() + "@scfmei.com.br";
+            String destinatario = usuario.getEmail();
             String assunto = "✅ Pagamento Aprovado - SCF-MEI";
             String nomeUsuario = usuario.getNomeCompleto() != null ? usuario.getNomeCompleto() : usuario.getUsername();
 
@@ -514,12 +514,12 @@ public class EmailService {
     public void enviarEmailPagamentoPendente(Usuario usuario, Assinatura assinatura, String transacaoId) {
         if (mailSender == null) {
             logger.warn("JavaMailSender não configurado. Email de pagamento pendente não será enviado.");
-            logEmailMock("PAGAMENTO PENDENTE", usuario.getUsername() + "@scfmei.com.br", "Pagamento Pendente");
+            logEmailMock("PAGAMENTO PENDENTE", usuario.getEmail(), "Pagamento Pendente");
             return;
         }
 
         try {
-            String destinatario = usuario.getUsername() + "@scfmei.com.br";
+            String destinatario = usuario.getEmail();
             String assunto = "⏳ Pagamento Pendente - SCF-MEI";
             String nomeUsuario = usuario.getNomeCompleto() != null ? usuario.getNomeCompleto() : usuario.getUsername();
 
