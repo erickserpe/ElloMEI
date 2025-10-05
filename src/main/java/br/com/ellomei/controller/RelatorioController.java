@@ -1,6 +1,8 @@
 package br.com.ellomei.controller;
 
 import br.com.ellomei.config.security.CurrentUser;
+import br.com.ellomei.domain.StatusLancamento;
+import br.com.ellomei.domain.TipoLancamento;
 import br.com.ellomei.domain.Usuario;
 import br.com.ellomei.event.ReportGenerationRequestedEvent;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,12 +1,14 @@
 package br.com.ellomei.service;
 
 import br.com.ellomei.domain.CategoriaDespesa;
+import br.com.ellomei.domain.ChartData;
 import br.com.ellomei.domain.Comprovante;
 import br.com.ellomei.domain.Conta;
 import br.com.ellomei.domain.FormaPagamento;
 import br.com.ellomei.domain.Lancamento;
 import br.com.ellomei.domain.LancamentoFormDTO;
 import br.com.ellomei.domain.LancamentoGrupoDTO;
+import br.com.ellomei.domain.PagamentoDTO;
 import br.com.ellomei.domain.StatusLancamento;
 import br.com.ellomei.domain.TipoLancamento;
 import br.com.ellomei.domain.Usuario;
@@ -29,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service

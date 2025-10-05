@@ -1,6 +1,7 @@
 package br.com.ellomei.service;
 
 import br.com.ellomei.domain.Assinatura;
+import br.com.ellomei.domain.FormaPagamento;
 import br.com.ellomei.domain.HistoricoPagamento;
 import br.com.ellomei.domain.PlanoAssinatura;
 import br.com.ellomei.domain.StatusAssinatura;
