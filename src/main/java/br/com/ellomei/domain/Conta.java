@@ -1,7 +1,12 @@
 // src/main/java/br/com/ellomei/domain/Conta.java
 package br.com.ellomei.domain;
 
-import jakarta.persistence.*; // Importe o necessário
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.Filter;

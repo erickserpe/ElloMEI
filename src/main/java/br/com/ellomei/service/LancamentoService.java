@@ -1,6 +1,15 @@
 package br.com.ellomei.service;
 
-import br.com.ellomei.domain.*;
+import br.com.ellomei.domain.CategoriaDespesa;
+import br.com.ellomei.domain.Comprovante;
+import br.com.ellomei.domain.Conta;
+import br.com.ellomei.domain.FormaPagamento;
+import br.com.ellomei.domain.Lancamento;
+import br.com.ellomei.domain.LancamentoFormDTO;
+import br.com.ellomei.domain.LancamentoGrupoDTO;
+import br.com.ellomei.domain.StatusLancamento;
+import br.com.ellomei.domain.TipoLancamento;
+import br.com.ellomei.domain.Usuario;
 import br.com.ellomei.repository.ComprovanteRepository;
 import br.com.ellomei.repository.LancamentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +24,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

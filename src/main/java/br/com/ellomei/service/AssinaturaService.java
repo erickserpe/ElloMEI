@@ -1,6 +1,10 @@
 package br.com.ellomei.service;
 
-import br.com.ellomei.domain.*;
+import br.com.ellomei.domain.Assinatura;
+import br.com.ellomei.domain.HistoricoPagamento;
+import br.com.ellomei.domain.PlanoAssinatura;
+import br.com.ellomei.domain.StatusAssinatura;
+import br.com.ellomei.domain.Usuario;
 import br.com.ellomei.event.PlanUpgradedEvent;
 import br.com.ellomei.event.SubscriptionCancelledEvent;
 import br.com.ellomei.repository.AssinaturaRepository;
